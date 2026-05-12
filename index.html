@@ -25965,7 +25965,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         const pill = document.getElementById('call-mini-pill');
         if (!pill || !S.pillPos) return;
         pill.style.left   = clamp(S.pillPos.x, 0, window.innerWidth  - (pill.offsetWidth  || 180)) + 'px';
-        pill.style.top    = clamp(S.pillPos.y, 0, window.innerHeight - (pill.offsetHeight || 50))  + 'px';
+        pill.style.top    = clamp(S.pillPos.y, 150, window.innerHeight - (pill.offsetHeight || 50))  + 'px';
         pill.style.right  = 'auto'; pill.style.bottom = 'auto';
     }
 
