@@ -12644,6 +12644,7 @@ body.unique-mode .input-area-wrapper {
         #advanced-functions-btn {
             transition: background 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.2s;
         }
+
     </style>
     <style id="css-live-preview-style"></style>
 
@@ -12938,6 +12939,86 @@ body.unique-mode .input-area-wrapper {
         color: var(--accent-color);
         background: rgba(var(--accent-color-rgb), 0.1);
     }
+/* ═══════════════════════════════════════════════════════
+   微信风格时间轴 ── 彻底粉碎原有分割线污染（完美色彩还原版）
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   微信风格时间轴 ── 强行全级粉碎空隙，实现绝对贴边
+   ═══════════════════════════════════════════════════════ */
+
+/* 1. 强行把所有外壳消息包裹框的内边距、外边距、高度全部降到最低，防止外围撑开 */
+.message-wrapper:has(.wx-clean-time-capsule) {
+    background: transparent !important;
+    border-left: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 8px 0 !important;   /* 仅保留上下两条时间胶囊之间的外边距 */
+    width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+/* 2. 强行把内部所有可能继承的消息主体容器的高宽和间距全部清空 */
+.message-wrapper:has(.wx-clean-time-capsule) .message-content,
+.message-wrapper:has(.wx-clean-time-capsule) .message-body {
+    background: transparent !important;
+    border: 0.1px solid #E5E5E5 !important; 
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+}
+
+/* 3. 强行重置你的专属时间容器：确保它自身没有任何多余的高宽撑场 */
+.wx-clean-time-capsule {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    line-height: 1 !important;
+}
+
+/* 4. 🎨 终极挤压：1:1 像素级复制截图，逼迫灰色框死死贴着文字边缘 */
+.wx-clean-time-capsule span {
+    /* 1:1 精准不透明色值 */
+    background-color: #F2F2F2 !important; 
+    border: 1px solid #EBEBEB !important;
+    color: #7D7D7D !important;                       
+    
+    /* 🛠️ 核心极限挤压大法 */
+    padding: 2px 3px !important;       /* 上下只给 3px，左右只给 6px，极度紧凑 */
+    line-height: 1 !important;          /* 强行剥离字体的上下隐形内行高 */
+    display: inline-flex !important;    /* 换成 inline-flex 能够实现最严丝合缝的紧包裹 */
+    align-items: center !important;
+    justify-content: center !important;
+    
+    font-size: 12px !important;         /* 缩小字号，让贴边感在视觉上更精致 */
+    border-radius: 2px !important;      /* 严密包裹的小圆角 */
+    margin: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    font-weight: normal !important;
+    user-select: none !important;
+    box-shadow: none !important;
+    letter-spacing: 0px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif !important;
+}
+
+/* 5. 自动无缝适配网页自带的暗色/夜间模式 */
+html[data-theme="dark"] .wx-clean-time-capsule span {
+    background-color: rgba(255, 255, 255, 0.09) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+
     </style>
 </head>
 <body>
@@ -18022,20 +18103,56 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
     const messageDate = new Date(msg.timestamp).toDateString();
     const prevDate = prevMsg ? new Date(prevMsg.timestamp).toDateString() : null;
 
-    if (messageDate !== prevDate) {
-        const dateDivider = document.createElement('div');
-        dateDivider.className = 'date-divider';
-        const today = new Date().toDateString();
-        const yesterday = new Date(Date.now() - 86400000).toDateString();
-        const displayDate = (messageDate === today) ? '今天' : (messageDate === yesterday) ? '昨天' : new Date(msg.timestamp).toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        dateDivider.innerHTML = `<span>${displayDate}</span>`;
-        fragment.appendChild(dateDivider);
-        lastSenderRef.current = null;
-    }
+          // 核心改动：跨天或超过5分钟时，生成一个纯净的微信时间轴
+        const isTimeGapExceeded = prevMsg && (msg.timestamp - prevMsg.timestamp > 300000);
+        
+        if (messageDate !== prevDate || isTimeGapExceeded) {
+            const dateDivider = document.createElement('div');
+            // 关键：给它加上 date-divider 和专用的标记类 is-timeline
+            // 核心：彻底改掉类名，变成一个完全干净、不受任何原有分割线CSS污染的新名字！
+dateDivider.className = 'wx-clean-time-capsule';
+
+            
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            
+            // 🌟 精准注入：在这里计算出微信风格的【早中晚/凌晨】时段前缀
+            const msgDateObj = new Date(msg.timestamp);
+            const hour = msgDateObj.getHours();
+            let timePeriod = "";
+            if (hour >= 0 && hour < 6) {
+                timePeriod = "朝 ";
+            } else if (hour >= 6 && hour < 12) {
+                timePeriod = "昼 ";
+            } else if (hour >= 12 && hour < 13) {
+                timePeriod = "夕方 ";
+            } else if (hour >= 13 && hour < 18) {
+                timePeriod = "夜 ";
+            } else if (hour >= 18 && hour < 24) {
+                timePeriod = "夜中 ";
+            }
+
+            // 获取具体的几点几分，例如 "05:21"
+            const timeStr = msgDateObj.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            let displayDate = "";
+            if (messageDate === today) {
+                // 如果是今天：当超过5分钟触发时，优雅显示如 "下午 15:30"；若跨天则显示 "今天"
+                displayDate = isTimeGapExceeded ? (timePeriod + timeStr) : '今天';
+            } else if (messageDate === yesterday) {
+                // 如果是昨天：优雅显示如 "昨天 下午 15:30"
+                displayDate = '昨天 ' + timePeriod + timeStr;
+            } else {
+                // 更早的日期：优雅显示如 "2026年5月18日 下午 15:30"
+                const dateStr = msgDateObj.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                displayDate = dateStr + ' ' + timePeriod + timeStr;
+            }
+            
+            dateDivider.innerHTML = `<span>${displayDate}</span>`;
+            fragment.appendChild(dateDivider);
+            lastSenderRef.current = null;
+        }
+
 
     if (msg.type === 'system') {
         const systemMsgDiv = document.createElement('div');
