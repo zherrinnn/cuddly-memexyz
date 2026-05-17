@@ -12988,18 +12988,24 @@ body.unique-mode .input-area-wrapper {
 /* 4. 🎨 终极挤压：1:1 像素级复制截图，逼迫灰色框死死贴着文字边缘 */
 .wx-clean-time-capsule span {
     /* 1:1 精准不透明色值 */
-    background-color: #F2F2F2 !important; 
-    border: 1px solid #EBEBEB !important;
-    color: #7D7D7D !important;                       
+    background-color: #F8F8F8 !important; 
+    border: 1px solid #E9E9E9 !important;
+    color: #6D6F6E !important;                       
     
-    /* 🛠️ 核心极限挤压大法 */
+    /* 🛠️ 单独控制微信时间胶囊的上下间距 */
+.wx-clean-time-capsule {
+    margin-top: 16px !important;    /* 距离上方消息气泡的间距 */
+    margin-bottom: 16px !important; /* 距离下方消息气泡的间距 */
+}
+
+/* 🛠️ 核心极限挤压大法 */
     padding: 2px 3px !important;       /* 上下只给 3px，左右只给 6px，极度紧凑 */
     line-height: 1 !important;          /* 强行剥离字体的上下隐形内行高 */
     display: inline-flex !important;    /* 换成 inline-flex 能够实现最严丝合缝的紧包裹 */
     align-items: center !important;
     justify-content: center !important;
     
-    font-size: 12px !important;         /* 缩小字号，让贴边感在视觉上更精致 */
+    font-size: 14px !important;         /* 缩小字号，让贴边感在视觉上更精致 */
     border-radius: 2px !important;      /* 严密包裹的小圆角 */
     margin: 0 !important;
     min-width: 0 !important;
