@@ -35445,9 +35445,16 @@ function openGalleryExternal() {
     </script>
 <script>
 (function() {
-    // 1. 核心控制与繁体化处理函数
+    // 获取当前时间 "小时:分钟" 的辅助函数
+    function getCurrentTimeStr() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+
+    // 1. 核心控制、繁体化与时间戳智能拼接函数
     function cleanAndTraditionalizeReceipts() {
-        // 抓取聊天容器里所有的消息行
         const container = document.getElementById('chat-container') || document.querySelector('.chat-container');
         if (!container) return;
         
@@ -35455,47 +35462,57 @@ function openGalleryExternal() {
         if (!allWrappers || allWrappers.length === 0) return;
 
         allWrappers.forEach((wrapper, index) => {
-            // 捕获所有命名可能性的已读/未读回执标签
+            // 捕获回执标签
             const receipts = wrapper.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
             if (receipts.length === 0) return;
 
-            // 条件 A: 是否是整条聊天记录的最后一条消息
+            // 是否是整条聊天记录的最后一条消息
             const isLastMessage = (index === allWrappers.length - 1);
 
             receipts.forEach(receipt => {
                 let txt = receipt.textContent.trim();
                 if (!txt) return;
 
-                // 条件 B: 判定原文本里有没有包含“未读”字样（支持简繁体）
+                // 判定原文本里有没有包含“未读”字样
                 const isUnread = txt.includes('未读') || txt.includes('未讀') || receipt.classList.contains('unread');
 
                 // 🌟 核心显示逻辑：只有【未读】或者【最后一条消息】，才显示出来
                 if (isLastMessage || isUnread) {
-                    receipt.style.setProperty('display', '', 'important'); // 保持显示
+                    receipt.style.setProperty('display', '', 'important'); 
                 } else {
-                    receipt.style.setProperty('display', 'none', 'important'); // 历史已读统统强行掐掉
+                    receipt.style.setProperty('display', 'none', 'important'); // 历史已读隐形
+                    return;
                 }
 
-                // 🌟 核心繁体化逻辑：直接在文本层改写，不怕任何开关重置
-                if (isUnread) {
-                    if (receipt.textContent !== '未讀') receipt.textContent = '未讀';
+                // 🌟 判定状态字
+                let statusText = isUnread ? '未讀' : '已讀';
+                
+                // 🌟 如果标签里还没被拼入过时间戳（不包含冒号），我们就动态生成当前时间拼进去
+                let targetContent = txt;
+                if (!txt.includes(':')) {
+                    const timeStr = getCurrentTimeStr();
+                    targetContent = `${timeStr} ${statusText}`;
                 } else {
-                    if (receipt.textContent !== '已讀') receipt.textContent = '已讀';
+                    // 如果已经有时间了，确保它是繁体
+                    targetContent = txt.replace('已读', '已讀').replace('未读', '未讀');
+                }
+
+                // 防止死循环重复赋值，只有在文字不一致时才写入
+                if (receipt.textContent !== targetContent) {
+                    receipt.textContent = targetContent;
                 }
             });
         });
     }
 
-    // 2. 启动底层动态监听（MutationObserver）
+    // 2. 启动底层动态监听
     function initWechatReceiptObserver() {
         const targetNode = document.getElementById('chat-container') || document.querySelector('.chat-container');
         if (!targetNode) {
-            // 如果一上来找不到聊天容器，每隔300毫秒死循环找一次，直到找到为止
             setTimeout(initWechatReceiptObserver, 300);
             return;
         }
 
-        // 配置监听器：只要子元素有增删、或者里面的属性和字变了，就立刻触发
         const observer = new MutationObserver(function(mutations) {
             cleanAndTraditionalizeReceipts();
         });
@@ -35506,11 +35523,10 @@ function openGalleryExternal() {
             characterData: true 
         });
 
-        // 页面刚加载时，先自己主动执行一次
+        // 页面刚加载时，主动执行一次
         cleanAndTraditionalizeReceipts();
     }
 
-    // 3. 稳妥挂载执行
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initWechatReceiptObserver);
     } else {
@@ -35518,5 +35534,6 @@ function openGalleryExternal() {
     }
 })();
 </script>
+
 
 </html>
