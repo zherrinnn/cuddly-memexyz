@@ -18584,49 +18584,6 @@ function renderMessages(preserveScroll = false) {
             container.scrollTop = container.scrollHeight;
         });
     }
-    // ═══════════════════════════════════════════════════════
-    // 🌟 微信已读状态净化与繁体化终极控制 (防止动态皮肤/发送新消息重置)
-    // ═══════════════════════════════════════════════════════
-    try {
-        // 1. 抓取该容器当前渲染出的所有消息外壳节点
-        const allWrappers = DOMElements.chatContainer.querySelectorAll('.message-wrapper');
-        
-        if (allWrappers && allWrappers.length > 0) {
-            allWrappers.forEach((wrapper, index) => {
-                // 2. 捕获当前这条消息里可能存在的所有已读文本节点
-                const receipts = wrapper.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
-                if (receipts.length === 0) return;
-
-                // 判断当前消息是否为全聊天记录的最后一句话
-                const isLastMessage = (index === allWrappers.length - 1);
-
-                receipts.forEach(receipt => {
-                    // 3. 获取原本的内容文本（无论是简体还是繁体）
-                    let txt = receipt.textContent.trim();
-                    if (!txt) return;
-
-                    // 判断该状态是已读还是未读
-                    const isUnread = txt.includes('未读') || txt.includes('未讀') || receipt.classList.contains('unread');
-
-                    // 4. 控制显示：只有【未读状态】或者【最后一条消息】，才允许显示出来
-                    if (isLastMessage || isUnread) {
-                        receipt.style.setProperty('display', '', 'important'); // 恢复可见
-                    } else {
-                        receipt.style.setProperty('display', 'none', 'important'); // 历史已读，统统强制隐藏
-                    }
-
-                    // 5. 繁体化转换：精准替换文字为繁体
-                    if (isUnread) {
-                        receipt.textContent = '未讀';
-                    } else {
-                        receipt.textContent = '已讀';
-                    }
-                });
-            });
-        }
-    } catch (e) {
-        console.warn("已读繁体化过滤异常:", e);
-    }
 
 }
 
@@ -35486,4 +35443,80 @@ function openGalleryExternal() {
     })();
 
     </script>
+<script>
+(function() {
+    // 1. 核心控制与繁体化处理函数
+    function cleanAndTraditionalizeReceipts() {
+        // 抓取聊天容器里所有的消息行
+        const container = document.getElementById('chat-container') || document.querySelector('.chat-container');
+        if (!container) return;
+        
+        const allWrappers = container.querySelectorAll('.message-wrapper');
+        if (!allWrappers || allWrappers.length === 0) return;
+
+        allWrappers.forEach((wrapper, index) => {
+            // 捕获所有命名可能性的已读/未读回执标签
+            const receipts = wrapper.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
+            if (receipts.length === 0) return;
+
+            // 条件 A: 是否是整条聊天记录的最后一条消息
+            const isLastMessage = (index === allWrappers.length - 1);
+
+            receipts.forEach(receipt => {
+                let txt = receipt.textContent.trim();
+                if (!txt) return;
+
+                // 条件 B: 判定原文本里有没有包含“未读”字样（支持简繁体）
+                const isUnread = txt.includes('未读') || txt.includes('未讀') || receipt.classList.contains('unread');
+
+                // 🌟 核心显示逻辑：只有【未读】或者【最后一条消息】，才显示出来
+                if (isLastMessage || isUnread) {
+                    receipt.style.setProperty('display', '', 'important'); // 保持显示
+                } else {
+                    receipt.style.setProperty('display', 'none', 'important'); // 历史已读统统强行掐掉
+                }
+
+                // 🌟 核心繁体化逻辑：直接在文本层改写，不怕任何开关重置
+                if (isUnread) {
+                    if (receipt.textContent !== '未讀') receipt.textContent = '未讀';
+                } else {
+                    if (receipt.textContent !== '已讀') receipt.textContent = '已讀';
+                }
+            });
+        });
+    }
+
+    // 2. 启动底层动态监听（MutationObserver）
+    function initWechatReceiptObserver() {
+        const targetNode = document.getElementById('chat-container') || document.querySelector('.chat-container');
+        if (!targetNode) {
+            // 如果一上来找不到聊天容器，每隔300毫秒死循环找一次，直到找到为止
+            setTimeout(initWechatReceiptObserver, 300);
+            return;
+        }
+
+        // 配置监听器：只要子元素有增删、或者里面的属性和字变了，就立刻触发
+        const observer = new MutationObserver(function(mutations) {
+            cleanAndTraditionalizeReceipts();
+        });
+
+        observer.observe(targetNode, { 
+            childList: true, 
+            subtree: true, 
+            characterData: true 
+        });
+
+        // 页面刚加载时，先自己主动执行一次
+        cleanAndTraditionalizeReceipts();
+    }
+
+    // 3. 稳妥挂载执行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initWechatReceiptObserver);
+    } else {
+        initWechatReceiptObserver();
+    }
+})();
+</script>
+
 </html>
