@@ -35440,5 +35440,25 @@ function openGalleryExternal() {
         // 统一覆盖 showNotification（忽略 type 参数，统一用暗色胶囊格式）
         window.showNotification = function(msg, type) { _showDarkPillToast(msg); };
     })();
+<style>
+/* 1. 默认把所有消息里的已读标签隐藏，解决满屏已读的问题 */
+.message-wrapper .read-receipt {
+    display: none !important;
+}
+
+/* 2. 强行把全聊天列表的【最后一条消息】里的已读标签显示出来 */
+.chat-container .message-wrapper:last-child .read-receipt,
+#chat-container .message-wrapper:last-child .read-receipt,
+.message-list .message-wrapper:last-child .read-receipt {
+    display: inline-block !important;
+}
+
+/* 3. 如果消息带有未读（或者包含 unread 类），也强行显示出来 */
+.message-wrapper .read-receipt.unread,
+.message-wrapper .unread .read-receipt {
+    display: inline-block !important;
+}
+</style>
+
     </script>
 </html>
