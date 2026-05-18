@@ -18126,16 +18126,16 @@ dateDivider.className = 'wx-clean-time-capsule';
             const msgDateObj = new Date(msg.timestamp);
             const hour = msgDateObj.getHours();
             let timePeriod = "";
-            if (hour >= 0 && hour < 6) {
-                timePeriod = "朝 ";
-            } else if (hour >= 6 && hour < 12) {
-                timePeriod = "昼 ";
-            } else if (hour >= 12 && hour < 13) {
-                timePeriod = "夕方 ";
-            } else if (hour >= 13 && hour < 18) {
-                timePeriod = "夜 ";
-            } else if (hour >= 18 && hour < 24) {
+            if (hour >= 0 && hour < 5) {
                 timePeriod = "夜中 ";
+            } else if (hour >= 5 && hour < 10) {
+                timePeriod = "朝 ";
+            } else if (hour >= 10 && hour < 17) {
+                timePeriod = "昼 ";
+            } else if (hour >= 17 && hour < 19) {
+                timePeriod = "夕方 ";
+            } else if (hour >= 19 && hour < 24) {
+                timePeriod = "夜 ";
             }
 
             // 获取具体的几点几分，例如 "05:21"
