@@ -18584,6 +18584,50 @@ function renderMessages(preserveScroll = false) {
             container.scrollTop = container.scrollHeight;
         });
     }
+    // ═══════════════════════════════════════════════════════
+    // 🌟 微信已读状态净化与繁体化终极控制 (防止动态皮肤/发送新消息重置)
+    // ═══════════════════════════════════════════════════════
+    try {
+        // 1. 抓取该容器当前渲染出的所有消息外壳节点
+        const allWrappers = DOMElements.chatContainer.querySelectorAll('.message-wrapper');
+        
+        if (allWrappers && allWrappers.length > 0) {
+            allWrappers.forEach((wrapper, index) => {
+                // 2. 捕获当前这条消息里可能存在的所有已读文本节点
+                const receipts = wrapper.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
+                if (receipts.length === 0) return;
+
+                // 判断当前消息是否为全聊天记录的最后一句话
+                const isLastMessage = (index === allWrappers.length - 1);
+
+                receipts.forEach(receipt => {
+                    // 3. 获取原本的内容文本（无论是简体还是繁体）
+                    let txt = receipt.textContent.trim();
+                    if (!txt) return;
+
+                    // 判断该状态是已读还是未读
+                    const isUnread = txt.includes('未读') || txt.includes('未讀') || receipt.classList.contains('unread');
+
+                    // 4. 控制显示：只有【未读状态】或者【最后一条消息】，才允许显示出来
+                    if (isLastMessage || isUnread) {
+                        receipt.style.setProperty('display', '', 'important'); // 恢复可见
+                    } else {
+                        receipt.style.setProperty('display', 'none', 'important'); // 历史已读，统统强制隐藏
+                    }
+
+                    // 5. 繁体化转换：精准替换文字为繁体
+                    if (isUnread) {
+                        receipt.textContent = '未讀';
+                    } else {
+                        receipt.textContent = '已讀';
+                    }
+                });
+            });
+        }
+    } catch (e) {
+        console.warn("已读繁体化过滤异常:", e);
+    }
+
 }
 
 const addMessage = (message) => {
@@ -35440,25 +35484,6 @@ function openGalleryExternal() {
         // 统一覆盖 showNotification（忽略 type 参数，统一用暗色胶囊格式）
         window.showNotification = function(msg, type) { _showDarkPillToast(msg); };
     })();
-<style>
-/* 1. 默认把所有消息里的已读标签隐藏，解决满屏已读的问题 */
-.message-wrapper .read-receipt {
-    display: none !important;
-}
-
-/* 2. 强行把全聊天列表的【最后一条消息】里的已读标签显示出来 */
-.chat-container .message-wrapper:last-child .read-receipt,
-#chat-container .message-wrapper:last-child .read-receipt,
-.message-list .message-wrapper:last-child .read-receipt {
-    display: inline-block !important;
-}
-
-/* 3. 如果消息带有未读（或者包含 unread 类），也强行显示出来 */
-.message-wrapper .read-receipt.unread,
-.message-wrapper .unread .read-receipt {
-    display: inline-block !important;
-}
-</style>
 
     </script>
 </html>
