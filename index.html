@@ -35462,7 +35462,7 @@ function openGalleryExternal() {
         const timeStr = getCurrentTimeStr();
 
         // ──────────────────────────────────────────────────
-        // 🌟 🚀 线路 A：对方消息 —— 暴力抓取并让新元素“向上吸附”
+        // 🌟 🚀 线路 A：对方消息 —— 父级空挡动态冲销算法
         // ──────────────────────────────────────────────────
         const allReceived = container.querySelectorAll('.message-received');
         
@@ -35473,20 +35473,25 @@ function openGalleryExternal() {
                 
                 // 在这个气泡的兄弟节点里找找看，有没有我们加过的新元素
                 let customEl = bubble.nextElementSibling;
-                const hasCustomEl = customEl && customEl.classList.contains('custom-new-time-label');
+                const hasCustomEl = customEl && customEl.classList.contains('custom-auto-flush-label');
 
                 if (!isLastReceived) {
-                    // 如果不是最后一条对方消息，历史的对方新时间标签全部强行隐形
+                    // 如果不是最后一条对方消息，历史的时间标签全部隐藏
                     if (hasCustomEl) customEl.style.setProperty('display', 'none', 'important');
                 } else {
-                    // 如果是最后一条对方消息，且还没被注入过新元素
+                    // 如果是最后一条对方消息，且还没被注入过
                     if (!hasCustomEl) {
                         customEl = document.createElement('div');
-                        // 🌟 赋予专属标识名，并同时塞入你的所有已读类名，全自动像素级拷贝已读的颜色、字体和形状
-                        customEl.className = 'custom-new-time-label read-receipt meta-read-receipt discord-read-receipt';
+                        // 🌟 赋予专属标识名，并同时塞入你的所有已读类名，100% 自动高仿已读样式
+                        customEl.className = 'custom-auto-flush-label read-receipt meta-read-receipt discord-read-receipt';
                         
-                        // 🌟 核心微调：使用负 margin-top (-10px) 强行让文字往上提，紧紧贴住粉色气泡！
-                        customEl.style.cssText = 'display: block !important; text-align: left !important; clear: both !important; float: left !important; margin-top: -10px !important; margin-left: 12px !important; font-size: 11px !important; position: relative !important; z-index: 10 !important;';
+                        /* 🚀 【终极全自动核心】：
+                           1. 开启相对定位 position: relative，拉起图层 z-index。
+                           2. 利用极其巧妙的 margin-top: -1.2em !important; 
+                              直接用字体行高比例去做负外边距！
+                           3. 这样一来，不管换什么皮肤导致外层盒子留了多大的空挡，
+                              它都会全自动向上产生一个动态对冲力，把空挡完全抹平，死死吸附在气泡边缘！ */
+                        customEl.style.cssText = 'display: block !important; text-align: left !important; clear: both !important; float: left !important; position: relative !important; z-index: 99 !important; margin-top: -1.2em !important; margin-left: 12px !important; font-size: 11px !important; line-height: 1.2 !important;';
                         
                         // 挂在对方气泡盒子的正下方
                         bubble.after(customEl);
@@ -35503,22 +35508,20 @@ function openGalleryExternal() {
         }
 
         // ──────────────────────────────────────────────────
-        // 🌟 🔒 线路 B：我方消息 —— 100% 还原你原本完美成功的稳定原版代码
+        // 🌟 🔒 线路 B：我方消息 —— 100% 你原本完美成功的稳定原版代码
         // ──────────────────────────────────────────────────
         const receipts = container.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
         if (receipts && receipts.length > 0) {
             receipts.forEach((receipt, index) => {
-                // 如果这个标签是我们刚刚给对方加的“全新标签”，跳过，不让我方逻辑碰它
-                if (receipt.classList.contains('custom-new-time-label')) return;
+                // 如果这个标签是我们刚刚给对方加的“全新标签”，跳过
+                if (receipt.classList.contains('custom-auto-flush-label')) return;
 
                 let txt = receipt.textContent.trim();
                 if (!txt) return;
 
-                // 判定这一条是不是全场的最后一条回执
                 const isLastReceipt = (index === receipts.length - 1);
                 const isUnread = txt.includes('未读') || txt.includes('未讀') || receipt.classList.contains('unread');
 
-                // 🌟 核心显示逻辑：只有【未读】或者【最后一条】，才显示出来
                 if (isLastReceipt || isUnread) {
                     receipt.style.setProperty('display', '', 'important'); 
                 } else {
@@ -35526,7 +35529,6 @@ function openGalleryExternal() {
                     return;
                 }
 
-                // 🌟 判定状态字
                 let statusText = isUnread ? '未讀' : '已讀';
                 
                 let targetContent = txt;
@@ -35552,12 +35554,11 @@ function openGalleryExternal() {
         }
 
         const observer = new MutationObserver(function(mutations) {
-            // 🛑 【至尊防火墙】如果是我们新元素引起的变化，直接拦截无视
             let shouldSkip = true;
             for (let mutation of mutations) {
                 if (mutation.target && 
-                    !mutation.target.classList?.contains('custom-new-time-label') &&
-                    !mutation.target.parentElement?.classList?.contains('custom-new-time-label')) {
+                    !mutation.target.classList?.contains('custom-auto-flush-label') &&
+                    !mutation.target.parentElement?.classList?.contains('custom-auto-flush-label')) {
                     shouldSkip = false;
                     break;
                 }
@@ -35583,6 +35584,7 @@ function openGalleryExternal() {
     }
 })();
 </script>
+
 
 
 
