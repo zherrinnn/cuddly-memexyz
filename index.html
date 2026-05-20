@@ -35453,67 +35453,117 @@ function openGalleryExternal() {
         return `${hours}:${minutes}`;
     }
 
-    // 1. 核心控制、繁体化与时间戳智能拼接函数
+    // 核心控制、繁体化与时间戳智能拼接函数
     function cleanAndTraditionalizeReceipts() {
-        const container = document.getElementById('chat-container') || document.querySelector('.chat-container');
+        // 1. 精准锁定说明书中的聊天消息滚动区域 id
+        const container = document.getElementById('chat-container');
         if (!container) return;
+
+        const timeStr = getCurrentTimeStr();
+
+        // ──────────────────────────────────────────────────
+        // 🌟 🚀 线路 A：对方消息 —— 暴力抓取并让新元素“向上吸附”
+        // ──────────────────────────────────────────────────
+        const allReceived = container.querySelectorAll('.message-received');
         
-        const allWrappers = container.querySelectorAll('.message-wrapper');
-        if (!allWrappers || allWrappers.length === 0) return;
+        if (allReceived && allReceived.length > 0) {
+            allReceived.forEach((bubble, index) => {
+                // 判定这一条是不是全场最后一条对方发出来的消息
+                const isLastReceived = (index === allReceived.length - 1);
+                
+                // 在这个气泡的兄弟节点里找找看，有没有我们加过的新元素
+                let customEl = bubble.nextElementSibling;
+                const hasCustomEl = customEl && customEl.classList.contains('custom-new-time-label');
 
-        allWrappers.forEach((wrapper, index) => {
-            // 捕获回执标签
-            const receipts = wrapper.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
-            if (receipts.length === 0) return;
+                if (!isLastReceived) {
+                    // 如果不是最后一条对方消息，历史的对方新时间标签全部强行隐形
+                    if (hasCustomEl) customEl.style.setProperty('display', 'none', 'important');
+                } else {
+                    // 如果是最后一条对方消息，且还没被注入过新元素
+                    if (!hasCustomEl) {
+                        customEl = document.createElement('div');
+                        // 🌟 赋予专属标识名，并同时塞入你的所有已读类名，全自动像素级拷贝已读的颜色、字体和形状
+                        customEl.className = 'custom-new-time-label read-receipt meta-read-receipt discord-read-receipt';
+                        
+                        // 🌟 核心微调：使用负 margin-top (-10px) 强行让文字往上提，紧紧贴住粉色气泡！
+                        customEl.style.cssText = 'display: block !important; text-align: left !important; clear: both !important; float: left !important; margin-top: -10px !important; margin-left: 12px !important; font-size: 11px !important; position: relative !important; z-index: 10 !important;';
+                        
+                        // 挂在对方气泡盒子的正下方
+                        bubble.after(customEl);
+                    }
 
-            // 是否是整条聊天记录的最后一条消息
-            const isLastMessage = (index === allWrappers.length - 1);
+                    // 确保显示，并写入繁体文字
+                    customEl.style.setProperty('display', 'block', 'important');
+                    const targetText = `發送於 ${timeStr}`;
+                    if (customEl.textContent !== targetText) {
+                        customEl.textContent = targetText;
+                    }
+                }
+            });
+        }
 
-            receipts.forEach(receipt => {
+        // ──────────────────────────────────────────────────
+        // 🌟 🔒 线路 B：我方消息 —— 100% 还原你原本完美成功的稳定原版代码
+        // ──────────────────────────────────────────────────
+        const receipts = container.querySelectorAll('.read-receipt, .meta-read-receipt, .discord-read-receipt');
+        if (receipts && receipts.length > 0) {
+            receipts.forEach((receipt, index) => {
+                // 如果这个标签是我们刚刚给对方加的“全新标签”，跳过，不让我方逻辑碰它
+                if (receipt.classList.contains('custom-new-time-label')) return;
+
                 let txt = receipt.textContent.trim();
                 if (!txt) return;
 
-                // 判定原文本里有没有包含“未读”字样
+                // 判定这一条是不是全场的最后一条回执
+                const isLastReceipt = (index === receipts.length - 1);
                 const isUnread = txt.includes('未读') || txt.includes('未讀') || receipt.classList.contains('unread');
 
-                // 🌟 核心显示逻辑：只有【未读】或者【最后一条消息】，才显示出来
-                if (isLastMessage || isUnread) {
+                // 🌟 核心显示逻辑：只有【未读】或者【最后一条】，才显示出来
+                if (isLastReceipt || isUnread) {
                     receipt.style.setProperty('display', '', 'important'); 
                 } else {
-                    receipt.style.setProperty('display', 'none', 'important'); // 历史已读隐形
+                    receipt.style.setProperty('display', 'none', 'important');
                     return;
                 }
 
                 // 🌟 判定状态字
                 let statusText = isUnread ? '未讀' : '已讀';
                 
-                // 🌟 如果标签里还没被拼入过时间戳（不包含冒号），我们就动态生成当前时间拼进去
                 let targetContent = txt;
                 if (!txt.includes(':')) {
-                    const timeStr = getCurrentTimeStr();
                     targetContent = `${timeStr} ${statusText}`;
                 } else {
-                    // 如果已经有时间了，确保它是繁体
                     targetContent = txt.replace('已读', '已讀').replace('未读', '未讀');
                 }
 
-                // 防止死循环重复赋值，只有在文字不一致时才写入
                 if (receipt.textContent !== targetContent) {
                     receipt.textContent = targetContent;
                 }
             });
-        });
+        }
     }
 
     // 2. 启动底层动态监听
     function initWechatReceiptObserver() {
-        const targetNode = document.getElementById('chat-container') || document.querySelector('.chat-container');
+        const targetNode = document.getElementById('chat-container');
         if (!targetNode) {
             setTimeout(initWechatReceiptObserver, 300);
             return;
         }
 
         const observer = new MutationObserver(function(mutations) {
+            // 🛑 【至尊防火墙】如果是我们新元素引起的变化，直接拦截无视
+            let shouldSkip = true;
+            for (let mutation of mutations) {
+                if (mutation.target && 
+                    !mutation.target.classList?.contains('custom-new-time-label') &&
+                    !mutation.target.parentElement?.classList?.contains('custom-new-time-label')) {
+                    shouldSkip = false;
+                    break;
+                }
+            }
+            if (shouldSkip) return;
+
             cleanAndTraditionalizeReceipts();
         });
 
@@ -35523,7 +35573,6 @@ function openGalleryExternal() {
             characterData: true 
         });
 
-        // 页面刚加载时，主动执行一次
         cleanAndTraditionalizeReceipts();
     }
 
@@ -35534,6 +35583,7 @@ function openGalleryExternal() {
     }
 })();
 </script>
+
 
 
 </html>
