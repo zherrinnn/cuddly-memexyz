@@ -12988,9 +12988,9 @@ body.unique-mode .input-area-wrapper {
 /* 4. 🎨 终极挤压：1:1 像素级复制截图，逼迫灰色框死死贴着文字边缘 */
 .wx-clean-time-capsule span {
     /* 1:1 精准不透明色值 */
-    background-color: #F8F8F8 !important; 
-    border: 1px solid #E9E9E9 !important;
-    color: #6D6F6E !important;                       
+    background-color: none !important; 
+    border: none !important;
+    color: #FFFFFF !important;                       
     
     /* 🛠️ 单独控制微信时间胶囊的上下间距 */
 .wx-clean-time-capsule {
@@ -35588,7 +35588,101 @@ function openGalleryExternal() {
 })();
 </script>
 
+<style id="discord-native-before-to-vertical-bar">
+/* 1. 彻底清除原本由边框（border）画出的折线样式 */
+.discord-reply-line-col::before,
+.discord-reply-line-col::after {
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+}
 
+/* ============================================================
+   2. 核心手术：Flex 布局基本配置
+============================================================ */
+.discord-reply-line-col {
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative !important;
+    height: 100% !important;
+    z-index: 10 !important;
+}
+
+/* ── 对方消息（左侧气泡）：正常顺序（字在左，线在右），深入气泡 2px ── */
+.message-wrapper.received.has-reply .discord-reply-line-col {
+    justify-content: flex-end !important; 
+    margin-left: 40px !important; /* 头像 36px + 深入 2px */
+}
+
+/* ── 我方消息（右侧气泡）：完全反转排布顺序（线在左），深入气泡 2px ── */
+.message-wrapper.sent.has-reply .discord-reply-line-col {
+    justify-content: flex-start !important; 
+    flex-direction: row-reverse !important; 
+    margin-right: 40px !important;          /* 负 margin 拽入气泡 2px */
+}
+
+/* ============================================================
+   3. 文字部分：对方保留 "Re:"，我方彻底隐藏
+============================================================ */
+/* 默认设置对方消息显示 "Re:" */
+.message-wrapper.received.has-reply .discord-reply-line-col::after {
+    content: 'Re:' !important;          
+    display: block !important;
+    position: static !important;        
+    margin-right: 8px !important; /* 字在竖线左边，给字加右边距 */
+    margin-left: 3px !important;
+    
+    /* 文字基本样式 */
+    color: #ffffff !important;          
+    font-size: 14px !important;         
+    font-weight: bold !important;       
+    white-space: nowrap !important;     
+}
+
+/* 我方消息：直接抹除 "Re:" 文字和间距 */
+.message-wrapper.sent.has-reply .discord-reply-line-col::after {
+    content: none !important;     /* 彻底不显示文字 */
+    display: none !important;
+}
+
+/* ============================================================
+   4. 纯白椭圆粗竖线：尺寸与占位控制
+============================================================ */
+.discord-reply-line-col::before {
+    content: '' !important;
+    display: block !important;
+    position: static !important;
+    box-sizing: border-box !important;
+    width: 6px !important;
+    height: 32px !important;
+    margin-left: 5px !important;
+    background: transparent !important;
+    border: 1.5px solid #ffffff !important;
+    border-radius: 1px !important;
+}      
+    
+    /* 顶开聊天气泡的距离 */
+    margin-right: 5px !important; 
+}
+
+/* ============================================================
+   5. 彻底隐藏引用内容中的双方昵称
+============================================================ */
+/* 同时覆盖常见插件版和原生版的昵称类名，确保两边都不显示 */
+.replied-message .reply-name,
+.replied-message .discord-reply-name,
+.replied-message .username {
+    display: none !important;
+}
+.message-wrapper.sent.has-reply .discord-reply-line-col {
+    width: fit-content !important;
+    flex: 0 0 auto !important;
+}
+.message-wrapper.sent.has-reply .replied-message {
+    width: fit-content !important;
+    margin-right: 5px !important;
+}
+</style>
 
 
 
