@@ -14243,6 +14243,16 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                         </div>
                     </div>
 
+                    <p class="cs-group-label" style="margin-top:14px;">表情包发送概率</p>
+                    <div class="cs-card" style="padding:14px;">
+                        <div class="font-size-control">
+                            <span class="font-size-label">概率:</span>
+                            <input type="range" min="0" max="100" step="5" value="20" class="font-size-slider" id="sticker-send-chance-slider">
+                            <span class="font-size-value" id="sticker-send-chance-value">20%</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-secondary);margin-top:7px;">对方每次回复后额外发送表情包的概率</div>
+                    </div>
+
                     <p class="cs-group-label" style="margin-top:4px;">通话功能</p>
                     <div class="cs-card">
                         <div class="setting-pill-row" id="call-feature-toggle-row">
@@ -14433,6 +14443,13 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
 
                 <!-- 头像面板 -->
                 <div class="cs-panel" id="cs-panel-avatar">
+                    <p class="cs-group-label">头像图片</p>
+                    <div class="cs-card">
+                        <button type="button" class="cs-name-btn" id="change-my-avatar-cs" style="width:100%;border:0;">
+                            <i class="fas fa-camera"></i>
+                            <span>更换我方头像</span>
+                        </button>
+                    </div>
                     <p class="cs-group-label">显示开关</p>
                     <div class="cs-card">
                         <div id="in-chat-avatar-toggle-cs" style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;" onclick="document.getElementById('in-chat-avatar-toggle-2') && document.getElementById('in-chat-avatar-toggle-2').click()">
@@ -17375,7 +17392,8 @@ autoSendInterval: 5,
         partnerPokeCustomSoundUrl: '',
         soundVolume: 0.15,
         bottomCollapseMode: false,
-        emojiMixEnabled: true
+        emojiMixEnabled: true,
+        stickerSendChance: 0.2
             };
         }
 
@@ -19103,7 +19121,10 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                         if (raw) disabledStickerItems = new Set(JSON.parse(raw));
                     } catch (e) {}
                     const enabledStickerPool = (stickerLibrary || []).filter(s => !disabledStickerItems.has(s));
-                    const shouldSendSticker = enabledStickerPool.length > 0 && Math.random() < 0.2;
+                    const stickerSendChance = Number.isFinite(Number(settings.stickerSendChance))
+                        ? Math.max(0, Math.min(1, Number(settings.stickerSendChance)))
+                        : 0.2;
+                    const shouldSendSticker = enabledStickerPool.length > 0 && Math.random() < stickerSendChance;
 
                     let finalText = replyText;
                     let separateEmoji = null;
@@ -35780,8 +35801,6 @@ function openGalleryExternal() {
         --border-color: var(--shell-line);
         --header-bg: transparent;
         --input-area-bg: transparent;
-        --message-received-bg: rgba(34,35,39,.88);
-        --message-received-text: #f6f4f1;
         --shadow: var(--shell-shadow);
         color-scheme: dark;
     }
@@ -35973,41 +35992,9 @@ function openGalleryExternal() {
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .message {
-        padding: 11px 15px !important;
-        border: 1px solid rgba(255,255,255,.055) !important;
-        border-radius: 20px !important;
-        font-size: clamp(15px, 1.5vw, 17px) !important;
-        line-height: 1.45 !important;
-        letter-spacing: -.01em;
-        box-shadow: 0 8px 22px rgba(0,0,0,.16) !important;
-        backdrop-filter: blur(18px) saturate(120%);
-        -webkit-backdrop-filter: blur(18px) saturate(120%);
-    }
-
-    .message-received {
-        background: var(--message-received-bg) !important;
-        color: var(--message-received-text) !important;
-        border-top-left-radius: 9px !important;
-    }
-
-    .message-sent {
-        background:
-            linear-gradient(145deg,
-                rgba(var(--accent-color-rgb),.95),
-                rgba(var(--accent-color-rgb),.72)) !important;
-        color: var(--message-sent-text) !important;
-        border-top-right-radius: 9px !important;
-    }
-
     .message-meta,
     .message-sender-name {
         color: rgba(255,255,255,.45) !important;
-    }
-
-    .message-avatar {
-        border-radius: 50% !important;
-        box-shadow: 0 6px 16px rgba(0,0,0,.22);
     }
 
     .typing-indicator {
@@ -36157,17 +36144,6 @@ function openGalleryExternal() {
         .chat-container {
             padding: 10px 14px 126px !important;
             mask-image: none;
-        }
-
-        .message-wrapper {
-            max-width: 87% !important;
-            margin-bottom: 5px !important;
-        }
-
-        .message {
-            padding: 10px 13px !important;
-            border-radius: 18px !important;
-            font-size: 16px !important;
         }
 
         .input-area-wrapper {
@@ -37047,7 +37023,6 @@ function openGalleryExternal() {
     }
 
     /* Unified translucent surfaces. */
-    .message,
     .input-area,
     .modal-content,
     .consolidated-menu,
@@ -37065,14 +37040,6 @@ function openGalleryExternal() {
         box-shadow: var(--ui-glass-shadow) !important;
         backdrop-filter: blur(24px) saturate(135%) !important;
         -webkit-backdrop-filter: blur(24px) saturate(135%) !important;
-    }
-    .message-received {
-        background: rgba(30,31,35,.52) !important;
-    }
-    .message-sent {
-        background: linear-gradient(145deg,
-            rgba(var(--accent-color-rgb),.62),
-            rgba(var(--accent-color-rgb),.42)) !important;
     }
     .input-area,
     .modal-content,
@@ -37678,41 +37645,6 @@ function openGalleryExternal() {
     }
     html[data-theme="dark"] .partner-name-line {
         background: rgba(28,29,33,.62) !important;
-    }
-
-    /* Reference chat geometry: no in-chat avatars, broad soft bubbles. */
-    .message-avatar { display: none !important; }
-    .message-wrapper,
-    .message-wrapper.sent,
-    .message-wrapper.received {
-        max-width: min(76%, 680px) !important;
-    }
-    .message-wrapper.received .message-content-wrapper,
-    .message-wrapper.sent .message-content-wrapper {
-        width: 100% !important;
-    }
-    .message {
-        border: 0 !important;
-        border-radius: 20px !important;
-        box-shadow: 0 4px 14px rgba(0,0,0,.08) !important;
-    }
-    .message-received { border-top-left-radius: 20px !important; }
-    .message-sent { border-top-right-radius: 20px !important; }
-    html[data-theme="light"][data-color-theme="black-white"] .message-received {
-        color: #1b1b1d !important;
-        background: rgba(239,239,243,.88) !important;
-    }
-    html[data-theme="light"][data-color-theme="black-white"] .message-sent {
-        color: #fff !important;
-        background: rgba(112,177,219,.9) !important;
-    }
-    html[data-theme="dark"][data-color-theme="black-white"] .message-received {
-        color: #f5f5f7 !important;
-        background: rgba(36,36,39,.9) !important;
-    }
-    html[data-theme="dark"][data-color-theme="black-white"] .message-sent {
-        color: #fff !important;
-        background: rgba(139,139,142,.92) !important;
     }
 
     /* Bottom bar: separate plus circle and composer pill, matching the reference. */
@@ -38412,11 +38344,7 @@ function openGalleryExternal() {
         background: rgba(255,255,255,.48) !important;
     }
 
-    /* Remove only the default shadows requested: timestamp, avatars and bubbles. */
-    .message,
-    .message:hover,
-    .message-sent,
-    .message-received,
+    /* Avatar and timestamp cleanup only; bubbles remain fully user-controlled. */
     .message-avatar,
     .message-avatar img,
     .avatar-container,
@@ -38491,26 +38419,6 @@ function openGalleryExternal() {
     }
     html[data-theme="light"] .message-input {
         border-right-color: rgba(255,255,255,.62) !important;
-    }
-    html body .message-wrapper .message,
-    html body .message-wrapper .message:hover,
-    html body .message-wrapper .message-sent,
-    html body .message-wrapper .message-received {
-        box-shadow: none !important;
-        text-shadow: none !important;
-        filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        background-image: none !important;
-        background-blend-mode: normal !important;
-        mix-blend-mode: normal !important;
-        opacity: 1 !important;
-    }
-    html body .message-wrapper .message-sent {
-        background-color: var(--message-sent-bg) !important;
-    }
-    html body .message-wrapper .message-received {
-        background-color: var(--message-received-bg) !important;
     }
 </style>
 
@@ -38714,7 +38622,6 @@ function openGalleryExternal() {
     .header-right > .user-info:first-child .status,
     #chat-plus-btn,
     #continue-btn,
-    .message,
     .typing-indicator,
     #call-mini-pill {
         border-width: .5px !important;
@@ -38732,10 +38639,6 @@ function openGalleryExternal() {
         padding: 5px 9px !important;
     }
 
-    html body .message-wrapper .message,
-    html body .message-wrapper .message:hover,
-    html body .message-wrapper .message-sent,
-    html body .message-wrapper .message-received,
     html body .message-avatar,
     html body .message-avatar img,
     html body .avatar-container,
@@ -38788,6 +38691,115 @@ function openGalleryExternal() {
     });
 })();
 </script>
+
+<style id="mobile-composer-alignment-and-custom-css-compat">
+    /* Mobile-safe floating composer, centered and aligned to the video button edge. */
+    .input-area-wrapper {
+        left: 22px !important;
+        right: 22px !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        transform: none !important;
+        bottom: max(12px, env(safe-area-inset-bottom)) !important;
+        box-sizing: border-box !important;
+    }
+    .input-area {
+        width: auto !important;
+        max-width: 100% !important;
+        height: 56px !important;
+        min-height: 56px !important;
+        padding: 5px !important;
+        border-radius: 28px !important;
+        box-sizing: border-box !important;
+    }
+    #chat-plus-btn,
+    #continue-btn,
+    .input-buttons {
+        width: 46px !important;
+        min-width: 46px !important;
+        height: 46px !important;
+        flex-basis: 46px !important;
+    }
+    .message-input {
+        height: 46px !important;
+        min-height: 46px !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+    @media (max-width: 540px) {
+        .input-area-wrapper {
+            left: 24px !important;
+            right: 24px !important;
+        }
+    }
+    @media (max-width: 420px) {
+        .input-area-wrapper {
+            left: 14px !important;
+            right: 14px !important;
+        }
+    }
+</style>
+
+<script id="avatar-entry-and-sticker-probability">
+(function () {
+    'use strict';
+
+    function initializeAddedSettings() {
+        if (typeof settings === 'undefined') return;
+
+        if (!Number.isFinite(Number(settings.stickerSendChance))) {
+            settings.stickerSendChance = 0.2;
+        }
+
+        var slider = document.getElementById('sticker-send-chance-slider');
+        var value = document.getElementById('sticker-send-chance-value');
+        if (slider && !slider.dataset.bound) {
+            slider.dataset.bound = '1';
+            slider.value = String(Math.round(Number(settings.stickerSendChance) * 100));
+            if (value) value.textContent = slider.value + '%';
+            slider.addEventListener('input', function () {
+                settings.stickerSendChance = Number(slider.value) / 100;
+                if (value) value.textContent = slider.value + '%';
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+        }
+
+        var avatarButton = document.getElementById('change-my-avatar-cs');
+        if (avatarButton && !avatarButton.dataset.bound) {
+            avatarButton.dataset.bound = '1';
+            avatarButton.addEventListener('click', function () {
+                var myAvatar = document.getElementById('my-avatar');
+                if (myAvatar) myAvatar.click();
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.setTimeout(initializeAddedSettings, 120);
+        window.setTimeout(initializeAddedSettings, 800);
+    });
+})();
+</script>
+
+<style id="equal-composer-side-buttons">
+    #chat-plus-btn,
+    #continue-btn,
+    html[data-theme="light"] #chat-plus-btn,
+    html[data-theme="light"] #continue-btn {
+        box-sizing: border-box !important;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        max-height: 46px !important;
+        flex: 0 0 46px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
+    }
+</style>
 
 
 
