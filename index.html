@@ -38824,8 +38824,47 @@ function openGalleryExternal() {
         margin-top: 0 !important;
         margin-bottom: 2px !important;
     }
+    .chat-container > .message-wrapper.sent:not(:has(.wx-clean-time-capsule)) {
+        margin-top: 2px !important;
+    }
     .chat-container > .message-wrapper.has-image-only:not(:has(.wx-clean-time-capsule)) {
         padding-bottom: 0 !important;
+    }
+</style>
+
+<style id="final-timestamp-type-cleanup">
+    /* Timestamp text is completely flat: no glow, drop shadow or filter. */
+    html body .timestamp,
+    html body .msg-timestamp,
+    html body .meta-timestamp,
+    html body .discord-inline-timestamp,
+    html body .inline-timestamp,
+    html body .message-time,
+    html body [class*="timestamp"],
+    html body .wx-clean-time-capsule,
+    html body .wx-clean-time-capsule span {
+        text-shadow: none !important;
+        box-shadow: none !important;
+        filter: none !important;
+        -webkit-filter: none !important;
+    }
+
+    /* Inline timestamps are one step larger. */
+    html body .discord-inline-timestamp,
+    html body .inline-timestamp,
+    html body .message-time,
+    html body .msg-timestamp {
+        font-size: calc(var(--font-size, 16px) * 0.625) !important;
+    }
+
+    /* Bubble-under timestamp keeps its original size. */
+    html body .meta-timestamp {
+        font-size: calc(var(--font-size, 16px) * 0.5625) !important;
+    }
+
+    /* Center timeline timestamp was 12px: now 13px. */
+    html body .wx-clean-time-capsule span {
+        font-size: 13px !important;
     }
 </style>
 
