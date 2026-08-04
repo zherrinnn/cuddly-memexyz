@@ -18183,6 +18183,17 @@ dateDivider.className = 'wx-clean-time-capsule';
         }
 
 
+    if (msg.type === 'status-change') {
+        const statusChangeDiv = document.createElement('div');
+        statusChangeDiv.className = 'wx-clean-time-capsule status-change-timeline';
+        const statusChangeText = document.createElement('span');
+        statusChangeText.textContent = msg.text;
+        statusChangeDiv.appendChild(statusChangeText);
+        fragment.appendChild(statusChangeDiv);
+        lastSenderRef.current = 'system';
+        return fragment;
+    }
+
     if (msg.type === 'system') {
         const systemMsgDiv = document.createElement('div');
         systemMsgDiv.className = 'system-message';
@@ -19691,6 +19702,14 @@ function showModal(modalElement, focusElement = null) {
             settings.lastStatusChange = Date.now();
             settings.nextStatusChange = 1 + Math.random() * 7;
             DOMElements.partner.status.textContent = newStatus;
+            messages.push({
+                id: Date.now(),
+                type: 'status-change',
+                text: (settings.partnerName || '对方') + '更改状态为：' + newStatus,
+                timestamp: new Date(),
+                sender: null
+            });
+            if (typeof renderMessages === 'function') renderMessages(true);
             throttledSaveData();
         };
 
@@ -38218,6 +38237,554 @@ function openGalleryExternal() {
     document.addEventListener('DOMContentLoaded', function () {
         window.setTimeout(cleanupRequestedFeatures, 60);
         window.setTimeout(cleanupRequestedFeatures, 700);
+    });
+})();
+</script>
+
+<style id="index5-main-ui-refinement">
+    /* Main-screen glass only: color changes, button geometry and behavior stay intact. */
+    #dc-mobile-open-btn,
+    .header-actions #call-toolbar-btn,
+    .partner-name-line,
+    .header-right > .user-info:first-child .status,
+    #chat-plus-btn,
+    .message-input,
+    .input-buttons,
+    .typing-indicator,
+    .consolidated-menu,
+    #call-mini-pill {
+        background-color: rgba(255,255,255,.16) !important;
+        border-color: rgba(255,255,255,.24) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.13), 0 7px 22px rgba(0,0,0,.08) !important;
+    }
+    html[data-theme="light"] #dc-mobile-open-btn,
+    html[data-theme="light"] .header-actions #call-toolbar-btn,
+    html[data-theme="light"] .partner-name-line,
+    html[data-theme="light"] .header-right > .user-info:first-child .status,
+    html[data-theme="light"] #chat-plus-btn,
+    html[data-theme="light"] .message-input,
+    html[data-theme="light"] .input-buttons,
+    html[data-theme="light"] .typing-indicator,
+    html[data-theme="light"] .consolidated-menu,
+    html[data-theme="light"] #call-mini-pill {
+        background-color: rgba(255,255,255,.46) !important;
+        border-color: rgba(255,255,255,.62) !important;
+    }
+
+    /* Ten pixels narrower in total, still centered by equal side insets. */
+    .input-area-wrapper {
+        left: 29px !important;
+        right: 29px !important;
+    }
+    @media (max-width: 390px) {
+        .input-area-wrapper {
+            left: 20px !important;
+            right: 20px !important;
+        }
+    }
+
+    /* The nickname capsule grows equally from the avatar center. */
+    .header-right > .user-info:first-child {
+        overflow: visible !important;
+    }
+    .partner-name-line {
+        align-self: center !important;
+        width: max-content !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        padding-left: 13px !important;
+        padding-right: 9px !important;
+        gap: 2px !important;
+        overflow: visible !important;
+    }
+    .partner-name-line .username,
+    #partner-name {
+        display: inline-block !important;
+        width: max-content !important;
+        min-width: max-content !important;
+        max-width: none !important;
+        flex: 0 0 auto !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: nowrap !important;
+    }
+    .partner-status-arrow {
+        width: 10px !important;
+        min-width: 10px !important;
+        flex: 0 0 10px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    .partner-status-arrow::before {
+        left: 0 !important;
+    }
+</style>
+
+<script id="index5-keepalive-visibility">
+(function () {
+    'use strict';
+
+    function moveKeepaliveToDefaultPanel() {
+        var toggle = document.getElementById('keepalive-audio-toggle');
+        var target = document.getElementById('cs-panel-display');
+        if (!toggle || !target) return;
+        var card = toggle.closest('.cs-card');
+        var label = card && card.previousElementSibling;
+        if (!card || card.dataset.movedToDisplay === '1') return;
+        card.dataset.movedToDisplay = '1';
+        if (label && label.classList.contains('cs-group-label')) {
+            label.textContent = '后台保活音频';
+            target.appendChild(label);
+        }
+        target.appendChild(card);
+    }
+
+    function suppressSystemMediaUi() {
+        try {
+            if (navigator.audioSession) navigator.audioSession.type = 'ambient';
+        } catch (e) {}
+        try {
+            if (!navigator.mediaSession) return;
+            navigator.mediaSession.metadata = null;
+            try { navigator.mediaSession.playbackState = 'none'; } catch (e) {}
+            ['play','pause','stop','seekbackward','seekforward','seekto','previoustrack','nexttrack']
+                .forEach(function (action) {
+                    try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
+                });
+        } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.setTimeout(moveKeepaliveToDefaultPanel, 80);
+        window.setTimeout(moveKeepaliveToDefaultPanel, 700);
+        suppressSystemMediaUi();
+    });
+    document.addEventListener('visibilitychange', suppressSystemMediaUi);
+    window.setInterval(suppressSystemMediaUi, 5000);
+})();
+</script>
+
+<style id="continue-circle-and-flat-chat-surfaces">
+    /* The old square was the whole input-buttons wrapper, not the ellipsis button. */
+    .message-input {
+        margin-right: -52px !important;
+        padding-right: 64px !important;
+        border-right: 1px solid rgba(255,255,255,.24) !important;
+        border-radius: 26px !important;
+    }
+    .input-buttons,
+    html[data-theme="light"] .input-buttons {
+        width: 52px !important;
+        min-width: 52px !important;
+        height: 52px !important;
+        flex: 0 0 52px !important;
+        padding: 6px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    #continue-btn {
+        width: 40px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        flex: 0 0 40px !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 1px solid rgba(255,255,255,.24) !important;
+        border-radius: 50% !important;
+        color: rgba(255,255,255,.76) !important;
+        background: rgba(255,255,255,.18) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.16) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(135%) !important;
+        backdrop-filter: blur(18px) saturate(135%) !important;
+    }
+    html[data-theme="light"] #continue-btn {
+        color: rgba(0,0,0,.48) !important;
+        border-color: rgba(255,255,255,.64) !important;
+        background: rgba(255,255,255,.48) !important;
+    }
+
+    /* Remove only the default shadows requested: timestamp, avatars and bubbles. */
+    .message,
+    .message:hover,
+    .message-sent,
+    .message-received,
+    .message-avatar,
+    .message-avatar img,
+    .avatar-container,
+    .avatar,
+    .timestamp,
+    .msg-timestamp,
+    .meta-timestamp,
+    .discord-inline-timestamp,
+    .inline-timestamp,
+    .message-time,
+    [class*="timestamp"] {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+    }
+</style>
+
+<style id="restore-composer-button-position">
+    /* Restore the original composer geometry; only its total centered width is reduced. */
+    .input-area-wrapper {
+        left: 29px !important;
+        right: 29px !important;
+    }
+    .message-input {
+        margin: 0 -11px 0 0 !important;
+        padding: 13px 18px !important;
+        border-right: 0 !important;
+        border-radius: 26px 0 0 26px !important;
+    }
+    .input-buttons,
+    html[data-theme="light"] .input-buttons {
+        width: auto !important;
+        min-width: 0 !important;
+        height: 52px !important;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 5px 6px 5px 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html[data-theme="light"] .input-buttons {
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    #continue-btn {
+        margin: 0 !important;
+        align-self: center !important;
+    }
+    @media (max-width: 390px) {
+        .input-area-wrapper {
+            left: 20px !important;
+            right: 20px !important;
+        }
+    }
+</style>
+
+<style id="restore-input-rounding-remove-bubble-darkening">
+    .message-input {
+        margin: 0 4px 0 0 !important;
+        border-right: 1px solid rgba(255,255,255,.24) !important;
+        border-radius: 26px !important;
+    }
+    html[data-theme="light"] .message-input {
+        border-right-color: rgba(255,255,255,.62) !important;
+    }
+    html body .message-wrapper .message,
+    html body .message-wrapper .message:hover,
+    html body .message-wrapper .message-sent,
+    html body .message-wrapper .message-received {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background-image: none !important;
+        background-blend-mode: normal !important;
+        mix-blend-mode: normal !important;
+        opacity: 1 !important;
+    }
+    html body .message-wrapper .message-sent {
+        background-color: var(--message-sent-bg) !important;
+    }
+    html body .message-wrapper .message-received {
+        background-color: var(--message-received-bg) !important;
+    }
+</style>
+
+<style id="restore-index5-original-composer-layout">
+    /* Exact index-5 composer layout; the current circular button skin is untouched. */
+    .input-area-wrapper {
+        left: 24px !important;
+        right: 24px !important;
+        bottom: max(18px, env(safe-area-inset-bottom)) !important;
+    }
+    .input-area {
+        min-height: 54px !important;
+        padding: 0 !important;
+        gap: 10px !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .message-input {
+        height: 52px !important;
+        min-height: 52px !important;
+        margin: 0 -11px 0 0 !important;
+        padding: 13px 18px !important;
+        border: 1px solid rgba(255,255,255,.15) !important;
+        border-right: 0 !important;
+        border-radius: 26px 0 0 26px !important;
+    }
+    .input-buttons,
+    html[data-theme="light"] .input-buttons {
+        width: auto !important;
+        min-width: 0 !important;
+        height: 52px !important;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 5px 6px 5px 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        border: 1px solid rgba(255,255,255,.15) !important;
+        border-left: 0 !important;
+        border-radius: 0 26px 26px 0 !important;
+        background: rgba(27,28,32,.4) !important;
+        box-shadow: 8px 8px 24px rgba(0,0,0,.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+        backdrop-filter: blur(20px) saturate(130%) !important;
+    }
+    html[data-theme="light"] .input-buttons {
+        color: #111 !important;
+        border-color: rgba(0,0,0,.055) !important;
+        background: rgba(255,255,255,.56) !important;
+    }
+    @media (max-width: 540px) {
+        .input-area-wrapper {
+            left: 24px !important;
+            right: 24px !important;
+        }
+    }
+    @media (max-width: 390px) {
+        .input-area-wrapper {
+            left: 15px !important;
+            right: 15px !important;
+        }
+    }
+</style>
+
+<style id="reference-single-pill-composer">
+    /* One straight, unified pill like the supplied reference. */
+    .input-area-wrapper {
+        left: 22px !important;
+        right: 22px !important;
+        bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    }
+    .input-area {
+        width: 100% !important;
+        min-height: 64px !important;
+        height: 64px !important;
+        padding: 6px !important;
+        gap: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        border: 1px solid rgba(255,255,255,.18) !important;
+        border-radius: 32px !important;
+        background: rgba(255,255,255,.14) !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: blur(24px) saturate(130%) !important;
+        backdrop-filter: blur(24px) saturate(130%) !important;
+    }
+    .message-input,
+    html[data-theme="light"] .message-input {
+        height: 52px !important;
+        min-height: 52px !important;
+        flex: 1 1 auto !important;
+        margin: 0 !important;
+        padding: 13px 8px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .input-buttons,
+    html[data-theme="light"] .input-buttons {
+        width: 52px !important;
+        min-width: 52px !important;
+        height: 52px !important;
+        flex: 0 0 52px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    #continue-btn,
+    html[data-theme="light"] #continue-btn {
+        width: 52px !important;
+        min-width: 52px !important;
+        height: 52px !important;
+        flex: 0 0 52px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 1px solid rgba(255,255,255,.18) !important;
+        border-radius: 50% !important;
+        color: currentColor !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    #continue-btn::before,
+    #continue-btn::after,
+    #continue-btn .ripple-wave {
+        content: none !important;
+        display: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    #chat-plus-btn {
+        width: 52px !important;
+        height: 52px !important;
+        flex: 0 0 52px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+    html[data-theme="light"] .input-area {
+        border-color: rgba(255,255,255,.62) !important;
+        background: rgba(255,255,255,.42) !important;
+    }
+    @media (max-width: 390px) {
+        .input-area-wrapper {
+            left: 15px !important;
+            right: 15px !important;
+        }
+    }
+</style>
+
+<style id="final-composer-glass-polish">
+    .input-area {
+        background: rgba(255,255,255,.16) !important;
+        border-color: rgba(255,255,255,.28) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.20), 0 10px 30px rgba(0,0,0,.12) !important;
+        -webkit-backdrop-filter: blur(34px) saturate(165%) !important;
+        backdrop-filter: blur(34px) saturate(165%) !important;
+    }
+    #continue-btn,
+    #continue-btn i,
+    html[data-theme="light"] #continue-btn,
+    html[data-theme="light"] #continue-btn i {
+        color: #fff !important;
+        opacity: 1 !important;
+    }
+    html[data-theme="light"] .input-area {
+        background: rgba(255,255,255,.48) !important;
+        border-color: rgba(255,255,255,.72) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.72), 0 10px 30px rgba(30,35,45,.09) !important;
+    }
+</style>
+
+<style id="separated-plus-thin-ui-borders">
+    /* Only the requested refinements; the previous unified composer remains unchanged. */
+    #dc-mobile-open-btn,
+    .header-actions #call-toolbar-btn,
+    .partner-name-line,
+    .header-right > .user-info:first-child .status,
+    #chat-plus-btn,
+    #continue-btn,
+    .message,
+    .typing-indicator,
+    #call-mini-pill {
+        border-width: .5px !important;
+    }
+    .input-area {
+        border-width: .5px !important;
+    }
+    .header-right > .user-info:first-child .status {
+        top: 117px !important;
+    }
+</style>
+
+<style id="compact-status-and-remove-chat-shadows">
+    .header-right > .user-info:first-child .status {
+        padding: 5px 9px !important;
+    }
+
+    html body .message-wrapper .message,
+    html body .message-wrapper .message:hover,
+    html body .message-wrapper .message-sent,
+    html body .message-wrapper .message-received,
+    html body .message-avatar,
+    html body .message-avatar img,
+    html body .avatar-container,
+    html body .avatar,
+    html body .timestamp,
+    html body .msg-timestamp,
+    html body .meta-timestamp,
+    html body .discord-inline-timestamp,
+    html body .inline-timestamp,
+    html body .message-time,
+    html body [class*="timestamp"] {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+    }
+</style>
+
+<style id="remove-anniversary-and-style-status-change">
+    #anniversary-function,
+    #anniversary-modal,
+    #anniversary-animation,
+    [data-invoke="anniversary-function"] {
+        display: none !important;
+    }
+    .status-change-timeline,
+    .status-change-timeline span {
+        color: #fff !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+</style>
+
+<script id="remove-anniversary-feature">
+(function () {
+    'use strict';
+    function removeAnniversaryUi() {
+        document.querySelectorAll('#anniversary-function, [data-invoke="anniversary-function"]').forEach(function (node) {
+            node.remove();
+        });
+        ['anniversary-modal', 'anniversary-animation'].forEach(function (id) {
+            var node = document.getElementById(id);
+            if (node) node.remove();
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        window.setTimeout(removeAnniversaryUi, 100);
+        window.setTimeout(removeAnniversaryUi, 800);
     });
 })();
 </script>
