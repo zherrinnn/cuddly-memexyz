@@ -38801,6 +38801,34 @@ function openGalleryExternal() {
     }
 </style>
 
+<style id="final-mobile-composer-centering-and-message-gap">
+    /* Use the viewport as the single positioning reference so the fixed composer
+       cannot inherit a shifted/oversized width from the chat layout. */
+    .input-area-wrapper {
+        left: 50% !important;
+        right: auto !important;
+        width: calc(100vw - 48px) !important;
+        max-width: 520px !important;
+        margin: 0 !important;
+        transform: translateX(-50%) !important;
+        box-sizing: border-box !important;
+    }
+    .input-area {
+        width: 100% !important;
+        max-width: none !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Chat bubbles keep their native appearance; only vertical rhythm changes. */
+    .chat-container > .message-wrapper:not(:has(.wx-clean-time-capsule)) {
+        margin-top: 0 !important;
+        margin-bottom: 2px !important;
+    }
+    .chat-container > .message-wrapper.has-image-only:not(:has(.wx-clean-time-capsule)) {
+        padding-bottom: 0 !important;
+    }
+</style>
+
 
 
 </html>
