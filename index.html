@@ -38868,6 +38868,56 @@ function openGalleryExternal() {
     }
 </style>
 
+<script id="restore-combo-picker-entry">
+(function () {
+    'use strict';
+
+    function ensureComboPickerReady(openAfterInit) {
+        var comboButton = document.getElementById('combo-btn');
+        var picker = document.getElementById('user-sticker-picker');
+        var content = document.getElementById('combo-content-area');
+        if (!comboButton || !picker || !content) return;
+
+        /* setupEventListeners can stop before this initializer when an optional
+           removed module throws. Re-running this initializer is safe because it
+           already guards itself with data-initialized. */
+        try {
+            if (typeof initComboMenu === 'function') initComboMenu();
+        } catch (error) {
+            console.warn('表情与拍一拍初始化恢复失败:', error);
+        }
+
+        if (!openAfterInit) return;
+
+        /* Let the original picker own all rendering/sending behavior. */
+        if (!picker.classList.contains('active')) comboButton.click();
+
+        /* If another legacy listener only toggled the shell, explicitly select
+           the first tab so the original renderer fills the content area. */
+        window.setTimeout(function () {
+            if (!picker.classList.contains('active')) picker.classList.add('active');
+            if (!content.children.length && !content.textContent.trim()) {
+                var firstTab = picker.querySelector('.combo-tab-btn[data-tab="my-sticker"]');
+                if (firstTab) firstTab.click();
+            }
+        }, 0);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.setTimeout(function () { ensureComboPickerReady(false); }, 120);
+        window.setTimeout(function () { ensureComboPickerReady(false); }, 900);
+    });
+
+    /* The visible entry is created later by the consolidated + menu, so use one
+       delegated recovery listener for both that entry and the old collapsed one. */
+    document.addEventListener('click', function (event) {
+        var action = event.target.closest('[data-invoke="combo-btn"], #combo-btn-extra');
+        if (!action) return;
+        window.setTimeout(function () { ensureComboPickerReady(true); }, 0);
+    }, true);
+})();
+</script>
+
 
 
 </html>
