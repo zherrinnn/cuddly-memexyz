@@ -39864,8 +39864,8 @@ window.addEventListener('load', function() {
 </script>
 
 <style id="fully-opaque-header-and-original-dialogs">
-    /* Header presets are solid colors with no wallpaper transmission. */
-    .header {
+    /* The compact preset is solid; the expanded header keeps its wallpaper glass. */
+    body.compact-header-mode .header {
         background: var(--header-preset-bg, #e2e2e4) !important;
         background-color: var(--header-preset-bg, #e2e2e4) !important;
         background-image: none !important;
@@ -39873,17 +39873,17 @@ window.addEventListener('load', function() {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
-    .header::before,
-    .header::after {
+    body.compact-header-mode .header::before,
+    body.compact-header-mode .header::after {
         display: none !important;
         content: none !important;
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
-    .header #dc-mobile-open-btn,
-    .header .header-actions #call-toolbar-btn,
-    .header .partner-name-line,
-    .header .header-right > .user-info:first-child .status {
+    body.compact-header-mode .header #dc-mobile-open-btn,
+    body.compact-header-mode .header .header-actions #call-toolbar-btn,
+    body.compact-header-mode .header .partner-name-line,
+    body.compact-header-mode .header .header-right > .user-info:first-child .status {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
@@ -41590,6 +41590,56 @@ window.addEventListener('load', function() {
     });
 })();
 </script>
+
+<style id="final-expanded-header-progressive-glass">
+    /* Expanded header overlays the wallpaper. It paints no solid rectangle:
+       only two masked backdrop-blur layers fade naturally into the chat. */
+    #dc-main { position: relative !important; }
+    body:not(.compact-header-mode) .header {
+        position: absolute !important;
+        z-index: 40 !important;
+        inset: 0 0 auto 0 !important;
+        isolation: isolate !important;
+        overflow: visible !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body:not(.compact-header-mode) .header::before,
+    body:not(.compact-header-mode) .header::after {
+        content: "" !important;
+        display: block !important;
+        position: absolute !important;
+        inset: 0 0 auto 0 !important;
+        pointer-events: none !important;
+        background: rgba(255,255,255,.001) !important;
+        background-image: none !important;
+    }
+    body:not(.compact-header-mode) .header::before {
+        z-index: -2 !important;
+        height: 88px !important;
+        -webkit-backdrop-filter: blur(15px) saturate(122%) !important;
+        backdrop-filter: blur(15px) saturate(122%) !important;
+        -webkit-mask-image: linear-gradient(to bottom,rgba(0,0,0,.88) 0%,rgba(0,0,0,.68) 18%,rgba(0,0,0,.43) 38%,rgba(0,0,0,.22) 58%,rgba(0,0,0,.08) 76%,rgba(0,0,0,.018) 90%,transparent 100%) !important;
+        mask-image: linear-gradient(to bottom,rgba(0,0,0,.88) 0%,rgba(0,0,0,.68) 18%,rgba(0,0,0,.43) 38%,rgba(0,0,0,.22) 58%,rgba(0,0,0,.08) 76%,rgba(0,0,0,.018) 90%,transparent 100%) !important;
+    }
+    body:not(.compact-header-mode) .header::after {
+        z-index: -1 !important;
+        height: 104px !important;
+        -webkit-backdrop-filter: blur(3px) saturate(108%) !important;
+        backdrop-filter: blur(3px) saturate(108%) !important;
+        -webkit-mask-image: linear-gradient(to bottom,rgba(0,0,0,.34) 0%,rgba(0,0,0,.24) 24%,rgba(0,0,0,.14) 48%,rgba(0,0,0,.065) 68%,rgba(0,0,0,.018) 86%,transparent 100%) !important;
+        mask-image: linear-gradient(to bottom,rgba(0,0,0,.34) 0%,rgba(0,0,0,.24) 24%,rgba(0,0,0,.14) 48%,rgba(0,0,0,.065) 68%,rgba(0,0,0,.018) 86%,transparent 100%) !important;
+    }
+    body:not(.compact-header-mode) .main-chat-area {
+        height: 100dvh !important;
+        padding-top: 0 !important;
+    }
+</style>
 
 
 
