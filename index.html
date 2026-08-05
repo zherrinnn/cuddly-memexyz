@@ -19722,15 +19722,19 @@ function showModal(modalElement, focusElement = null) {
                 settings.nextStatusChange = 1 + Math.random() * 7;
             }
             DOMElements.partner.status.textContent = `${settings.partnerStatus || '在线'} · ${settings.partnerActivity || '忙碌'}`;
-            messages.push({
+            const statusMessage = {
                 id: now + (isActivity ? 1 : 0),
                 type: 'status-change',
                 text: `${settings.partnerName || '对方'}更改状态为：${settings.partnerStatus || '在线'} · ${settings.partnerActivity || '忙碌'}`,
                 timestamp: new Date(now),
                 sender: null
-            });
-            if (typeof renderMessages === 'function') renderMessages(true);
-            throttledSaveData();
+            };
+            if (typeof addMessage === 'function') addMessage(statusMessage);
+            else {
+                messages.push(statusMessage);
+                if (typeof renderMessages === 'function') renderMessages(false);
+                throttledSaveData();
+            }
         };
 
         const checkStatusChange = () => {
@@ -41771,6 +41775,78 @@ window.addEventListener('load', function() {
         z-index: 20 !important;
     }
 </style>
+
+<style id="mobile-compact-header-solid-safe-area-fix">
+    /* iPhone Safari/PWA: paint the compact header and its top safe area as one solid surface. */
+    body.compact-header-mode,
+    body.compact-header-mode #dc-layout,
+    body.compact-header-mode #dc-main {
+        --mobile-compact-solid: var(--compact-header-bg, #e2e2e4);
+    }
+    body.compact-header-mode .header {
+        background: var(--mobile-compact-solid) !important;
+        background-color: var(--mobile-compact-solid) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        isolation: isolate !important;
+    }
+    @media (max-width: 768px) {
+        body.compact-header-mode {
+            background-color: var(--mobile-compact-solid) !important;
+        }
+        body.compact-header-mode .header {
+            box-sizing: content-box !important;
+            height: 52px !important;
+            min-height: 52px !important;
+            padding: env(safe-area-inset-top, 0px) 8px 2px !important;
+        }
+        body.compact-header-mode .header-inner,
+        body.compact-header-mode .header-right {
+            height: 52px !important;
+            min-height: 52px !important;
+        }
+        body.compact-header-mode #dc-main::after {
+            content: "";
+            position: fixed;
+            z-index: 39;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: env(safe-area-inset-top, 0px);
+            pointer-events: none;
+            background: var(--mobile-compact-solid) !important;
+        }
+        body.compact-header-mode .main-chat-area {
+            height: calc(100dvh - 54px - env(safe-area-inset-top, 0px)) !important;
+        }
+    }
+</style>
+
+<script id="mobile-compact-header-theme-color-sync">
+(function () {
+    'use strict';
+    function syncCompactSafeAreaColor() {
+        if (!document.body || !document.body.classList.contains('compact-header-mode')) return;
+        var header = document.querySelector('.header');
+        var color = header ? getComputedStyle(header).backgroundColor : '';
+        if (!color || color === 'rgba(0, 0, 0, 0)' || color === 'transparent') {
+            color = getComputedStyle(document.documentElement).getPropertyValue('--compact-header-bg').trim() || '#e2e2e4';
+        }
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', color);
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        syncCompactSafeAreaColor();
+        new MutationObserver(syncCompactSafeAreaColor).observe(document.body, { attributes:true, attributeFilter:['class','style'] });
+        new MutationObserver(syncCompactSafeAreaColor).observe(document.documentElement, { attributes:true, attributeFilter:['class','style','data-theme'] });
+        document.addEventListener('input', function (event) {
+            if (event.target && event.target.closest && event.target.closest('#theme-editor-modal')) {
+                requestAnimationFrame(syncCompactSafeAreaColor);
+            }
+        }, true);
+    });
+})();
+</script>
 
 
 
