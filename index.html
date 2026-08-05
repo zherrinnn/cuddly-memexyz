@@ -14697,8 +14697,8 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
             </label>
             <label class="suggestion-field">
                 <span>选项</span>
-                <textarea id="suggestion-options" class="modal-textarea" rows="4" placeholder="例如：火锅、烤肉、寿司&#10;也可以直接输入 abc"></textarea>
-                <small>可用换行、逗号或空格分隔；输入 abc 会识别为 a、b、c。</small>
+                <textarea id="suggestion-options" class="modal-textarea" rows="6" placeholder="每行填写一个选项，例如：&#10;火锅&#10;烤肉&#10;寿司"></textarea>
+                <small>每行一个选项；只有换行会分隔选项，数量和文字长度不限。</small>
             </label>
             <div class="suggestion-preview" id="suggestion-preview">等待填写问题和选项</div>
             <div class="modal-buttons">
@@ -36267,24 +36267,12 @@ function openGalleryExternal() {
     'use strict';
 
     function splitSuggestionOptions(raw) {
-        var value = String(raw || '').trim();
-        if (!value) return [];
+        var value = String(raw || '');
+        if (!value.trim()) return [];
 
-        var parts = value.split(/[\n,，、;；|/]+/)
+        return value.split(/\r?\n/)
             .map(function (item) { return item.trim(); })
             .filter(Boolean);
-
-        if (parts.length === 1 && /\s+/.test(parts[0])) {
-            parts = parts[0].split(/\s+/).filter(Boolean);
-        }
-
-        if (parts.length === 1 && /^[a-zA-Z]{2,10}$/.test(parts[0])) {
-            parts = parts[0].split('');
-        }
-
-        return parts.filter(function (item, index, array) {
-            return array.indexOf(item) === index;
-        }).slice(0, 12);
     }
 
     function hideSuggestionTyping() {
@@ -36347,7 +36335,10 @@ function openGalleryExternal() {
             return;
         }
 
-        var messageText = '想听听你的选择：\n' + question + '\n\n选项：' + options.join(' / ');
+        var messageText = '想听听你的选择：\n' + question + '\n\n选项：\n' +
+            options.map(function (item, index) {
+                return (index + 1) + '. ' + item;
+            }).join('\n');
         addMessage({
             id: Date.now(),
             sender: 'user',
@@ -36395,6 +36386,13 @@ function openGalleryExternal() {
         var send = document.getElementById('send-suggestion');
         var question = document.getElementById('suggestion-question');
         var options = document.getElementById('suggestion-options');
+
+        [document.getElementById('message-input'), question, options].forEach(function (field) {
+            if (field) {
+                field.removeAttribute('maxlength');
+                field.maxLength = -1;
+            }
+        });
 
         if (entry) entry.addEventListener('click', openSuggestionModal);
         if (cancel) cancel.addEventListener('click', function () {
@@ -38917,6 +38915,105 @@ function openGalleryExternal() {
     }, true);
 })();
 </script>
+
+<style id="final-reply-box-and-lighter-glass">
+    /* Received replies use exactly the same outlined marker geometry as sent replies. */
+    .message-wrapper.received.has-reply .discord-reply-line-col,
+    body.hide-received-avatar .message-wrapper.received.has-reply .discord-reply-line-col {
+        width: fit-content !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
+    }
+    .message-wrapper.received.has-reply .discord-reply-line-col::before,
+    body.hide-received-avatar .message-wrapper.received.has-reply .discord-reply-line-col::before {
+        content: '' !important;
+        display: block !important;
+        position: static !important;
+        box-sizing: border-box !important;
+        width: 6px !important;
+        min-width: 6px !important;
+        height: 32px !important;
+        margin: 0 5px 0 1px !important;
+        background: transparent !important;
+        border: 1.5px solid #fff !important;
+        border-radius: 1px !important;
+    }
+
+    /* Main UI glass is lighter; chat bubbles are deliberately excluded. */
+    :root {
+        --ui-glass: rgba(255,255,255,.04);
+        --ui-glass-strong: rgba(20,21,24,.32);
+        --ui-glass-soft: rgba(255,255,255,.022);
+        --ui-glass-line: rgba(255,255,255,.11);
+    }
+    #dc-mobile-open-btn,
+    .header-actions #call-toolbar-btn,
+    .partner-name-line,
+    .header-right > .user-info:first-child .status,
+    #chat-plus-btn,
+    .input-area,
+    .typing-indicator,
+    .consolidated-menu,
+    #call-mini-pill {
+        background: rgba(255,255,255,.045) !important;
+        background-color: rgba(255,255,255,.045) !important;
+        border-color: rgba(255,255,255,.12) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(165%) !important;
+        backdrop-filter: blur(32px) saturate(165%) !important;
+    }
+    .modal-content,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    #reply-preview-container {
+        background: rgba(20,21,24,.34) !important;
+        background-color: rgba(20,21,24,.34) !important;
+        border-color: rgba(255,255,255,.10) !important;
+        -webkit-backdrop-filter: blur(38px) saturate(155%) !important;
+        backdrop-filter: blur(38px) saturate(155%) !important;
+    }
+    .settings-item,
+    .dm-row-item,
+    .cs-card,
+    .setting-pill-row,
+    .empty-state,
+    .call-event-pill {
+        background-color: rgba(255,255,255,.022) !important;
+        border-color: rgba(255,255,255,.085) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+        backdrop-filter: blur(28px) saturate(150%) !important;
+    }
+
+    html[data-theme="light"] #dc-mobile-open-btn,
+    html[data-theme="light"] .header-actions #call-toolbar-btn,
+    html[data-theme="light"] .partner-name-line,
+    html[data-theme="light"] .header-right > .user-info:first-child .status,
+    html[data-theme="light"] #chat-plus-btn,
+    html[data-theme="light"] .input-area,
+    html[data-theme="light"] .typing-indicator,
+    html[data-theme="light"] .consolidated-menu,
+    html[data-theme="light"] #call-mini-pill,
+    html[data-theme="light"] .modal-content,
+    html[data-theme="light"] .sticker-picker-popover,
+    html[data-theme="light"] .combo-picker,
+    html[data-theme="light"] .popover,
+    html[data-theme="light"] .batch-preview,
+    html[data-theme="light"] #reply-preview-container {
+        background: rgba(255,255,255,.16) !important;
+        background-color: rgba(255,255,255,.16) !important;
+        border-color: rgba(255,255,255,.30) !important;
+    }
+    html[data-theme="light"] .settings-item,
+    html[data-theme="light"] .dm-row-item,
+    html[data-theme="light"] .cs-card,
+    html[data-theme="light"] .setting-pill-row,
+    html[data-theme="light"] .empty-state,
+    html[data-theme="light"] .call-event-pill {
+        background-color: rgba(255,255,255,.085) !important;
+        border-color: rgba(255,255,255,.22) !important;
+    }
+</style>
 
 
 
