@@ -13630,6 +13630,10 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
             </div>
 
             <div class="settings-grid">
+                <div class="settings-card" id="css-settings">
+                    <i class="fas fa-code"></i>
+                    <span>CSS 编辑</span>
+                </div>
                 <div class="settings-card" id="appearance-settings">
                     <i class="fas fa-palette"></i>
                     <span>外观设置</span>
@@ -13676,7 +13680,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
 
 <div id="appearance-panel-container" style="display:none;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <button onclick="hideAppearancePanel()" style="background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text-secondary);">
+        <button id="appearance-panel-back" onclick="hideAppearancePanel()" style="background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text-secondary);">
             <i class="fas fa-arrow-left"></i> 返回
         </button>
         <span id="appearance-panel-title" style="font-size:14px;font-weight:600;color:var(--text-primary);"></span>
@@ -14385,17 +14389,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                             <i class="fas fa-chevron-right" style="color:var(--text-secondary);font-size:12px;flex-shrink:0;"></i>
                         </div>
                     </div>
-                    <!-- 唯一/并蓄 焦点模式切换 -->
-                    <div style="display:flex;flex-direction:column;align-items:center;margin-top:16px;padding-bottom:4px;">
-                        <div class="focus-mode-selector" id="focus-mode-selector">
-                            <div class="focus-mode-slider-bg slider-at-right" id="focus-mode-slider-bg"></div>
-                            <div class="focus-mode-opt" id="focus-mode-unique" onclick="window.setFocusMode('unique')">唯一</div>
-                            <div class="focus-mode-opt" id="focus-mode-together" onclick="window.setFocusMode('together')">并蓄</div>
-                        </div>
-                    </div>
-                    <div class="focus-mode-text" id="focus-mode-text">爱如繁星，每一颗都熠熠生辉。</div>
-
-                    <!-- 昵称迁移至此，位于唯一/并蓄下方 -->
+                    <!-- 聊天昵称 -->
                     <p class="cs-group-label" style="margin-top:16px;">聊天昵称</p>
                     <div class="cs-name-row">
                         <button class="cs-name-btn" onclick="(function(){var m=document.getElementById('edit-modal'),ti=m.querySelector('#edit-modal-title'),ni=m.querySelector('#name-input'),sb=m.querySelector('#save-name');ti.textContent='修改梦角的昵称';ni.value=(typeof settings!=='undefined'?settings.partnerName:'梦角');sb.disabled=!ni.value.trim();sb.onclick=function(){var n=ni.value.trim();if(n){settings.partnerName=n;var pEls=document.querySelectorAll('.username[data-role=partner],.partner-name,.contact-name');pEls.forEach(function(el){el.textContent=n;});if(typeof throttledSaveData==='function')throttledSaveData();if(typeof updateUI==='function')updateUI();if(typeof showNotification==='function')showNotification('梦角昵称已更新为「'+n+'」✦','success');}if(typeof hideModal==='function')hideModal(m);};if(typeof showModal==='function')showModal(m,ni);})()">
@@ -16953,8 +16947,10 @@ async function importAllData(file) {
         let customReplies = [];
         let customPokes = [];
         let customStatuses = [];
+        let customActivities = [];
         let customPokeGroups = [];
         let customStatusGroups = [];
+        let customActivityGroups = [];
         let customMottos = [];
         let customIntros = []; 
         let currentMajorTab = 'reply'; 
@@ -17252,6 +17248,7 @@ function loadMoreHistory() {
                 myName: "我",
                 myStatus: "在线",
                 partnerStatus: "在线",
+                partnerActivity: "忙碌",
                 isDarkMode: false,
                 colorTheme: "gold",
                 soundEnabled: true,
@@ -17261,6 +17258,8 @@ function loadMoreHistory() {
                 replyBarStyle: 'top',
                 lastStatusChange: Date.now(),
                 nextStatusChange: 1 + Math.random() * 7,
+                lastActivityChange: Date.now(),
+                nextActivityChange: 1 + Math.random() * 7,
                 fontSize: 16,
                 bubbleStyle: 'standard',
                 messageFontFamily: "'Noto Serif SC', serif",
@@ -17304,7 +17303,7 @@ autoSendInterval: 5,
         soundVolume: 0.15,
         bottomCollapseMode: false,
         compactHeaderMode: false,
-        headerColorPreset: 'gray',
+        compactHeaderAvatarEnabled: false,
         emojiMixEnabled: true,
         stickerSendChance: 0.2
             };
@@ -17425,7 +17424,9 @@ const loadData = async () => {
             localforage.getItem(getStorageKey('myStickerLibrary')),
             localforage.getItem(getStorageKey('customReplyGroups')),
             localforage.getItem(getStorageKey('customPokeGroups')),
-            localforage.getItem(getStorageKey('customStatusGroups'))
+            localforage.getItem(getStorageKey('customStatusGroups')),
+            localforage.getItem(getStorageKey('customActivities')),
+            localforage.getItem(getStorageKey('customActivityGroups'))
         ]);
         const getVal = (index) => results[index].status === 'fulfilled' ? results[index].value : null;
 
@@ -17450,6 +17451,8 @@ const loadData = async () => {
         const savedReplyGroups = getVal(18);
         const savedPokeGroups = getVal(19);
         const savedStatusGroups = getVal(20);
+        const savedActivities = getVal(21);
+        const savedActivityGroups = getVal(22);
 
         if (savedPartnerPersonas) partnerPersonas = savedPartnerPersonas;
 
@@ -17472,6 +17475,8 @@ const loadData = async () => {
 
         if (savedStatuses) customStatuses = savedStatuses;
         else customStatuses = [...CONSTANTS.PARTNER_STATUSES];
+        if (savedActivities && Array.isArray(savedActivities)) customActivities = savedActivities;
+        else customActivities = ['工作', '休息', '吃饭', '睡觉', '发呆', '看手机', '出门', '忙碌'];
 
         if (savedMottos) customMottos = savedMottos;
         else customMottos = [...CONSTANTS.HEADER_MOTTOS];
@@ -17525,6 +17530,7 @@ const loadData = async () => {
         if (savedReplyGroups) window.customReplyGroups = savedReplyGroups;
         if (savedPokeGroups) window.customPokeGroups = savedPokeGroups;
         if (savedStatusGroups) window.customStatusGroups = savedStatusGroups;
+        if (savedActivityGroups) window.customActivityGroups = savedActivityGroups;
         if (savedAnniversaries) anniversaries = savedAnniversaries;
         if (savedStickers) stickerLibrary = savedStickers;
         if (savedMyStickers) myStickerLibrary = savedMyStickers;
@@ -17584,7 +17590,8 @@ const LIBRARY_CONFIG = {
     atmosphere: {
         title: "状态",
         tabs: [
-            { id: 'statuses', name: '状态', mode: 'list' }
+            { id: 'statuses', name: '情绪状态', mode: 'list' },
+            { id: 'activities', name: '即时动态', mode: 'list' }
         ]
     }
 };
@@ -17745,10 +17752,12 @@ const saveData = async () => {
         { key: 'customReplyGroups',      val: () => localforage.setItem(getStorageKey('customReplyGroups'), window.customReplyGroups || []) },
         { key: 'customPokeGroups',        val: () => localforage.setItem(getStorageKey('customPokeGroups'), window.customPokeGroups || []) },
         { key: 'customStatusGroups',      val: () => localforage.setItem(getStorageKey('customStatusGroups'), window.customStatusGroups || []) },
+        { key: 'customActivityGroups',    val: () => localforage.setItem(getStorageKey('customActivityGroups'), window.customActivityGroups || []) },
         { key: 'customEmojis',           val: () => localforage.setItem(getStorageKey('customEmojis'), customEmojis) },
         { key: 'anniversaries',          val: () => localforage.setItem(getStorageKey('anniversaries'), anniversaries) },
         { key: 'customPokes',            val: () => localforage.setItem(getStorageKey('customPokes'), customPokes) },
         { key: 'customStatuses',         val: () => localforage.setItem(getStorageKey('customStatuses'), customStatuses) },
+        { key: 'customActivities',       val: () => localforage.setItem(getStorageKey('customActivities'), customActivities) },
         { key: 'customMottos',           val: () => localforage.setItem(getStorageKey('customMottos'), customMottos) },
         { key: 'customIntros',           val: () => localforage.setItem(getStorageKey('customIntros'), customIntros) },
         { key: 'stickerLibrary',         val: () => localforage.setItem(getStorageKey('stickerLibrary'), stickerLibrary) },
@@ -18006,7 +18015,7 @@ function manageAutoSendTimer() {
             if (_themeIcon) _themeIcon.className = settings.isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
             DOMElements.partner.name.textContent = settings.partnerName;
             DOMElements.me.name.textContent = settings.myName;
-            DOMElements.partner.status.textContent = settings.partnerStatus || '在线';
+            DOMElements.partner.status.textContent = `${settings.partnerStatus || '在线'} · ${settings.partnerActivity || '忙碌'}`;
             DOMElements.me.statusText.textContent = settings.myStatus;
             if (typeof window.updateDynamicNames === 'function') window.updateDynamicNames();
             document.documentElement.style.setProperty('--font-size', `${settings.fontSize}px`);
@@ -19667,57 +19676,57 @@ function showModal(modalElement, focusElement = null) {
         }
 
         // ── 对方状态更新核心逻辑（提取为独立函数，供定时触发和 /测试状态更新 指令共用）──
-        window._triggerStatusChange = function() {
-            let newStatus = null;
-
-            const groups = window.customStatusGroups || [];
-            const allStatuses = (typeof customStatuses !== 'undefined' ? customStatuses : []) || [];
-
-            // 只保留「启用」且「有内容」的分组，内容必须也在 allStatuses 里存在
-            const enabledGroups = groups.filter(function(g) {
-                return !g.disabled && Array.isArray(g.items) && g.items.length > 0;
-            });
-
-            // 收集所有在分组内的状态文本
+        function pickRandomStatusCard(items, groups, fallback) {
+            items = Array.isArray(items) ? items : [];
+            groups = Array.isArray(groups) ? groups : [];
+            fallback = Array.isArray(fallback) ? fallback : [];
+            const enabledGroups = groups.filter(g => !g.disabled && Array.isArray(g.items) && g.items.length);
             const groupedItems = new Set();
-            enabledGroups.forEach(function(g) { g.items.forEach(function(t) { groupedItems.add(t); }); });
+            enabledGroups.forEach(g => g.items.forEach(t => groupedItems.add(t)));
+            const ungrouped = items.filter(t => !groupedItems.has(t));
+            let picked = null;
+            if (enabledGroups.length) {
+                const group = enabledGroups[Math.floor(Math.random() * enabledGroups.length)];
+                const pool = group.items.filter(t => items.includes(t));
+                if (pool.length) picked = pool[Math.floor(Math.random() * pool.length)];
+            }
+            if (!picked && ungrouped.length) picked = ungrouped[Math.floor(Math.random() * ungrouped.length)];
+            if (!picked && items.length) picked = items[Math.floor(Math.random() * items.length)];
+            if (!picked && fallback.length) picked = fallback[Math.floor(Math.random() * fallback.length)];
+            return picked;
+        }
 
-            // 未分组的状态
-            const ungroupedStatuses = allStatuses.filter(function(t) { return !groupedItems.has(t); });
-
-            if (enabledGroups.length > 0) {
-                // 有启用分组时：随机选一个分组 → 从该分组随机选一条状态
-                const pickedGroup = enabledGroups[Math.floor(Math.random() * enabledGroups.length)];
-                const groupPool = pickedGroup.items.filter(function(t) { return allStatuses.includes(t); });
-                if (groupPool.length > 0) {
-                    newStatus = groupPool[Math.floor(Math.random() * groupPool.length)];
-                }
-            }
-
-            // 分组里没找到内容时，退回到：未分组状态 → 全部 customStatuses → 内置 PARTNER_STATUSES
-            if (!newStatus && ungroupedStatuses.length > 0) {
-                newStatus = ungroupedStatuses[Math.floor(Math.random() * ungroupedStatuses.length)];
-            }
-            if (!newStatus && allStatuses.length > 0) {
-                newStatus = allStatuses[Math.floor(Math.random() * allStatuses.length)];
-            }
-            if (!newStatus && CONSTANTS.PARTNER_STATUSES && CONSTANTS.PARTNER_STATUSES.length > 0) {
-                newStatus = getRandomItem(CONSTANTS.PARTNER_STATUSES);
-            }
-            if (!newStatus) {
-                if (typeof showNotification === 'function') showNotification('状态库为空，请先添加内容', 'warning', 2500);
+        // kind: self=自身状态，activity=在干什么；不传时仅供测试指令随机触发其中一类。
+        window._triggerStatusChange = function(kind) {
+            kind = kind === 'self' || kind === 'activity' ? kind : (Math.random() < .5 ? 'self' : 'activity');
+            const isActivity = kind === 'activity';
+            const fallbackActivities = ['工作', '休息', '吃饭', '睡觉', '发呆', '看手机', '出门', '忙碌'];
+            const picked = pickRandomStatusCard(
+                isActivity ? customActivities : customStatuses,
+                isActivity ? window.customActivityGroups : window.customStatusGroups,
+                isActivity ? fallbackActivities : CONSTANTS.PARTNER_STATUSES
+            );
+            if (!picked) {
+                if (typeof showNotification === 'function') showNotification(`${isActivity ? '即时动态' : '情绪状态'}字卡为空，请先添加内容`, 'warning', 2500);
                 return;
             }
 
-            settings.partnerStatus = newStatus;
-            settings.lastStatusChange = Date.now();
-            settings.nextStatusChange = 1 + Math.random() * 7;
-            DOMElements.partner.status.textContent = newStatus;
+            const now = Date.now();
+            if (isActivity) {
+                settings.partnerActivity = picked;
+                settings.lastActivityChange = now;
+                settings.nextActivityChange = 1 + Math.random() * 7;
+            } else {
+                settings.partnerStatus = picked;
+                settings.lastStatusChange = now;
+                settings.nextStatusChange = 1 + Math.random() * 7;
+            }
+            DOMElements.partner.status.textContent = `${settings.partnerStatus || '在线'} · ${settings.partnerActivity || '忙碌'}`;
             messages.push({
-                id: Date.now(),
+                id: now + (isActivity ? 1 : 0),
                 type: 'status-change',
-                text: (settings.partnerName || '对方') + '更改状态为：' + newStatus,
-                timestamp: new Date(),
+                text: `${settings.partnerName || '对方'}更改状态为：${settings.partnerStatus || '在线'} · ${settings.partnerActivity || '忙碌'}`,
+                timestamp: new Date(now),
                 sender: null
             });
             if (typeof renderMessages === 'function') renderMessages(true);
@@ -19725,9 +19734,13 @@ function showModal(modalElement, focusElement = null) {
         };
 
         const checkStatusChange = () => {
-            if ((Date.now() - settings.lastStatusChange) / 36e5 >= settings.nextStatusChange) {
-                window._triggerStatusChange();
-            }
+            const now = Date.now();
+            if (!settings.lastStatusChange) settings.lastStatusChange = now;
+            if (!settings.nextStatusChange) settings.nextStatusChange = 1 + Math.random() * 7;
+            if (!settings.lastActivityChange) settings.lastActivityChange = now;
+            if (!settings.nextActivityChange) settings.nextActivityChange = 1 + Math.random() * 7;
+            if ((now - settings.lastStatusChange) / 36e5 >= settings.nextStatusChange) window._triggerStatusChange('self');
+            if ((now - settings.lastActivityChange) / 36e5 >= settings.nextActivityChange) window._triggerStatusChange('activity');
         };
 
 
@@ -21229,6 +21242,14 @@ window.showAppearancePanel = function(panel) {
     if (panel === 'bubble' || panel === 'bubble-css') { setTimeout(() => { if (typeof window.updateBubblePreviewFn === 'function') window.updateBubblePreviewFn(); }, 50); }
 };
 window.hideAppearancePanel = function() {
+    if (window._appearanceDirectFromSettings) {
+        window._appearanceDirectFromSettings = false;
+        var directBottomBack = document.getElementById('back-appearance');
+        if (directBottomBack) directBottomBack.style.display = '';
+        hideModal(document.getElementById('appearance-modal'));
+        showModal(document.getElementById('settings-modal'));
+        return;
+    }
     document.getElementById('appearance-nav-grid').style.display = 'grid';
     document.getElementById('appearance-panel-container').style.display = 'none';
     document.querySelectorAll('.appearance-sub-panel').forEach(p => p.style.display = 'none');
@@ -21547,6 +21568,7 @@ if (typeof customReplyGroups === 'undefined') window.customReplyGroups = [];
 if (typeof replyGroupsEnabled === 'undefined') window.replyGroupsEnabled = false;
 if (typeof customPokeGroups === 'undefined') window.customPokeGroups = [];
 if (typeof customStatusGroups === 'undefined') window.customStatusGroups = [];
+if (!window.customActivityGroups) window.customActivityGroups = [];
 
 // 根据当前 tab 返回对应的分组上下文 {groups, items, itemLabel}
 function _getGroupCtx(tab) {
@@ -21557,7 +21579,11 @@ function _getGroupCtx(tab) {
     }
     if (tab === 'statuses') {
         if (!window.customStatusGroups) window.customStatusGroups = [];
-        return { groups: window.customStatusGroups, items: customStatuses, itemLabel: '状态' };
+        return { groups: window.customStatusGroups, items: customStatuses, itemLabel: '情绪状态' };
+    }
+    if (tab === 'activities') {
+        if (!window.customActivityGroups) window.customActivityGroups = [];
+        return { groups: window.customActivityGroups, items: customActivities, itemLabel: '即时动态' };
     }
     // default: custom replies
     if (!window.customReplyGroups) window.customReplyGroups = [];
@@ -21567,7 +21593,7 @@ function _getGroupCtx(tab) {
 // 判断当前 tab 是否支持分组
 function _tabHasGroups(tab) {
     tab = tab || currentSubTab;
-    return tab === 'custom' || tab === 'pokes' || tab === 'statuses';
+    return tab === 'custom' || tab === 'pokes' || tab === 'statuses' || tab === 'activities';
 }
 
 let _batchSelectedIndices = new Set();
@@ -21696,6 +21722,7 @@ function _renderListContentOnly() {
     } else if (currentMajorTab === 'atmosphere') {
         if (currentSubTab === 'pokes') itemsToRender = customPokes;
         else if (currentSubTab === 'statuses') itemsToRender = customStatuses;
+        else if (currentSubTab === 'activities') itemsToRender = customActivities;
         else if (currentSubTab === 'mottos') itemsToRender = customMottos;
         else if (currentSubTab === 'intros') itemsToRender = customIntros;
     }
@@ -21784,6 +21811,7 @@ function renderReplyLibrary() {
     } else if (currentMajorTab === 'atmosphere') {
         if (currentSubTab === 'pokes') itemsToRender = customPokes;
         else if (currentSubTab === 'statuses') itemsToRender = customStatuses;
+        else if (currentSubTab === 'activities') itemsToRender = customActivities;
         else if (currentSubTab === 'mottos') itemsToRender = customMottos;
         else if (currentSubTab === 'intros') itemsToRender = customIntros;
     }
@@ -22568,6 +22596,7 @@ function _renderAtmosphereList(list, items) {
     const indexMaps = {
         pokes:    new Map(customPokes.map((r,i)   => [r, i])),
         statuses: new Map(customStatuses.map((r,i) => [r, i])),
+        activities: new Map(customActivities.map((r,i) => [r, i])),
         mottos:   new Map(customMottos.map((r,i)   => [r, i])),
         intros:   new Map(customIntros.map((r,i)   => [r, i])),
     };
@@ -22744,6 +22773,8 @@ function _runDedup() {
     customPokes = cpDedup.result; totalRemoved += cpDedup.removedCount;
     const csDedup = deduplicateContentArray(customStatuses);
     customStatuses = csDedup.result; totalRemoved += csDedup.removedCount;
+    const caDedup = deduplicateContentArray(customActivities);
+    customActivities = caDedup.result; totalRemoved += caDedup.removedCount;
     const cmDedup = deduplicateContentArray(customMottos);
     customMottos = cmDedup.result; totalRemoved += cmDedup.removedCount;
     const ciDedup = deduplicateContentArray(customIntros);
@@ -23128,6 +23159,7 @@ function deleteItem(index, onDone) {
     if (currentMajorTab === 'reply' && currentSubTab === 'custom') customReplies.splice(index, 1);
     else if (currentSubTab === 'pokes') customPokes.splice(index, 1);
     else if (currentSubTab === 'statuses') customStatuses.splice(index, 1);
+    else if (currentSubTab === 'activities') customActivities.splice(index, 1);
     else if (currentSubTab === 'mottos') customMottos.splice(index, 1);
     else if (currentSubTab === 'intros') customIntros.splice(index, 1);
     if (item && ctx.groups) {
@@ -23162,6 +23194,7 @@ function editItem(index, oldText, onDone) {
     if (currentMajorTab === 'reply' && currentSubTab === 'custom') customReplies[index] = newText.trim();
     else if (currentSubTab === 'pokes') customPokes[index] = newText.trim();
     else if (currentSubTab === 'statuses') customStatuses[index] = newText.trim();
+    else if (currentSubTab === 'activities') customActivities[index] = newText.trim();
     else if (currentSubTab === 'mottos') customMottos[index] = newText.trim();
     else if (currentSubTab === 'intros') customIntros[index] = newText.trim();
     throttledSaveData();
@@ -23931,11 +23964,14 @@ function _showBatchAddDialog() {
                 ? customPokes.some(r => normalizeStringStrict(r) === norm)
                 : currentSubTab === 'statuses'
                 ? customStatuses.some(r => normalizeStringStrict(r) === norm)
+                : currentSubTab === 'activities'
+                ? customActivities.some(r => normalizeStringStrict(r) === norm)
                 : false;
             if (isDup) { skipped++; return; }
             if (currentSubTab === 'custom') { customReplies.push(val); newItems.push(val); }
             else if (currentSubTab === 'pokes') { customPokes.push(val); newItems.push(val); }
             else if (currentSubTab === 'statuses') { customStatuses.push(val); newItems.push(val); }
+            else if (currentSubTab === 'activities') { customActivities.push(val); newItems.push(val); }
             else if (currentSubTab === 'mottos') customMottos.push(val);
             added++;
         });
@@ -24083,7 +24119,7 @@ function initReplyLibraryListeners() {
                 }
                 return;
             }
-            if (currentSubTab === 'custom' || currentSubTab === 'pokes' || currentSubTab === 'statuses') {
+            if (currentSubTab === 'custom' || currentSubTab === 'pokes' || currentSubTab === 'statuses' || currentSubTab === 'activities') {
                 _showBatchAddDialog(); return;
             }
             let input;
@@ -24101,11 +24137,13 @@ function initReplyLibraryListeners() {
                 let isDup = false;
                 if (currentSubTab === 'pokes' && customPokes.some(r => normalizeStringStrict(r) === valNorm)) isDup = true;
                 else if (currentSubTab === 'statuses' && customStatuses.some(r => normalizeStringStrict(r) === valNorm)) isDup = true;
+                else if (currentSubTab === 'activities' && customActivities.some(r => normalizeStringStrict(r) === valNorm)) isDup = true;
                 else if (currentSubTab === 'mottos' && customMottos.some(r => normalizeStringStrict(r) === valNorm)) isDup = true;
                 else if (currentSubTab === 'intros' && customIntros.some(r => normalizeStringStrict(r) === valNorm)) isDup = true;
                 if (isDup) { showNotification('该内容已存在', 'warning'); return; }
                 if (currentSubTab === 'pokes') customPokes.unshift(val);
                 else if (currentSubTab === 'statuses') customStatuses.unshift(val);
+                else if (currentSubTab === 'activities') customActivities.unshift(val);
                 else if (currentSubTab === 'mottos') customMottos.unshift(val);
                 else if (currentSubTab === 'intros') customIntros.unshift(val);
                 throttledSaveData(); renderReplyLibrary();
@@ -24116,7 +24154,7 @@ function initReplyLibraryListeners() {
 }
 
 function getCategoryName(tabId) {
-    return { custom: '回复', pokes: '拍一拍', statuses: '状态', mottos: '格言', intros: '开场语' }[tabId] || '内容';
+    return { custom: '回复', pokes: '拍一拍', statuses: '情绪状态', activities: '即时动态', mottos: '格言', intros: '开场语' }[tabId] || '内容';
 }
 
 function updateTabUI() {
@@ -24387,7 +24425,8 @@ function applyAvatarShapeToDOM(type, shape) {
         const themeColorMappings = {
             '--primary-bg':        '主背景（聊天底色）',
             '--secondary-bg':      '卡片 / 弹窗背景',
-            '--header-bg':         '顶栏背景色',
+            '--header-bg':         '展开顶栏底色（通常保持透明）',
+            '--compact-header-bg': '收起顶栏背景色',
             '--compact-header-content-color': '收起顶栏内容颜色（箭头 / 昵称 / 状态 / 视频）',
             '--input-area-bg':     '输入框区域背景',
             '--text-primary':      '主要文字颜色',
@@ -24588,7 +24627,7 @@ function initThemeEditor() {
             const rootStyle = getComputedStyle(document.documentElement);
 
             const groups = [
-                { label: '🖼 背景颜色',  vars: ['--primary-bg','--secondary-bg','--header-bg','--input-area-bg'] },
+                { label: '🖼 背景颜色',  vars: ['--primary-bg','--secondary-bg','--header-bg','--compact-header-bg','--input-area-bg'] },
                 { label: '✏️ 文字 & 线条', vars: ['--text-primary','--text-secondary','--compact-header-content-color','--timestamp-color','--border-color'] },
                 { label: '✨ 强调色（影响全局）', vars: ['--accent-color','--accent-color-dark'] },
                 { label: '💬 我方气泡',  vars: ['--message-sent-bg','--message-sent-text'] },
@@ -29972,7 +30011,8 @@ window.openCustomRepliesModal = function() {
     var STORAGE_KEY = 'focusMode_v1';
 
     function applyFocusMode(mode) {
-        var isUnique = mode === 'unique';
+        /* 唯一/并蓄功能已移除：始终保持完整界面，避免隐藏返回箭头。 */
+        var isUnique = false;
         document.body.classList.toggle('unique-mode', isUnique);
 
         var optUnique = document.getElementById('focus-mode-unique');
@@ -30003,8 +30043,9 @@ window.openCustomRepliesModal = function() {
     };
 
     /* 恢复上次状态 */
-    var saved = localStorage.getItem(STORAGE_KEY) || 'together';
-    applyFocusMode(saved);
+    localStorage.removeItem(STORAGE_KEY);
+    var saved = 'together';
+    applyFocusMode('together');
     var initText = document.getElementById('focus-mode-text');
     if (initText) {
         initText.textContent = saved === 'unique'
@@ -32924,6 +32965,9 @@ if (_chatSettingsEl) _chatSettingsEl.addEventListener('click', () => {
 
             const _appearanceEl = document.getElementById('appearance-settings');
             if (_appearanceEl) _appearanceEl.addEventListener('click', () => {
+                window._appearanceDirectFromSettings = false;
+                const bottomBack = document.getElementById('back-appearance');
+                if (bottomBack) bottomBack.style.display = '';
                 hideModal(DOMElements.settingsModal.modal);
                 window.hideAppearancePanel && window.hideAppearancePanel();
                 renderBackgroundGallery();
@@ -32956,7 +33000,23 @@ if (_chatSettingsEl) _chatSettingsEl.addEventListener('click', () => {
                     setupAppearancePanelFrameSettings && setupAppearancePanelFrameSettings();
                 }, 100);
             });
+            const _cssSettingsEl = document.getElementById('css-settings');
+            if (_cssSettingsEl) _cssSettingsEl.addEventListener('click', () => {
+                hideModal(DOMElements.settingsModal.modal);
+                window._appearanceDirectFromSettings = true;
+                const cssTextareaEl = document.getElementById('custom-bubble-css');
+                const globalCssTextareaEl = document.getElementById('custom-global-css');
+                if (cssTextareaEl) cssTextareaEl.value = settings.customBubbleCss || '';
+                if (globalCssTextareaEl) globalCssTextareaEl.value = settings.customGlobalCss || '';
+                showModal(DOMElements.appearanceModal.modal);
+                showAppearancePanel('css');
+                const bottomBack = document.getElementById('back-appearance');
+                if (bottomBack) bottomBack.style.display = 'none';
+            });
             DOMElements.appearanceModal.closeBtn.addEventListener('click', () => {
+                    window._appearanceDirectFromSettings = false;
+                    const bottomBack = document.getElementById('back-appearance');
+                    if (bottomBack) bottomBack.style.display = '';
                     hideModal(DOMElements.appearanceModal.modal);
                 });
 
@@ -39721,33 +39781,16 @@ window.addEventListener('load', function() {
 (function () {
     'use strict';
 
-    var headerPresets = {
-        gray:  { light: ['#e2e2e4', '#000000', 'rgba(0,0,0,.56)', 'rgba(0,0,0,.08)'], dark: ['#303034', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] },
-        white: { light: ['#ffffff', '#000000', 'rgba(0,0,0,.52)', 'rgba(0,0,0,.08)'], dark: ['#f5f5f7', '#000000', 'rgba(0,0,0,.52)', 'rgba(0,0,0,.10)'] },
-        black: { light: ['#18181a', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'], dark: ['#080809', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] },
-        blue:  { light: ['#cbd9e8', '#000000', 'rgba(0,0,0,.58)', 'rgba(0,0,0,.10)'], dark: ['#2e3d4e', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] },
-        pink:  { light: ['#ead6dd', '#000000', 'rgba(0,0,0,.58)', 'rgba(0,0,0,.10)'], dark: ['#4a323b', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] }
-    };
-
     function applyHeaderPreset() {
         if (typeof settings === 'undefined') return false;
-        var presetName = headerPresets[settings.headerColorPreset] ? settings.headerColorPreset : 'gray';
-        settings.headerColorPreset = presetName;
         if (settings.compactHeaderMode === undefined) settings.compactHeaderMode = false;
-        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        var values = headerPresets[presetName][isDark ? 'dark' : 'light'];
-        var root = document.documentElement;
-        root.style.setProperty('--header-preset-bg', values[0]);
-        root.style.setProperty('--header-preset-text', values[1]);
-        root.style.setProperty('--header-preset-muted', values[2]);
-        root.style.setProperty('--header-preset-line', values[3]);
-        root.setAttribute('data-header-preset', presetName);
+        if (settings.compactHeaderAvatarEnabled === undefined) settings.compactHeaderAvatarEnabled = false;
         document.body.classList.toggle('compact-header-mode', !!settings.compactHeaderMode);
-        document.querySelectorAll('.header-preset-swatch').forEach(function (button) {
-            button.classList.toggle('active', button.dataset.preset === presetName);
-        });
+        document.body.classList.toggle('compact-header-avatar', !!settings.compactHeaderAvatarEnabled);
         var toggle = document.getElementById('compact-header-mode-toggle');
         if (toggle) toggle.classList.toggle('active', !!settings.compactHeaderMode);
+        var avatarToggle = document.getElementById('compact-header-avatar-toggle');
+        if (avatarToggle) avatarToggle.classList.toggle('active', !!settings.compactHeaderAvatarEnabled);
         return true;
     }
 
@@ -39766,6 +39809,13 @@ window.addEventListener('load', function() {
         if (typeof settings !== 'undefined') {
             delete settings.interfaceColor;
             delete settings.interfaceTintStrength;
+            delete settings.headerColorPreset;
+        }
+        var oldPresetCard = document.getElementById('header-preset-card');
+        if (oldPresetCard) {
+            var oldPresetLabel = oldPresetCard.previousElementSibling;
+            if (oldPresetLabel && oldPresetLabel.classList.contains('cs-group-label') && oldPresetLabel.textContent.trim() === '顶栏颜色') oldPresetLabel.remove();
+            oldPresetCard.remove();
         }
     }
 
@@ -39775,33 +39825,6 @@ window.addEventListener('load', function() {
         var avatarPanel = document.getElementById('cs-panel-avatar');
         if (!displayPanel || !avatarPanel) return false;
         removeRetiredUi();
-
-        if (!document.getElementById('header-preset-card')) {
-            var label = document.createElement('p');
-            label.className = 'cs-group-label';
-            label.textContent = '顶栏颜色';
-            var card = document.createElement('div');
-            card.id = 'header-preset-card';
-            card.className = 'cs-card header-preset-card';
-            card.innerHTML =
-                '<div class="header-preset-title">颜色预设</div>' +
-                '<div class="header-preset-list">' +
-                    '<button type="button" class="header-preset-swatch" data-preset="gray" aria-label="灰色"></button>' +
-                    '<button type="button" class="header-preset-swatch" data-preset="white" aria-label="白色"></button>' +
-                    '<button type="button" class="header-preset-swatch" data-preset="black" aria-label="黑色"></button>' +
-                    '<button type="button" class="header-preset-swatch" data-preset="blue" aria-label="蓝灰色"></button>' +
-                    '<button type="button" class="header-preset-swatch" data-preset="pink" aria-label="灰粉色"></button>' +
-                '</div>';
-            displayPanel.insertBefore(card, displayPanel.firstChild);
-            displayPanel.insertBefore(label, card);
-            card.querySelectorAll('.header-preset-swatch').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    settings.headerColorPreset = button.dataset.preset;
-                    applyHeaderPreset();
-                    if (typeof throttledSaveData === 'function') throttledSaveData();
-                });
-            });
-        }
 
         if (!document.getElementById('compact-header-mode-toggle')) {
             var modeCard = displayPanel.querySelector('.cs-immersive-wrap');
@@ -39821,6 +39844,28 @@ window.addEventListener('load', function() {
             modeCard.appendChild(compact);
             compact.addEventListener('click', function () {
                 settings.compactHeaderMode = !settings.compactHeaderMode;
+                applyHeaderPreset();
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+        }
+
+        if (!document.getElementById('compact-header-avatar-toggle')) {
+            var compactModeCard = displayPanel.querySelector('.cs-immersive-wrap');
+            if (!compactModeCard) {
+                compactModeCard = document.createElement('div');
+                compactModeCard.className = 'cs-card cs-immersive-wrap';
+                displayPanel.appendChild(compactModeCard);
+            }
+            var compactAvatar = document.createElement('div');
+            compactAvatar.id = 'compact-header-avatar-toggle';
+            compactAvatar.className = 'setting-pill-row';
+            compactAvatar.innerHTML =
+                '<span class="setting-pill-icon"><i class="fas fa-user-circle"></i></span>' +
+                '<span class="setting-pill-label">收起顶栏显示头像 <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">点击顶栏头像可更换</span></span>' +
+                '<div class="setting-pill-switch"><div class="setting-pill-knob"></div></div>';
+            compactModeCard.appendChild(compactAvatar);
+            compactAvatar.addEventListener('click', function () {
+                settings.compactHeaderAvatarEnabled = !settings.compactHeaderAvatarEnabled;
                 applyHeaderPreset();
                 if (typeof throttledSaveData === 'function') throttledSaveData();
             });
@@ -41638,6 +41683,92 @@ window.addEventListener('load', function() {
     body:not(.compact-header-mode) .main-chat-area {
         height: 100dvh !important;
         padding-top: 0 !important;
+    }
+
+    /* Compact mode owns one solid, editable surface including the top safe
+       area. This final rule intentionally comes after all legacy glass rules. */
+    :root { --compact-header-bg: #e2e2e4; }
+    body.compact-header-mode .header {
+        position: relative !important;
+        z-index: 40 !important;
+        background: var(--compact-header-bg) !important;
+        background-color: var(--compact-header-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.compact-header-mode .header::before,
+    body.compact-header-mode .header::after {
+        display: none !important;
+        content: none !important;
+    }
+
+    /* Optional compact identity layout: the 40px avatar matches the combined
+       visual height of the name and status, and the pair stays centered. */
+    body.compact-header-mode.compact-header-avatar .header-right > .user-info:first-child {
+        left: 50px !important;
+        right: auto !important;
+        top: 5px !important;
+        width: max-content !important;
+        max-width: calc(100vw - 108px) !important;
+        height: 42px !important;
+        display: grid !important;
+        grid-template-columns: 40px minmax(72px, max-content) !important;
+        grid-template-rows: 23px 15px !important;
+        column-gap: 8px !important;
+        row-gap: 0 !important;
+        align-items: center !important;
+        transform: none !important;
+    }
+    body.compact-header-mode.compact-header-avatar .partner-name-line {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        width: auto !important;
+        max-width: min(48vw, 210px) !important;
+    }
+    body.compact-header-mode.compact-header-avatar .header-right > .user-info:first-child .status {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+        width: auto !important;
+        max-width: min(48vw, 210px) !important;
+    }
+    body.compact-header-mode.compact-header-avatar .header-right > .user-info:first-child .avatar-container {
+        display: block !important;
+        position: relative !important;
+        grid-column: 1 !important;
+        grid-row: 1 / 3 !important;
+        width: 40px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        cursor: pointer !important;
+        overflow: visible !important;
+    }
+    body.compact-header-mode.compact-header-avatar .header-right > .user-info:first-child .avatar {
+        width: 40px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        border-radius: 50% !important;
+        box-shadow: none !important;
+        overflow: hidden !important;
+    }
+    body.compact-header-mode.compact-header-avatar .header-right > .user-info:first-child .avatar img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        border-radius: inherit !important;
+    }
+    body.compact-header-mode .header-left,
+    body.compact-header-mode #dc-mobile-open-btn {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 20 !important;
     }
 </style>
 
