@@ -25640,9 +25640,10 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         const dockLeft = saved.x < (window.innerWidth - pillWidth) / 2;
         pill.classList.toggle('dock-left', dockLeft);
         pill.classList.toggle('dock-right', !dockLeft);
-        pill.style.left = (dockLeft ? 0 : window.innerWidth - pillWidth) + 'px';
-        pill.style.top = clamp(saved.y, 110, window.innerHeight - pillHeight - 16) + 'px';
-        pill.style.right  = 'auto'; pill.style.bottom = 'auto';
+        pill.style.setProperty('left', (dockLeft ? 0 : window.innerWidth - pillWidth) + 'px', 'important');
+        pill.style.setProperty('top', clamp(saved.y, 74, window.innerHeight - pillHeight - 16) + 'px', 'important');
+        pill.style.setProperty('right', 'auto', 'important');
+        pill.style.setProperty('bottom', 'auto', 'important');
     }
 
     function sendCallEvent(icon, label, detail) {
@@ -25859,6 +25860,8 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
     function initPillDrag() {
         const pill = document.getElementById('call-mini-pill');
         if (!pill) return;
+        pill.dataset.callDragBound = '1';
+        pill.style.setProperty('touch-action', 'none', 'important');
         let on = false;
         pill.addEventListener('pointerdown', e => {
             if (e.target.closest('.call-mini-hangup')) return;
@@ -25871,9 +25874,10 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         pill.addEventListener('pointermove', e => {
             if (!on || !S.pillDragOff) return; e.preventDefault();
             S.pillDragged = true;
-            pill.style.left   = clamp(e.clientX - S.pillDragOff.x, 0, window.innerWidth  - pill.offsetWidth)  + 'px';
-            pill.style.top    = clamp(e.clientY - S.pillDragOff.y, 0, window.innerHeight - pill.offsetHeight) + 'px';
-            pill.style.right  = 'auto'; pill.style.bottom = 'auto';
+            pill.style.setProperty('left', clamp(e.clientX - S.pillDragOff.x, 0, window.innerWidth - pill.offsetWidth) + 'px', 'important');
+            pill.style.setProperty('top', clamp(e.clientY - S.pillDragOff.y, 0, window.innerHeight - pill.offsetHeight) + 'px', 'important');
+            pill.style.setProperty('right', 'auto', 'important');
+            pill.style.setProperty('bottom', 'auto', 'important');
         });
         const stop = e => {
             if (!on) return; on = false;
@@ -25889,6 +25893,12 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         };
         pill.addEventListener('pointerup', stop);
         pill.addEventListener('pointercancel', stop);
+        window.addEventListener('resize', () => {
+            if (pill.classList.contains('visible')) positionPill();
+        });
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => { if (pill.classList.contains('visible')) positionPill(); }, 120);
+        });
     }
 
     function initResize() {
