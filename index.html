@@ -13662,18 +13662,6 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
 <div class="modal-title" id="appearance-modal-title">
     <i class="fas fa-palette"></i><span>外观设置</span>
 </div>
-<div id="gallery-banner-entry" onclick="showGalleryConfirmModal()" style="margin-bottom: 15px; padding: 12px 16px; background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.1), rgba(var(--accent-color-rgb), 0.02)); border: 1px solid rgba(var(--accent-color-rgb), 0.2); border-radius: 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);">
-    <div style="display:flex; align-items:center; gap: 12px;">
-        <div style="width: 36px; height: 36px; background: var(--accent-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 10px rgba(var(--accent-color-rgb), 0.3);">
-            <i class="fas fa-images" style="font-size: 16px;"></i>
-        </div>
-        <div>
-            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); letter-spacing: 0.5px;">传讯专属画廊</div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">获取气泡等素材</div>
-        </div>
-    </div>
-    <i class="fas fa-chevron-right" style="color: var(--accent-color); opacity: 0.7;"></i>
-</div>
 <div id="appearance-nav-grid" style="display:grid;grid-template-columns:1fr;gap:10px;padding:4px 0 12px;margin-left:0;">
     <div class="settings-card" onclick="showAppearancePanel('theme')" style="cursor:pointer;">
         <i class="fas fa-paint-roller"></i><span>主题配色</span>
@@ -13938,6 +13926,13 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
 .message-received {
   border-bottom: 2px solid var(--accent-color);
 }"></textarea>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;margin-top:8px;align-items:center;">
+                <select id="css-preset-select" class="modal-input" aria-label="CSS 预设" style="min-width:0;height:34px;font-size:12px;">
+                    <option value="">选择 CSS 预设</option>
+                </select>
+                <button id="save-css-preset-btn" class="modal-btn modal-btn-secondary" style="padding:6px 10px;font-size:12px;white-space:nowrap;">存为预设</button>
+                <button id="delete-css-preset-btn" class="modal-btn modal-btn-secondary" style="padding:6px 10px;font-size:12px;white-space:nowrap;" disabled>删除</button>
+            </div>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top:8px;">
                 <button id="reset-css-btn" class="modal-btn modal-btn-secondary" style="padding: 6px 12px; font-size: 12px;">清空</button>
                 <button id="apply-css-btn" class="modal-btn modal-btn-primary" style="padding: 6px 12px; font-size: 12px;">应用 CSS</button>
@@ -14005,32 +14000,6 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
             </div>
         </div>
     </div>
-
-    <!-- 传讯专属画廊确认框模态 -->
-    <div class="modal" id="gallery-confirm-modal">
-        <div class="modal-content" style="max-width: 360px;">
-            <div class="modal-title" style="text-align: center; justify-content: center; padding-left: 0;">
-                <i class="fas fa-exclamation-circle" style="color: var(--accent-color); font-size: 14px; margin-right: 6px;"></i><span>确认导航</span><i class="fas fa-exclamation-circle" style="color: var(--accent-color); font-size: 14px; margin-left: 6px;"></i>
-            </div>
-            <div style="padding: 24px 16px; text-align: center;">
-                <div style="font-size: 16px; color: var(--text-primary); line-height: 1.6; margin-bottom: 20px; font-weight: 600;">传讯专属画廊</div>
-                <div style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.5;">将跳转至外部网页获取气泡、背景等素材</div>
-                <div style="background: rgba(var(--accent-color-rgb), 0.08); border: 1px solid rgba(var(--accent-color-rgb), 0.2); border-radius: 10px; padding: 10px; margin-bottom: 0; font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 6px;">
-                    <i class="fas fa-info-circle" style="flex-shrink: 0;"></i>
-                    <span>请确认您已准备好跳转到外部网站</span>
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; padding: 8px 24px 24px 24px;">
-                <button class="modal-btn modal-btn-primary" id="confirm-gallery" onclick="openGalleryExternal()" style="width: 60%; max-width: 180px; min-width: 120px;">
-                    <i class="fas fa-check"></i> 确认
-                </button>
-                <button class="modal-btn modal-btn-secondary" id="cancel-gallery" onclick="hideModal(document.getElementById('gallery-confirm-modal'))" style="width: 60%; max-width: 180px; min-width: 120px;">
-                    <i class="fas fa-times"></i> 取消
-                </button>
-            </div>
-        </div>
-    </div>
-
 
     <div class="modal" id="chat-modal">
         <div class="modal-content">
@@ -14659,7 +14628,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                     <i class="fas fa-balance-scale"></i><span>抉择</span>
                 </div>
                 <div class="settings-item" id="fortune-lenormand-function" style="position:relative;">
-                    <i class="fas fa-star-and-crescent"></i><span>运势 · 占卜</span>
+                    <i class="fas fa-star-and-crescent"></i><span>塔罗</span>
                 </div>
                 <div class="settings-item" id="anniversary-function">
                     <i class="fas fa-heart"></i><span>重要日</span>
@@ -14787,52 +14756,8 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
 
     <div class="modal" id="fortune-lenormand-modal">
         <div class="modal-content fl-modal-content">
-            <div class="fl-tab-bar">
-                <button class="fl-tab active" id="fl-tab-fortune" onclick="switchFLTab('fortune')">
-                    <i class="fas fa-sun"></i> 每日运势
-                </button>
-                <button class="fl-tab" id="fl-tab-lenormand" onclick="switchFLTab('lenormand')">
-                    <i class="fas fa-moon"></i> 雷诺曼占卜
-                </button>
-                <button class="fl-tab" id="fl-tab-tarot" onclick="switchFLTab('tarot')">
-                    <i class="fas fa-star-and-crescent"></i> 塔罗占卜
-                </button>
-                <button class="fl-tab" id="fl-tab-divihistory" onclick="switchFLTab('divihistory')">
-                    <i class="fas fa-scroll"></i> 往昔
-                </button>
-            </div>
-            <div id="fl-panel-fortune" class="fl-panel fl-panel-active">
-                <div id="fortune-content"></div>
-                <div class="modal-buttons" style="margin-top:16px;">
-
-                    <button class="modal-btn modal-btn-secondary" id="close-fortune">关闭</button>
-                </div>
-            </div>
-            <div id="fl-panel-lenormand" class="fl-panel">
-                <div id="lenormand-content">
-                    <div id="lenormand-setup" style="padding: 4px 0 12px;">
-                        <div class="leno-num-section">
-                            <div class="leno-section-label"><i class="fas fa-layer-group"></i> 抽牌数量</div>
-                            <div class="leno-num-btns">
-                                <button class="lenormand-num-btn active" onclick="setLenormandCount(1)"><span class="leno-btn-num">1</span><span class="leno-btn-label">单张</span></button>
-                                <button class="lenormand-num-btn" onclick="setLenormandCount(3)"><span class="leno-btn-num">3</span><span class="leno-btn-label">三张</span></button>
-                            </div>
-                            <div class="leno-num-desc" id="leno-num-desc">单张牌 · 直达答案</div>
-                        </div>
-                        <div class="leno-question-section">
-                            <div class="leno-section-label"><i class="fas fa-feather-alt"></i> 你的提问（可选）</div>
-                            <textarea id="lenormand-question" placeholder="将心中的疑问轻声诉说..." class="leno-question-input"></textarea>
-                        </div>
-                        <button class="modal-btn modal-btn-primary leno-draw-btn" onclick="startLenormandDraw()"><i class="fas fa-hand-sparkles"></i> 开始抽牌</button>
-                    </div>
-                    <div id="lenormand-result" style="display:none;"></div>
-                </div>
-                <div class="modal-buttons" style="margin-top:12px;">
-                    <button class="modal-btn modal-btn-secondary" id="lenormand-reset-btn" onclick="resetLenormand()" style="display:none;">重新占卜</button>
-                    <button class="modal-btn modal-btn-secondary" id="close-lenormand">关闭</button>
-                </div>
-            </div>
-            <div id="fl-panel-tarot" class="fl-panel">
+            <div class="modal-title"><i class="fas fa-star-and-crescent"></i><span>塔罗</span></div>
+            <div id="fl-panel-tarot" class="fl-panel fl-panel-active">
                 <div id="tarot-divination-content">
                     <div id="tarot-setup" style="padding:4px 0 12px;">
                         <div class="leno-num-section">
@@ -14855,20 +14780,6 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                 <div class="modal-buttons" style="margin-top:12px;">
                     <button class="modal-btn modal-btn-secondary" id="tarot-reset-btn" onclick="resetTarotDivination()" style="display:none;">重新占卜</button>
                     <button class="modal-btn modal-btn-secondary" id="close-tarot-divination">关闭</button>
-                </div>
-            </div>
-            <div id="fl-panel-divihistory" class="fl-panel">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <div style="font-size:13px;color:var(--text-secondary);font-style:italic;">每一次占卜，皆是与命运的对话</div>
-                    <button id="clear-divi-history-btn" onclick="clearDiviHistory()" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-family);">清空记录</button>
-                </div>
-                <div id="divi-history-list" style="display:flex;flex-direction:column;gap:12px;min-height:120px;"></div>
-                <div id="divi-history-empty" style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:13px;display:none;">
-                    <i class="fas fa-moon" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px;"></i>
-                    尚无占卜记录<br><span style="font-size:11px;opacity:0.6;">完成一次占卜后，结果将自动收录于此</span>
-                </div>
-                <div class="modal-buttons" style="margin-top:16px;">
-                    <button class="modal-btn modal-btn-secondary" id="close-divihistory">关闭</button>
                 </div>
             </div>
         </div>
@@ -17392,6 +17303,8 @@ autoSendInterval: 5,
         partnerPokeCustomSoundUrl: '',
         soundVolume: 0.15,
         bottomCollapseMode: false,
+        compactHeaderMode: false,
+        headerColorPreset: 'gray',
         emojiMixEnabled: true,
         stickerSendChance: 0.2
             };
@@ -17598,6 +17511,9 @@ const loadData = async () => {
                 messages = [];
             }
         }
+        /* Also inspect existing records after startup, not only after the next
+         * message is saved.  The work itself is split into idle-time chunks. */
+        setTimeout(() => scheduleChatSizeWarning(true), 1200);
 
         if (savedBgGallery) {
             savedBackgrounds = savedBgGallery;
@@ -17768,6 +17684,55 @@ function _tryRecoverFromBackup() {
     }
 }
 
+/* Incremental chat-size check: measuring in small idle chunks avoids a long
+ * main-thread pause when a conversation has already become very large. */
+const _CHAT_SIZE_WARNING_BYTES = 100 * 1024 * 1024;
+let _chatSizeCheckRunning = false;
+let _lastChatSizeCheckAt = 0;
+function scheduleChatSizeWarning(force) {
+    if (_chatSizeCheckRunning) return;
+    if (!force && Date.now() - _lastChatSizeCheckAt < 15000) return;
+    _chatSizeCheckRunning = true;
+    _lastChatSizeCheckAt = Date.now();
+    let index = 0;
+    let bytes = 2;
+    const count = messages.length;
+    const runChunk = deadline => {
+        let processed = 0;
+        try {
+            while (index < count && processed < 40 && (!deadline || deadline.timeRemaining() > 2)) {
+                const json = JSON.stringify(messages[index++] || null);
+                bytes += new Blob([json]).size + 1;
+                processed++;
+                if (bytes > _CHAT_SIZE_WARNING_BYTES) break;
+            }
+        } catch (e) {
+            console.warn('[storage] 聊天记录大小检测失败:', e);
+            _chatSizeCheckRunning = false;
+            return;
+        }
+        if (bytes > _CHAT_SIZE_WARNING_BYTES || index >= count) {
+            _chatSizeCheckRunning = false;
+            const warningKey = `${APP_PREFIX}${SESSION_ID || 'default'}_chat100mbWarned`;
+            if (bytes > _CHAT_SIZE_WARNING_BYTES) {
+                let hasWarned = false;
+                try { hasWarned = localStorage.getItem(warningKey) === '1'; } catch (e) {}
+                if (!hasWarned) {
+                    try { localStorage.setItem(warningKey, '1'); } catch (e) {}
+                    setTimeout(() => alert('当前聊天记录已超过 100 MB。\n\n记录过多可能导致页面卡顿或无法打开，建议现在导出备份，并删除一部分旧消息。'), 0);
+                }
+            } else if (bytes < 90 * 1024 * 1024) {
+                try { localStorage.removeItem(warningKey); } catch (e) {}
+            }
+            return;
+        }
+        if (typeof requestIdleCallback === 'function') requestIdleCallback(runChunk, { timeout: 500 });
+        else setTimeout(() => runChunk(null), 16);
+    };
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(runChunk, { timeout: 500 });
+    else setTimeout(() => runChunk(null), 16);
+}
+
 const saveData = async () => {
     if (!SESSION_ID) {
         console.warn('[saveData] SESSION_ID 尚未初始化，跳过保存以防数据写入临时 key');
@@ -17836,6 +17801,7 @@ const saveData = async () => {
     }
 
     _backupCriticalData();
+    scheduleChatSizeWarning(false);
 };
 
         function initializeRandomUI() {
@@ -18871,10 +18837,11 @@ if (!isBatchMode && type === 'normal') {
         if (changed) { _updateReadReceiptsDOM(); throttledSaveData(); }
     }, readDelay);
 
-    if (window._pendingReplyTimer) clearTimeout(window._pendingReplyTimer);
-    window._pendingReplyTimer = null;
-
-            if (!shouldIgnore) {
+            /* Use the latest outgoing message as the start of the reply delay.
+             * Only the pending (not-yet-started) cycle is replaced; an active
+             * reply cycle is never duplicated. */
+            if (!shouldIgnore && !window._replyCycleActive) {
+        if (window._pendingReplyTimer) clearTimeout(window._pendingReplyTimer);
         if (settings.typingIndicatorEnabled) {
             const tiWrapper = document.getElementById('typing-indicator-wrapper');
             const tiLabel = document.getElementById('typing-indicator-label');
@@ -18892,7 +18859,7 @@ if (!isBatchMode && type === 'normal') {
         }
         window._pendingReplyTimer = setTimeout(() => {
             window._pendingReplyTimer = null;
-            simulateReply();
+            simulateReply(true);
         }, randomDelay);
     }
 }
@@ -19014,7 +18981,14 @@ if (!isBatchMode && type === 'normal') {
             ro.observe(inputArea);
         })();
 
-        window.simulateReply = function() {
+        window.simulateReply = function(delayAlreadyWaited) {
+            if (window._replyCycleActive) return;
+            window._replyCycleActive = true;
+
+            function finishReplyCycle() {
+                window._replyCycleActive = false;
+            }
+
             function showTypingIndicator() {
                 if (!settings.typingIndicatorEnabled) return;
                 const tiWrapper = document.getElementById('typing-indicator-wrapper');
@@ -19062,12 +19036,18 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
             if (Math.random() < 0.03) {
                 // ── 对方拍一拍：调用提取的通用函数（同时供 /测试拍一拍 指令使用）──
                 if (typeof window._triggerPartnerPoke === 'function') window._triggerPartnerPoke();
+                finishReplyCycle();
+                const tiWrapper = document.getElementById('typing-indicator-wrapper');
+                if (tiWrapper) tiWrapper.style.display = 'none';
                 return;
             }
 
             const replyCount = Math.floor(Math.random() * 3) + 1;
             if (!customReplies || customReplies.length === 0) {
                 showNotification('回复库为空，请先到「自定义回复」中添加内容', 'info', 3500);
+                finishReplyCycle();
+                const tiWrapper = document.getElementById('typing-indicator-wrapper');
+                if (tiWrapper) tiWrapper.style.display = 'none';
                 return;
             }
             const disabledItemsOnce = (() => {
@@ -19086,6 +19066,9 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                 .filter(Boolean);
             if (!replyPoolOnce.length) {
                 showNotification('回复库可用内容为空（可能被分组禁用或屏蔽），请到「自定义回复」中调整', 'info', 4000);
+                finishReplyCycle();
+                const tiWrapper = document.getElementById('typing-indicator-wrapper');
+                if (tiWrapper) tiWrapper.style.display = 'none';
                 return;
             }
 
@@ -19097,7 +19080,11 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                 : [];
             for (let i = 0; i < replyCount; i++) {
                 const delayRange = settings.replyDelayMax - settings.replyDelayMin;
-                delay += settings.replyDelayMin + Math.random() * delayRange;
+                /* The normal send path already waited one configured interval.
+                 * Do not charge that interval a second time before reply #1. */
+                if (!(delayAlreadyWaited === true && i === 0)) {
+                    delay += settings.replyDelayMin + Math.random() * delayRange;
+                }
                 setTimeout(() => {
                     try {
                     const replyPool = replyPoolOnce;
@@ -19111,6 +19098,7 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                         }
                     }
                     if (!replyText && i === replyCount - 1) {
+                        finishReplyCycle();
                         (function(){try{if(window._typingIndicatorAutoHideTimer){clearTimeout(window._typingIndicatorAutoHideTimer);window._typingIndicatorAutoHideTimer=null;}}catch(e){}var _tiW=document.getElementById('typing-indicator-wrapper');if(_tiW){var _tiInner=_tiW.querySelector('.typing-indicator');if(_tiInner){_tiInner.classList.add('hiding');setTimeout(function(){_tiW.style.display='none';if(_tiInner)_tiInner.classList.remove('hiding');},240);}else{_tiW.style.display='none';}}})();
                         return;
                     }
@@ -19195,6 +19183,7 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                     }
 
                     if (i === replyCount - 1) {
+                        finishReplyCycle();
                         (function() {
                             try {
                                 if (window._typingIndicatorAutoHideTimer) {
@@ -19219,6 +19208,7 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                     }
                     } catch (e) {
                         console.error('[simulateReply] 渲染/回填出错:', e);
+                        finishReplyCycle();
                         // 机制性兜底：出错时至少让“正在输入中”消失，避免假死
                         try {
                             (function(){
@@ -21224,8 +21214,6 @@ window.showAppearancePanel = function(panel) {
     document.getElementById('appearance-nav-grid').style.display = 'none';
     var unBtn = document.getElementById('update-notice-btn');
     if (unBtn) unBtn.style.display = 'none';
-    var galleryBanner = document.getElementById('gallery-banner-entry');
-    if (galleryBanner) galleryBanner.style.display = 'none';
     document.getElementById('appearance-panel-container').style.display = 'block';
     document.getElementById('appearance-panel-title').textContent = APPEARANCE_PANEL_TITLES[panel] || panel;
     document.querySelectorAll('.appearance-sub-panel').forEach(p => p.style.display = 'none');
@@ -21246,8 +21234,6 @@ window.hideAppearancePanel = function() {
     document.querySelectorAll('.appearance-sub-panel').forEach(p => p.style.display = 'none');
     var unBtn = document.getElementById('update-notice-btn');
     if (unBtn) unBtn.style.display = 'flex';
-    var galleryBanner = document.getElementById('gallery-banner-entry');
-    if (galleryBanner) galleryBanner.style.display = 'flex';
 };
 
 window.openEnvelopeAndViewReply = function(replyId) {
@@ -24402,6 +24388,7 @@ function applyAvatarShapeToDOM(type, shape) {
             '--primary-bg':        '主背景（聊天底色）',
             '--secondary-bg':      '卡片 / 弹窗背景',
             '--header-bg':         '顶栏背景色',
+            '--compact-header-content-color': '收起顶栏内容颜色（箭头 / 昵称 / 状态 / 视频）',
             '--input-area-bg':     '输入框区域背景',
             '--text-primary':      '主要文字颜色',
             '--text-secondary':    '次要文字 / 说明文字',
@@ -24602,7 +24589,7 @@ function initThemeEditor() {
 
             const groups = [
                 { label: '🖼 背景颜色',  vars: ['--primary-bg','--secondary-bg','--header-bg','--input-area-bg'] },
-                { label: '✏️ 文字 & 线条', vars: ['--text-primary','--text-secondary','--timestamp-color','--border-color'] },
+                { label: '✏️ 文字 & 线条', vars: ['--text-primary','--text-secondary','--compact-header-content-color','--timestamp-color','--border-color'] },
                 { label: '✨ 强调色（影响全局）', vars: ['--accent-color','--accent-color-dark'] },
                 { label: '💬 我方气泡',  vars: ['--message-sent-bg','--message-sent-text'] },
                 { label: '💬 对方气泡',  vars: ['--message-received-bg','--message-received-text'] },
@@ -26150,9 +26137,15 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
     }
     function positionPill() {
         const pill = document.getElementById('call-mini-pill');
-        if (!pill || !S.pillPos) return;
-        pill.style.left   = clamp(S.pillPos.x, 0, window.innerWidth  - (pill.offsetWidth  || 180)) + 'px';
-        pill.style.top    = clamp(S.pillPos.y, 150, window.innerHeight - (pill.offsetHeight || 50))  + 'px';
+        if (!pill) return;
+        const pillWidth = pill.offsetWidth || 36;
+        const pillHeight = pill.offsetHeight || 42;
+        const saved = S.pillPos || { x: window.innerWidth - pillWidth, y: window.innerHeight * .48 };
+        const dockLeft = saved.x < (window.innerWidth - pillWidth) / 2;
+        pill.classList.toggle('dock-left', dockLeft);
+        pill.classList.toggle('dock-right', !dockLeft);
+        pill.style.left = (dockLeft ? 0 : window.innerWidth - pillWidth) + 'px';
+        pill.style.top = clamp(saved.y, 110, window.innerHeight - pillHeight - 16) + 'px';
         pill.style.right  = 'auto'; pill.style.bottom = 'auto';
     }
 
@@ -26390,8 +26383,10 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
             if (!on) return; on = false;
             if (S.pillDragged) {
                 const r = pill.getBoundingClientRect();
-                S.pillPos = { x: r.left, y: r.top };
+                const dockLeft = r.left + r.width / 2 < window.innerWidth / 2;
+                S.pillPos = { x: dockLeft ? 0 : window.innerWidth - r.width, y: r.top };
                 localStorage.setItem(KEY_PILL_POS, JSON.stringify(S.pillPos));
+                positionPill();
             }
             S.pillDragOff = null;
             try { pill.releasePointerCapture(e.pointerId); } catch(_) {}
@@ -28812,8 +28807,10 @@ function showEmojiTab() {
                 
                 const delayRange = settings.replyDelayMax - settings.replyDelayMin;
                 const randomDelay = settings.replyDelayMin + Math.random() * delayRange;
-                if (window._pendingReplyTimer) clearTimeout(window._pendingReplyTimer);
-                window._pendingReplyTimer = setTimeout(() => { window._pendingReplyTimer = null; simulateReply(); }, randomDelay);
+                if (!window._replyCycleActive) {
+                    if (window._pendingReplyTimer) clearTimeout(window._pendingReplyTimer);
+                    window._pendingReplyTimer = setTimeout(() => { window._pendingReplyTimer = null; simulateReply(true); }, randomDelay);
+                }
             }
             document.getElementById('user-sticker-picker').classList.remove('active');
         };
@@ -32234,6 +32231,13 @@ if (_chatSettingsEl) _chatSettingsEl.addEventListener('click', () => {
             const cssTextarea = document.getElementById('custom-bubble-css');
             const applyCssBtn = document.getElementById('apply-css-btn');
             const resetCssBtn = document.getElementById('reset-css-btn');
+            const cssPresetSelect = document.getElementById('css-preset-select');
+            const saveCssPresetBtn = document.getElementById('save-css-preset-btn');
+            const deleteCssPresetBtn = document.getElementById('delete-css-preset-btn');
+            const CSS_PRESET_KEY = `${APP_PREFIX}cssPresets`;
+            const CSS_PRESET_MAX_COUNT = 30;
+            const CSS_PRESET_MAX_BYTES = 100 * 1024;
+            let cssPresets = [];
 
             if (cssTextarea) cssTextarea.value = settings.customBubbleCss || "";
 
@@ -32252,6 +32256,60 @@ if (_chatSettingsEl) _chatSettingsEl.addEventListener('click', () => {
                 cssTextarea.addEventListener('input', updateCssLivePreview);
                 updateCssLivePreview();
             }
+
+            function renderCssPresets() {
+                if (!cssPresetSelect) return;
+                const selected = cssPresetSelect.value;
+                cssPresetSelect.innerHTML = '<option value="">选择 CSS 预设</option>' + cssPresets.map(p =>
+                    `<option value="${String(p.id).replace(/"/g, '&quot;')}">${String(p.name).replace(/&/g, '&amp;').replace(/</g, '&lt;')}</option>`
+                ).join('');
+                if (cssPresets.some(p => String(p.id) === selected)) cssPresetSelect.value = selected;
+                if (deleteCssPresetBtn) deleteCssPresetBtn.disabled = !cssPresetSelect.value;
+            }
+
+            if (window.localforage) {
+                localforage.getItem(CSS_PRESET_KEY).then(saved => {
+                    cssPresets = Array.isArray(saved) ? saved : [];
+                    renderCssPresets();
+                }).catch(() => renderCssPresets());
+            }
+
+            if (cssPresetSelect) cssPresetSelect.addEventListener('change', () => {
+                const preset = cssPresets.find(p => String(p.id) === cssPresetSelect.value);
+                if (deleteCssPresetBtn) deleteCssPresetBtn.disabled = !preset;
+                if (!preset || !cssTextarea) return;
+                cssTextarea.value = preset.css || '';
+                updateCssLivePreview();
+            });
+
+            if (saveCssPresetBtn) saveCssPresetBtn.addEventListener('click', async () => {
+                const css = cssTextarea ? cssTextarea.value : '';
+                if (!css.trim()) { showNotification('请先输入 CSS', 'info'); return; }
+                if (new Blob([css]).size > CSS_PRESET_MAX_BYTES) {
+                    showNotification('单个 CSS 预设不能超过 100 KB', 'warning', 3500); return;
+                }
+                if (cssPresets.length >= CSS_PRESET_MAX_COUNT) {
+                    showNotification('最多保存 30 个 CSS 预设，请先删除一个', 'warning', 3500); return;
+                }
+                const name = prompt('给这个 CSS 预设起一个名字：', `预设 ${cssPresets.length + 1}`);
+                if (!name || !name.trim()) return;
+                const preset = { id: `${Date.now()}_${Math.random().toString(36).slice(2,7)}`, name: name.trim().slice(0,40), css };
+                cssPresets.push(preset);
+                await localforage.setItem(CSS_PRESET_KEY, cssPresets);
+                renderCssPresets();
+                cssPresetSelect.value = preset.id;
+                if (deleteCssPresetBtn) deleteCssPresetBtn.disabled = false;
+                showNotification('CSS 预设已保存', 'success');
+            });
+
+            if (deleteCssPresetBtn) deleteCssPresetBtn.addEventListener('click', async () => {
+                const id = cssPresetSelect ? cssPresetSelect.value : '';
+                if (!id) return;
+                cssPresets = cssPresets.filter(p => String(p.id) !== id);
+                await localforage.setItem(CSS_PRESET_KEY, cssPresets);
+                renderCssPresets();
+                showNotification('CSS 预设已删除', 'success');
+            });
 
             if (applyCssBtn) {
                 applyCssBtn.addEventListener('click', () => {
@@ -32987,8 +33045,8 @@ autoSendSlider.addEventListener('change', () => {
             if (flEntry) {
                 flEntry.addEventListener('click', () => {
                     hideModal(DOMElements.advancedModal.modal);
-                    generateFortune();
-                    switchFLTab('fortune');
+                    resetTarotDivination();
+                    switchFLTab('tarot');
                     showModal(document.getElementById('fortune-lenormand-modal'));
                 });
             }
@@ -33013,17 +33071,6 @@ autoSendSlider.addEventListener('change', () => {
             renderEnvelopeLists();
             showModal(document.getElementById('envelope-modal'));
         });
-    }
-    const galleryBanner = document.getElementById('gallery-banner-entry');
-    if (galleryBanner) {
-        // 移除旧的直接打开链接的监听器，改为弹出确认框
-        galleryBanner.addEventListener('click', () => {
-            showGalleryConfirmModal();
-        });
-        // 保留鼠标动画效果
-        galleryBanner.addEventListener('mousedown', () => { galleryBanner.style.transform = 'scale(0.97)'; });
-        galleryBanner.addEventListener('mouseup', () => { galleryBanner.style.transform = 'scale(1)'; });
-        galleryBanner.addEventListener('mouseleave', () => { galleryBanner.style.transform = 'scale(1)'; });
     }
 const _sendEnvEl = document.getElementById('send-envelope');
 if (_sendEnvEl) _sendEnvEl.addEventListener('click', handleSendEnvelope);
@@ -35144,41 +35191,6 @@ window.addEventListener('load', function() {
     }, 4500);
 }, { once: true });
 
-/**
- * 变更2：传讯专属画廊确认框相关函数
- */
-
-/**
- * 显示传讯专属画廊确认框
- */
-function showGalleryConfirmModal() {
-    const modal = document.getElementById('gallery-confirm-modal');
-    if (modal) {
-        showModal(modal);
-    }
-}
-
-/**
- * 打开外部网页（传讯专属画廊）
- * 注：实际URL需要根据应用配置修改
- */
-function openGalleryExternal() {
-    const modal = document.getElementById('gallery-confirm-modal');
-    if (modal) {
-        hideModal(modal);
-    }
-    
-    // 外部网页URL - 根据实际情况修改
-    const galleryUrl = 'https://www.xhs.com'; // 示例URL，需要替换为实际的画廊网址
-    
-    try {
-        window.open(galleryUrl, '_blank');
-    } catch (error) {
-        console.error('打开外部网页失败:', error);
-        showNotification('无法打开外部网页，请检查浏览器设置', 'error', 3000);
-    }
-}
-
 </script>
 
     <script>
@@ -36390,7 +36402,6 @@ function openGalleryExternal() {
         [document.getElementById('message-input'), question, options].forEach(function (field) {
             if (field) {
                 field.removeAttribute('maxlength');
-                field.maxLength = -1;
             }
         });
 
@@ -36641,7 +36652,7 @@ function openGalleryExternal() {
                 '<div class="menu-action-grid">' +
                     makeAction('mood-function', 'fa-calendar-day', '心晴手账') +
                     makeAction('envelope-function', 'fa-envelope', '信封投递') +
-                    makeAction('fortune-lenormand-function', 'fa-star-and-crescent', '运势 · 占卜') +
+                    makeAction('fortune-lenormand-function', 'fa-star-and-crescent', '塔罗') +
                     makeAction('anniversary-function', 'fa-heart', '重要日') +
                     makeAction('suggestion-function', 'fa-list-check', '让对方选一个') +
                 '</div>'
@@ -37215,26 +37226,26 @@ function openGalleryExternal() {
     /* Minimized call is only a three-dot side tab; click it to restore. */
     #call-mini-pill,
     #call-mini-pill.visible {
-        right: 0 !important;
-        left: auto !important;
-        top: 48% !important;
-        bottom: auto !important;
-        width: 43px !important;
-        min-width: 43px !important;
-        height: 48px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 42px !important;
         padding: 0 !important;
         display: none;
         align-items: center !important;
         justify-content: center !important;
         border: 1px solid rgba(255,255,255,.16) !important;
-        border-right: 0 !important;
-        border-radius: 17px 0 0 17px !important;
+        border-radius: 14px 0 0 14px !important;
         color: #fff;
         background: rgba(20,21,24,.46) !important;
         box-shadow: -8px 10px 30px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.08) !important;
         backdrop-filter: blur(22px) saturate(140%) !important;
         -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+        touch-action: none !important;
+        cursor: grab;
     }
+    #call-mini-pill:active { cursor: grabbing; }
+    #call-mini-pill.dock-right { border-right: 0 !important; border-left: 1px solid rgba(255,255,255,.16) !important; border-radius: 14px 0 0 14px !important; }
+    #call-mini-pill.dock-left { border-left: 0 !important; border-right: 1px solid rgba(255,255,255,.16) !important; border-radius: 0 14px 14px 0 !important; }
     #call-mini-pill.visible { display: flex !important; }
     #call-mini-pill > * { display: none !important; }
     #call-mini-pill::after {
@@ -37305,14 +37316,8 @@ function openGalleryExternal() {
                 });
             }
 
-            /* Old saved pill coordinates must not pull the three-dot tab away from the side. */
-            try { localStorage.removeItem('callPillPos'); } catch (e) {}
             var pill = document.getElementById('call-mini-pill');
             if (pill) {
-                pill.style.setProperty('left', 'auto', 'important');
-                pill.style.setProperty('right', '0', 'important');
-                pill.style.setProperty('top', '48%', 'important');
-                pill.style.setProperty('bottom', 'auto', 'important');
                 pill.setAttribute('aria-label', '恢复视频通话');
                 pill.title = '恢复视频通话';
             }
@@ -39014,6 +39019,2577 @@ function openGalleryExternal() {
         border-color: rgba(255,255,255,.22) !important;
     }
 </style>
+
+<style id="interface-color-compact-header-and-card-glass">
+    /* The former preset palette is retired; the unified color control replaces it. */
+    .settings-card[onclick*="'theme'"],
+    .settings-card[onclick*='"theme"'],
+    #appearance-panel-theme,
+    #theme-schemes-section,
+    .theme-picker,
+    #open-theme-editor {
+        display: none !important;
+    }
+
+    /* Header glass stays readable without the heavy blur used by the bottom composer. */
+    .header,
+    .header::before {
+        -webkit-backdrop-filter: blur(10px) saturate(130%) !important;
+        backdrop-filter: blur(10px) saturate(130%) !important;
+    }
+    .header::after {
+        -webkit-backdrop-filter: blur(5px) saturate(120%) !important;
+        backdrop-filter: blur(5px) saturate(120%) !important;
+    }
+    .header #dc-mobile-open-btn,
+    .header .header-actions #call-toolbar-btn,
+    .header .partner-name-line,
+    .header .header-right > .user-info:first-child .status {
+        -webkit-backdrop-filter: blur(13px) saturate(135%) !important;
+        backdrop-filter: blur(13px) saturate(135%) !important;
+    }
+
+    /* Every forced card and nested card shares the same wallpaper-aware glass material. */
+    .modal {
+        background: rgba(0,0,0,.10) !important;
+        -webkit-backdrop-filter: blur(5px) saturate(110%) !important;
+        backdrop-filter: blur(5px) saturate(110%) !important;
+    }
+    .modal-content,
+    .modal-content .cs-header,
+    .modal-content .cs-tabs,
+    .modal-content .cs-card,
+    .modal-content .settings-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .appearance-sub-panel,
+    .modal-content .dm-row-item,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .picker-option-item,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content [class*="card"]:not(.message):not(.message-sent):not(.message-received) {
+        background: rgba(var(--user-interface-rgb,255,255,255), var(--user-interface-alpha-soft,.045)) !important;
+        background-color: rgba(var(--user-interface-rgb,255,255,255), var(--user-interface-alpha-soft,.045)) !important;
+        border-color: rgba(var(--user-interface-rgb,255,255,255), .13) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.055) !important;
+        -webkit-backdrop-filter: blur(26px) saturate(150%) !important;
+        backdrop-filter: blur(26px) saturate(150%) !important;
+    }
+    .modal-content,
+    .consolidated-menu,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    #reply-preview-container {
+        background: rgba(var(--user-interface-rgb,255,255,255), var(--user-interface-alpha-strong,.12)) !important;
+        background-color: rgba(var(--user-interface-rgb,255,255,255), var(--user-interface-alpha-strong,.12)) !important;
+        border-color: rgba(var(--user-interface-rgb,255,255,255), .16) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(155%) !important;
+        backdrop-filter: blur(30px) saturate(155%) !important;
+    }
+    .modal-content .modal-buttons[style] {
+        background: rgba(var(--user-interface-rgb,255,255,255), var(--user-interface-alpha-soft,.045)) !important;
+        -webkit-backdrop-filter: blur(22px) saturate(145%) !important;
+        backdrop-filter: blur(22px) saturate(145%) !important;
+    }
+
+    /* The user-selected color reaches all non-message interface glass. */
+    #dc-mobile-open-btn,
+    .header-actions #call-toolbar-btn,
+    .partner-name-line,
+    .header-right > .user-info:first-child .status,
+    #chat-plus-btn,
+    .input-area,
+    .typing-indicator,
+    #call-mini-pill,
+    .settings-item,
+    .dm-row-item,
+    .cs-card,
+    .setting-pill-row,
+    .modal-btn-secondary,
+    .menu-action,
+    .input-btn {
+        background-color: rgba(var(--user-interface-rgb,255,255,255), var(--user-interface-alpha,.08)) !important;
+        border-color: rgba(var(--user-interface-rgb,255,255,255), .14) !important;
+    }
+
+    .interface-color-card {
+        padding: 12px 14px !important;
+    }
+    .interface-color-row {
+        display: grid;
+        grid-template-columns: 34px minmax(0,1fr) auto;
+        align-items: center;
+        gap: 11px;
+    }
+    #interface-color-picker {
+        width: 34px;
+        height: 34px;
+        padding: 2px;
+        border: .5px solid rgba(255,255,255,.2);
+        border-radius: 50%;
+        background: transparent;
+        overflow: hidden;
+    }
+    #interface-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    #interface-color-picker::-webkit-color-swatch { border: 0; border-radius: 50%; }
+    .interface-color-copy strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 13px;
+    }
+    .interface-color-copy span {
+        display: block;
+        margin-top: 2px;
+        color: var(--text-secondary);
+        font-size: 10.5px;
+    }
+    .interface-strength-row {
+        display: grid;
+        grid-template-columns: auto minmax(0,1fr) 38px;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+    }
+    .interface-strength-row label,
+    #interface-tint-value { color: var(--text-secondary); font-size: 11px; }
+    #interface-tint-value { text-align: right; }
+
+    /* Compact reference mode: one functional top row, with video kept at the top-right. */
+    body.compact-header-mode .header {
+        min-height: 76px !important;
+        height: 76px !important;
+        padding: max(7px, env(safe-area-inset-top)) 14px 5px !important;
+    }
+    body.compact-header-mode .header-inner {
+        min-height: 62px !important;
+        height: 62px !important;
+    }
+    body.compact-header-mode .header-right {
+        height: 62px !important;
+    }
+    body.compact-header-mode .header-right > .user-info:first-child {
+        top: 7px !important;
+        left: 66px !important;
+        right: 70px !important;
+        width: auto !important;
+        height: 52px !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        align-items: flex-start !important;
+        transform: none !important;
+    }
+    body.compact-header-mode .header-right > .user-info:first-child .avatar-container {
+        display: none !important;
+    }
+    body.compact-header-mode .partner-name-line {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 28px !important;
+        min-height: 28px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        justify-content: flex-start !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.compact-header-mode .partner-name-line .username {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 18px !important;
+        line-height: 28px !important;
+        text-align: left !important;
+    }
+    body.compact-header-mode .partner-status-arrow { display: none !important; }
+    body.compact-header-mode .header-right > .user-info:first-child .status {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 18px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        color: var(--text-secondary) !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        opacity: .82 !important;
+        visibility: visible !important;
+        transform: none !important;
+        pointer-events: auto !important;
+    }
+    body.compact-header-mode .header-left {
+        left: 8px !important;
+        top: 50% !important;
+    }
+    body.compact-header-mode .header-actions {
+        right: 8px !important;
+        top: 50% !important;
+    }
+    body.compact-header-mode #dc-mobile-open-btn,
+    body.compact-header-mode .header-actions #call-toolbar-btn {
+        width: 44px !important;
+        height: 44px !important;
+    }
+    body.compact-header-mode .main-chat-area {
+        height: calc(100dvh - 76px) !important;
+    }
+    body.compact-header-mode .chat-container {
+        padding-top: 10px !important;
+    }
+</style>
+
+<script id="interface-color-compact-header-and-partner-avatar">
+(function () {
+    'use strict';
+
+    function hexToRgb(hex) {
+        var value = String(hex || '#ffffff').replace('#', '').trim();
+        if (value.length === 3) value = value.split('').map(function (c) { return c + c; }).join('');
+        if (!/^[0-9a-fA-F]{6}$/.test(value)) value = 'ffffff';
+        return [parseInt(value.slice(0,2),16), parseInt(value.slice(2,4),16), parseInt(value.slice(4,6),16)];
+    }
+
+    function applyInterfacePreferences() {
+        return false; /* retired: global interface tinting was removed */
+        if (typeof settings === 'undefined') return false;
+        if (!settings.interfaceColor) settings.interfaceColor = '#ffffff';
+        if (!Number.isFinite(Number(settings.interfaceTintStrength))) settings.interfaceTintStrength = 8;
+        if (settings.compactHeaderMode === undefined) settings.compactHeaderMode = false;
+
+        settings.colorTheme = 'black-white';
+        var rgb = hexToRgb(settings.interfaceColor);
+        var amount = Math.max(0, Math.min(30, Number(settings.interfaceTintStrength))) / 100;
+        var soft = Math.max(.012, amount * .55);
+        var strong = Math.max(.07, amount + .045);
+
+        var style = document.getElementById('user-interface-color-style');
+        if (!style) {
+            style = document.createElement('style');
+            style.id = 'user-interface-color-style';
+        }
+        style.textContent = ':root{' +
+            '--user-interface-color:' + settings.interfaceColor + ';' +
+            '--user-interface-rgb:' + rgb.join(',') + ';' +
+            '--user-interface-alpha:' + amount.toFixed(3) + ';' +
+            '--user-interface-alpha-soft:' + soft.toFixed(3) + ';' +
+            '--user-interface-alpha-strong:' + strong.toFixed(3) + ';' +
+            '--accent-color:' + settings.interfaceColor + ';' +
+            '--accent-color-rgb:' + rgb.join(',') + ';' +
+        '}';
+        document.head.appendChild(style);
+
+        /* User CSS remains the final authority. */
+        ['user-custom-bubble-style', 'user-custom-global-theme-style'].forEach(function (id) {
+            var custom = document.getElementById(id);
+            if (custom && document.body) document.body.appendChild(custom);
+        });
+
+        document.documentElement.setAttribute('data-color-theme', 'user-interface');
+        document.documentElement.setAttribute('data-ui-color', 'true');
+        document.body.classList.toggle('compact-header-mode', !!settings.compactHeaderMode);
+
+        var compactToggle = document.getElementById('compact-header-mode-toggle');
+        if (compactToggle) compactToggle.classList.toggle('active', !!settings.compactHeaderMode);
+        var picker = document.getElementById('interface-color-picker');
+        if (picker) picker.value = settings.interfaceColor;
+        var slider = document.getElementById('interface-tint-strength');
+        if (slider) slider.value = String(settings.interfaceTintStrength);
+        var value = document.getElementById('interface-tint-value');
+        if (value) value.textContent = settings.interfaceTintStrength + '%';
+        return true;
+    }
+
+    function buildSettingsEntries() {
+        return false; /* replaced by header-only presets below */
+        if (typeof settings === 'undefined') return false;
+        var displayPanel = document.getElementById('cs-panel-display');
+        var avatarPanel = document.getElementById('cs-panel-avatar');
+        if (!displayPanel || !avatarPanel) return false;
+
+        if (!document.getElementById('interface-color-card')) {
+            var colorLabel = document.createElement('p');
+            colorLabel.className = 'cs-group-label';
+            colorLabel.textContent = '界面颜色';
+            var colorCard = document.createElement('div');
+            colorCard.id = 'interface-color-card';
+            colorCard.className = 'cs-card interface-color-card';
+            colorCard.innerHTML =
+                '<div class="interface-color-row">' +
+                    '<input id="interface-color-picker" type="color" value="#ffffff" aria-label="界面颜色">' +
+                    '<div class="interface-color-copy"><strong>全局界面颜色</strong><span>覆盖系统预设；自定义 CSS 优先</span></div>' +
+                    '<button type="button" id="reset-interface-color" class="modal-btn modal-btn-secondary" style="padding:6px 9px;font-size:11px;">重置</button>' +
+                '</div>' +
+                '<div class="interface-strength-row">' +
+                    '<label for="interface-tint-strength">着色强度</label>' +
+                    '<input id="interface-tint-strength" class="font-size-slider" type="range" min="0" max="30" step="1" value="8">' +
+                    '<span id="interface-tint-value">8%</span>' +
+                '</div>';
+            displayPanel.insertBefore(colorCard, displayPanel.firstChild);
+            displayPanel.insertBefore(colorLabel, colorCard);
+
+            var picker = colorCard.querySelector('#interface-color-picker');
+            var strength = colorCard.querySelector('#interface-tint-strength');
+            picker.addEventListener('input', function () {
+                settings.interfaceColor = picker.value;
+                applyInterfacePreferences();
+            });
+            picker.addEventListener('change', function () {
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+            strength.addEventListener('input', function () {
+                settings.interfaceTintStrength = Number(strength.value);
+                applyInterfacePreferences();
+            });
+            strength.addEventListener('change', function () {
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+            colorCard.querySelector('#reset-interface-color').addEventListener('click', function () {
+                settings.interfaceColor = '#ffffff';
+                settings.interfaceTintStrength = 8;
+                applyInterfacePreferences();
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+        }
+
+        if (!document.getElementById('compact-header-mode-toggle')) {
+            var firstCard = displayPanel.querySelector('.cs-immersive-wrap');
+            if (!firstCard) {
+                firstCard = document.createElement('div');
+                firstCard.className = 'cs-card cs-immersive-wrap';
+                var displayLabel = Array.from(displayPanel.querySelectorAll('.cs-group-label')).find(function (label) {
+                    return label.textContent.trim() === '显示模式';
+                });
+                if (displayLabel) displayLabel.insertAdjacentElement('afterend', firstCard);
+                else displayPanel.appendChild(firstCard);
+            }
+            var compact = document.createElement('div');
+            compact.id = 'compact-header-mode-toggle';
+            compact.className = 'setting-pill-row';
+            compact.style.borderTop = '1px solid var(--border-color)';
+            compact.innerHTML =
+                '<span class="setting-pill-icon"><i class="fas fa-compress-arrows-alt"></i></span>' +
+                '<span class="setting-pill-label">收起顶栏 <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">隐藏大头像，改为紧凑信息栏</span></span>' +
+                '<div class="setting-pill-switch"><div class="setting-pill-knob"></div></div>';
+            if (firstCard) firstCard.appendChild(compact);
+            compact.addEventListener('click', function () {
+                settings.compactHeaderMode = !settings.compactHeaderMode;
+                applyInterfacePreferences();
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+        }
+
+        if (!document.getElementById('change-partner-avatar-cs')) {
+            var avatarCard = avatarPanel.querySelector('.cs-card');
+            var partnerButton = document.createElement('button');
+            partnerButton.type = 'button';
+            partnerButton.id = 'change-partner-avatar-cs';
+            partnerButton.className = 'cs-name-btn';
+            partnerButton.style.cssText = 'width:100%;border:0;border-top:1px solid var(--border-color);';
+            partnerButton.innerHTML = '<i class="fas fa-camera-retro"></i><span>更换对方头像</span>';
+            if (avatarCard) avatarCard.appendChild(partnerButton);
+            partnerButton.addEventListener('click', function () {
+                var avatar = document.getElementById('partner-avatar');
+                if (avatar) avatar.click();
+            });
+        }
+
+        applyInterfacePreferences();
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        [80, 500, 1200, 2400].forEach(function (delay) {
+            window.setTimeout(function () {
+                buildSettingsEntries();
+                applyInterfacePreferences();
+            }, delay);
+        });
+
+        var observer = new MutationObserver(function (mutations) {
+            if (typeof settings === 'undefined') return;
+            var changed = mutations.some(function (mutation) {
+                return mutation.type === 'attributes' && mutation.attributeName === 'data-color-theme';
+            });
+            if (changed && document.documentElement.getAttribute('data-color-theme') !== 'user-interface') {
+                applyInterfacePreferences();
+            }
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-color-theme'] });
+
+        /* If either CSS editor reapplies its style into <head>, move it after the
+           interface layer again so user CSS always has the final cascade position. */
+        var cssPriorityObserver = new MutationObserver(function () {
+            window.setTimeout(function () {
+                ['user-custom-bubble-style', 'user-custom-global-theme-style'].forEach(function (id) {
+                    var custom = document.getElementById(id);
+                    if (custom && custom.parentNode !== document.body) document.body.appendChild(custom);
+                });
+            }, 0);
+        });
+        cssPriorityObserver.observe(document.head, { childList: true });
+    });
+})();
+</script>
+
+<style id="revert-global-tint-and-header-presets">
+    /* Removed surfaces. */
+    #interface-color-card,
+    #interface-tint-strength,
+    .interface-strength-row {
+        display: none !important;
+    }
+
+    /* Restore the original theme controls hidden by the retired global tint layer. */
+    .settings-card[onclick*="'theme'"] { display: flex !important; }
+    #appearance-panel-theme[style*="display: block"] { display: block !important; }
+    #theme-schemes-section { display: block !important; }
+    .theme-picker { display: flex !important; }
+    #open-theme-editor { display: flex !important; }
+
+    /* Main-screen glass returns to the state from before the retired tint feature. */
+    #dc-mobile-open-btn,
+    .header-actions #call-toolbar-btn,
+    .partner-name-line,
+    .header-right > .user-info:first-child .status,
+    #chat-plus-btn,
+    .input-area,
+    .typing-indicator,
+    .consolidated-menu,
+    #call-mini-pill {
+        background: rgba(255,255,255,.045) !important;
+        background-color: rgba(255,255,255,.045) !important;
+        border-color: rgba(255,255,255,.12) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(165%) !important;
+        backdrop-filter: blur(32px) saturate(165%) !important;
+    }
+    .modal {
+        background: rgba(2,3,5,.72) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        backdrop-filter: blur(12px) !important;
+    }
+    .modal-content,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    #reply-preview-container {
+        background: rgba(20,21,24,.34) !important;
+        background-color: rgba(20,21,24,.34) !important;
+        border-color: rgba(255,255,255,.10) !important;
+        -webkit-backdrop-filter: blur(38px) saturate(155%) !important;
+        backdrop-filter: blur(38px) saturate(155%) !important;
+    }
+    html[data-theme="light"] .modal-content,
+    html[data-theme="light"] .sticker-picker-popover,
+    html[data-theme="light"] .combo-picker,
+    html[data-theme="light"] .popover,
+    html[data-theme="light"] .batch-preview,
+    html[data-theme="light"] #reply-preview-container {
+        background: rgba(255,255,255,.16) !important;
+        background-color: rgba(255,255,255,.16) !important;
+        border-color: rgba(255,255,255,.30) !important;
+    }
+
+    /* Restore the original outer presentation; nested cards are deliberately solid. */
+    .modal-content .cs-card,
+    .modal-content .settings-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .appearance-sub-panel,
+    .modal-content .dm-row-item,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .picker-option-item,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content [class*="card"]:not(.message):not(.message-sent):not(.message-received) {
+        background: #fff !important;
+        background-color: #fff !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+    }
+    html[data-theme="dark"] .modal-content .cs-card,
+    html[data-theme="dark"] .modal-content .settings-card,
+    html[data-theme="dark"] .modal-content .settings-section,
+    html[data-theme="dark"] .modal-content .settings-item,
+    html[data-theme="dark"] .modal-content .setting-pill-row,
+    html[data-theme="dark"] .modal-content .appearance-sub-panel,
+    html[data-theme="dark"] .modal-content .dm-row-item,
+    html[data-theme="dark"] .modal-content .ti-inline-section,
+    html[data-theme="dark"] .modal-content .ti-inline-input-wrap,
+    html[data-theme="dark"] .modal-content .ti-inline-preview,
+    html[data-theme="dark"] .modal-content .suggestion-preview,
+    html[data-theme="dark"] .modal-content .picker-option-item,
+    html[data-theme="dark"] .modal-content .frame-settings-container,
+    html[data-theme="dark"] .modal-content .frame-controls,
+    html[data-theme="dark"] .modal-content [class*="card"]:not(.message):not(.message-sent):not(.message-received) {
+        background: #000 !important;
+        background-color: #000 !important;
+        background-image: none !important;
+    }
+
+    /* Header color is independent from the page theme and controlled by presets. */
+    .header {
+        background: var(--header-preset-bg, rgba(226,226,228,.94)) !important;
+        background-color: var(--header-preset-bg, rgba(226,226,228,.94)) !important;
+        box-shadow: 0 .5px 0 var(--header-preset-line, rgba(0,0,0,.08)) !important;
+    }
+    .header::before,
+    .header::after {
+        background: transparent !important;
+        background-image: none !important;
+    }
+    .header .username,
+    .header .status,
+    .header #dc-mobile-open-btn,
+    .header .header-actions #call-toolbar-btn,
+    .header .partner-status-arrow {
+        color: var(--header-preset-text, #222) !important;
+    }
+    .header .partner-status-arrow::before {
+        border-color: var(--header-preset-muted, rgba(0,0,0,.5)) !important;
+    }
+
+    .header-preset-card {
+        padding: 12px 14px !important;
+    }
+    .header-preset-title {
+        margin-bottom: 10px;
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 650;
+    }
+    .header-preset-list {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .header-preset-swatch {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: .5px solid rgba(127,127,127,.25);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: none;
+    }
+    .header-preset-swatch.active::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border: 1.5px solid var(--accent-color);
+        border-radius: 50%;
+    }
+    .header-preset-swatch[data-preset="gray"] { background:#dedee1; }
+    .header-preset-swatch[data-preset="white"] { background:#fff; }
+    .header-preset-swatch[data-preset="black"] { background:#171719; }
+    .header-preset-swatch[data-preset="blue"] { background:#cbd9e8; }
+    .header-preset-swatch[data-preset="pink"] { background:#ead6dd; }
+
+    /* Compact mode contains only information and icons: no glass capsules. */
+    body.compact-header-mode .header {
+        min-height: 64px !important;
+        height: 64px !important;
+        padding: max(4px, env(safe-area-inset-top)) 8px 2px !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.compact-header-mode .header::before,
+    body.compact-header-mode .header::after { display: none !important; }
+    body.compact-header-mode .header-inner,
+    body.compact-header-mode .header-right {
+        min-height: 52px !important;
+        height: 52px !important;
+    }
+    body.compact-header-mode .header-left,
+    body.compact-header-mode .header-actions {
+        position: absolute !important;
+        z-index: 8 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+    body.compact-header-mode .header-left { left: 4px !important; }
+    body.compact-header-mode .header-actions { right: 4px !important; }
+    body.compact-header-mode #dc-mobile-open-btn,
+    body.compact-header-mode .header-actions #call-toolbar-btn {
+        width: 38px !important;
+        min-width: 38px !important;
+        height: 38px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.compact-header-mode .header-right > .user-info:first-child {
+        top: 4px !important;
+        left: 50px !important;
+        right: 50px !important;
+        width: auto !important;
+        height: 44px !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        align-items: flex-start !important;
+        transform: none !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.compact-header-mode .header-right > .user-info:first-child .avatar-container,
+    body.compact-header-mode .partner-status-arrow { display: none !important; }
+    body.compact-header-mode .partner-name-line {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 23px !important;
+        min-height: 23px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        justify-content: flex-start !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.compact-header-mode .partner-name-line .username {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        color: var(--header-preset-text, #222) !important;
+        font-size: 16px !important;
+        line-height: 23px !important;
+        text-align: left !important;
+    }
+    body.compact-header-mode .header-right > .user-info:first-child .status {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        min-height: 15px !important;
+        font-size: 11.5px !important;
+        line-height: 15px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        color: var(--header-preset-muted, rgba(0,0,0,.58)) !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+    }
+    body.compact-header-mode .main-chat-area {
+        height: calc(100dvh - 64px) !important;
+    }
+    body.compact-header-mode .chat-container {
+        padding-top: 6px !important;
+    }
+</style>
+
+<script id="solid-subcards-header-presets-and-compact-mode">
+(function () {
+    'use strict';
+
+    var headerPresets = {
+        gray:  { light: ['#e2e2e4', '#000000', 'rgba(0,0,0,.56)', 'rgba(0,0,0,.08)'], dark: ['#303034', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] },
+        white: { light: ['#ffffff', '#000000', 'rgba(0,0,0,.52)', 'rgba(0,0,0,.08)'], dark: ['#f5f5f7', '#000000', 'rgba(0,0,0,.52)', 'rgba(0,0,0,.10)'] },
+        black: { light: ['#18181a', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'], dark: ['#080809', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] },
+        blue:  { light: ['#cbd9e8', '#000000', 'rgba(0,0,0,.58)', 'rgba(0,0,0,.10)'], dark: ['#2e3d4e', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] },
+        pink:  { light: ['#ead6dd', '#000000', 'rgba(0,0,0,.58)', 'rgba(0,0,0,.10)'], dark: ['#4a323b', '#ffffff', 'rgba(255,255,255,.62)', 'rgba(255,255,255,.10)'] }
+    };
+
+    function applyHeaderPreset() {
+        if (typeof settings === 'undefined') return false;
+        var presetName = headerPresets[settings.headerColorPreset] ? settings.headerColorPreset : 'gray';
+        settings.headerColorPreset = presetName;
+        if (settings.compactHeaderMode === undefined) settings.compactHeaderMode = false;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var values = headerPresets[presetName][isDark ? 'dark' : 'light'];
+        var root = document.documentElement;
+        root.style.setProperty('--header-preset-bg', values[0]);
+        root.style.setProperty('--header-preset-text', values[1]);
+        root.style.setProperty('--header-preset-muted', values[2]);
+        root.style.setProperty('--header-preset-line', values[3]);
+        root.setAttribute('data-header-preset', presetName);
+        document.body.classList.toggle('compact-header-mode', !!settings.compactHeaderMode);
+        document.querySelectorAll('.header-preset-swatch').forEach(function (button) {
+            button.classList.toggle('active', button.dataset.preset === presetName);
+        });
+        var toggle = document.getElementById('compact-header-mode-toggle');
+        if (toggle) toggle.classList.toggle('active', !!settings.compactHeaderMode);
+        return true;
+    }
+
+    function removeRetiredUi() {
+        ['interface-color-card'].forEach(function (id) {
+            var node = document.getElementById(id);
+            if (node) node.remove();
+        });
+        var tintStyle = document.getElementById('user-interface-color-style');
+        if (tintStyle) tintStyle.remove();
+        document.querySelectorAll('#cs-panel-display .cs-group-label').forEach(function (label) {
+            if (label.textContent.trim() === '界面颜色') label.remove();
+        });
+        var legacyCompact = document.getElementById('compact-header-mode-toggle');
+        if (legacyCompact && legacyCompact.dataset.headerPresetControl !== '1') legacyCompact.remove();
+        if (typeof settings !== 'undefined') {
+            delete settings.interfaceColor;
+            delete settings.interfaceTintStrength;
+        }
+    }
+
+    function buildHeaderSettings() {
+        if (typeof settings === 'undefined') return false;
+        var displayPanel = document.getElementById('cs-panel-display');
+        var avatarPanel = document.getElementById('cs-panel-avatar');
+        if (!displayPanel || !avatarPanel) return false;
+        removeRetiredUi();
+
+        if (!document.getElementById('header-preset-card')) {
+            var label = document.createElement('p');
+            label.className = 'cs-group-label';
+            label.textContent = '顶栏颜色';
+            var card = document.createElement('div');
+            card.id = 'header-preset-card';
+            card.className = 'cs-card header-preset-card';
+            card.innerHTML =
+                '<div class="header-preset-title">颜色预设</div>' +
+                '<div class="header-preset-list">' +
+                    '<button type="button" class="header-preset-swatch" data-preset="gray" aria-label="灰色"></button>' +
+                    '<button type="button" class="header-preset-swatch" data-preset="white" aria-label="白色"></button>' +
+                    '<button type="button" class="header-preset-swatch" data-preset="black" aria-label="黑色"></button>' +
+                    '<button type="button" class="header-preset-swatch" data-preset="blue" aria-label="蓝灰色"></button>' +
+                    '<button type="button" class="header-preset-swatch" data-preset="pink" aria-label="灰粉色"></button>' +
+                '</div>';
+            displayPanel.insertBefore(card, displayPanel.firstChild);
+            displayPanel.insertBefore(label, card);
+            card.querySelectorAll('.header-preset-swatch').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    settings.headerColorPreset = button.dataset.preset;
+                    applyHeaderPreset();
+                    if (typeof throttledSaveData === 'function') throttledSaveData();
+                });
+            });
+        }
+
+        if (!document.getElementById('compact-header-mode-toggle')) {
+            var modeCard = displayPanel.querySelector('.cs-immersive-wrap');
+            if (!modeCard) {
+                modeCard = document.createElement('div');
+                modeCard.className = 'cs-card cs-immersive-wrap';
+                displayPanel.appendChild(modeCard);
+            }
+            var compact = document.createElement('div');
+            compact.id = 'compact-header-mode-toggle';
+            compact.className = 'setting-pill-row';
+            compact.dataset.headerPresetControl = '1';
+            compact.innerHTML =
+                '<span class="setting-pill-icon"><i class="fas fa-compress-arrows-alt"></i></span>' +
+                '<span class="setting-pill-label">收起顶栏 <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">只保留昵称、状态和顶部按键</span></span>' +
+                '<div class="setting-pill-switch"><div class="setting-pill-knob"></div></div>';
+            modeCard.appendChild(compact);
+            compact.addEventListener('click', function () {
+                settings.compactHeaderMode = !settings.compactHeaderMode;
+                applyHeaderPreset();
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+        }
+
+        if (!document.getElementById('change-partner-avatar-cs')) {
+            var avatarCard = avatarPanel.querySelector('.cs-card');
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.id = 'change-partner-avatar-cs';
+            button.className = 'cs-name-btn';
+            button.style.cssText = 'width:100%;border:0;border-top:1px solid var(--border-color);';
+            button.innerHTML = '<i class="fas fa-camera-retro"></i><span>更换对方头像</span>';
+            if (avatarCard) avatarCard.appendChild(button);
+            button.addEventListener('click', function () {
+                var avatar = document.getElementById('partner-avatar');
+                if (avatar) avatar.click();
+            });
+        }
+
+        applyHeaderPreset();
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        [60, 300, 850, 1600, 2600].forEach(function (delay) {
+            window.setTimeout(function () {
+                removeRetiredUi();
+                buildHeaderSettings();
+                applyHeaderPreset();
+            }, delay);
+        });
+        var observer = new MutationObserver(function (mutations) {
+            if (mutations.some(function (mutation) { return mutation.attributeName === 'data-theme'; })) {
+                applyHeaderPreset();
+            }
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    });
+})();
+</script>
+
+<style id="fully-opaque-header-and-original-dialogs">
+    /* Header presets are solid colors with no wallpaper transmission. */
+    .header {
+        background: var(--header-preset-bg, #e2e2e4) !important;
+        background-color: var(--header-preset-bg, #e2e2e4) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .header::before,
+    .header::after {
+        display: none !important;
+        content: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .header #dc-mobile-open-btn,
+    .header .header-actions #call-toolbar-btn,
+    .header .partner-name-line,
+    .header .header-right > .user-info:first-child .status {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Restore the original opaque dialog material everywhere. */
+    .modal {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    #reply-preview-container,
+    .consolidated-menu {
+        background: var(--secondary-bg) !important;
+        background-color: var(--secondary-bg) !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content *,
+    .sticker-picker-popover *,
+    .combo-picker *,
+    .popover *,
+    .consolidated-menu * {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content .cs-card,
+    .modal-content .settings-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .appearance-sub-panel,
+    .modal-content .dm-row-item,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .picker-option-item,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content [class*="card"]:not(.message):not(.message-sent):not(.message-received),
+    .modal-content .modal-buttons[style] {
+        background: var(--primary-bg) !important;
+        background-color: var(--primary-bg) !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+    }
+</style>
+
+
+<style id="opaque-dialogs-and-surface-color-presets" media="not all">
+    /* Every popup surface is opaque. This deliberately overrides all legacy glass rules. */
+    .modal-content,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    #reply-preview-container,
+    .consolidated-menu,
+    .modal-content [class*="card"],
+    .modal-content [class*="panel"],
+    .modal-content [class*="section"],
+    .modal-content [class*="preview"],
+    .modal-content [class*="picker"],
+    .modal-content [class*="popover"],
+    .modal-content [class*="container"],
+    .sticker-picker-popover [class*="card"],
+    .combo-picker [class*="card"],
+    .popover [class*="card"] {
+        background-color: var(--secondary-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content .cs-card,
+    .modal-content .settings-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .appearance-sub-panel,
+    .modal-content .dm-row-item,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .picker-option-item,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content [class*="sub-card"],
+    .modal-content [class*="subcard"] {
+        background-color: var(--primary-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+    }
+
+    /* Header foreground is always a single high-contrast black or white tone. */
+    .header .username,
+    .header .status,
+    .header #dc-mobile-open-btn,
+    .header #dc-mobile-open-btn *,
+    .header .header-actions #call-toolbar-btn,
+    .header .header-actions #call-toolbar-btn *,
+    .header .partner-status-arrow,
+    .header .partner-status-arrow * {
+        color: var(--header-preset-text, #18181a) !important;
+        fill: currentColor !important;
+        stroke: currentColor !important;
+        -webkit-text-fill-color: currentColor !important;
+    }
+
+    /* Independently configurable bottom bar and partner-status capsule. */
+    body.surface-bottom-colored .input-area,
+    body.surface-bottom-colored #chat-plus-btn,
+    body.surface-bottom-colored #continue-btn {
+        background: var(--bottom-preset-bg) !important;
+        background-color: var(--bottom-preset-bg) !important;
+    }
+    body.surface-bottom-colored .input-area,
+    body.surface-bottom-colored #chat-plus-btn,
+    body.surface-bottom-colored #continue-btn,
+    body.surface-status-colored .header-right > .user-info:first-child .status {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.surface-status-colored .header-right > .user-info:first-child .status {
+        background: var(--status-preset-bg) !important;
+        background-color: var(--status-preset-bg) !important;
+        color: var(--status-preset-text) !important;
+    }
+
+    .surface-preset-block + .surface-preset-block { margin-top: 12px; }
+    .surface-preset-label {
+        margin: 0 0 8px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .surface-preset-list { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .surface-preset-swatch {
+        position:relative;
+        width:28px;
+        height:28px;
+        padding:0;
+        border:.5px solid rgba(127,127,127,.28);
+        border-radius:50%;
+        box-shadow:none;
+        cursor:pointer;
+    }
+    .surface-preset-swatch.active::after {
+        content:'';
+        position:absolute;
+        inset:-4px;
+        border:1.5px solid var(--accent-color);
+        border-radius:50%;
+    }
+    .surface-preset-swatch[data-preset="system"] {
+        background:linear-gradient(135deg,#fff 0 49%,#1d1d1f 51% 100%);
+    }
+    .surface-preset-swatch[data-preset="gray"] { background:#dedee1; }
+    .surface-preset-swatch[data-preset="white"] { background:#fff; }
+    .surface-preset-swatch[data-preset="black"] { background:#171719; }
+    .surface-preset-swatch[data-preset="blue"] { background:#cbd9e8; }
+    .surface-preset-swatch[data-preset="pink"] { background:#ead6dd; }
+</style>
+
+<script id="bottom-and-status-color-presets" type="application/json">
+(function () {
+    'use strict';
+
+    var palette = {
+        gray:  { light:['#dedee1','#18181a'], dark:['#303034','#ffffff'] },
+        white: { light:['#ffffff','#18181a'], dark:['#f5f5f7','#18181a'] },
+        black: { light:['#171719','#ffffff'], dark:['#080809','#ffffff'] },
+        blue:  { light:['#cbd9e8','#18181a'], dark:['#2e3d4e','#ffffff'] },
+        pink:  { light:['#ead6dd','#18181a'], dark:['#4a323b','#ffffff'] }
+    };
+
+    function applySurfacePresets() {
+        if (typeof settings === 'undefined' || !document.body) return;
+        if (!settings.bottomColorPreset) settings.bottomColorPreset = 'system';
+        if (!settings.statusColorPreset) settings.statusColorPreset = 'system';
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var root = document.documentElement;
+        ['bottom', 'status'].forEach(function (surface) {
+            var key = surface + 'ColorPreset';
+            var preset = palette[settings[key]] ? settings[key] : 'system';
+            document.body.classList.toggle('surface-' + surface + '-colored', preset !== 'system');
+            if (preset !== 'system') {
+                var values = palette[preset][dark ? 'dark' : 'light'];
+                root.style.setProperty('--' + surface + '-preset-bg', values[0]);
+                root.style.setProperty('--' + surface + '-preset-text', values[1]);
+            }
+            document.querySelectorAll('.surface-preset-swatch[data-surface="' + surface + '"]').forEach(function (button) {
+                button.classList.toggle('active', button.dataset.preset === preset);
+            });
+        });
+    }
+
+    function swatches(surface) {
+        return ['system','gray','white','black','blue','pink'].map(function (preset) {
+            var names = {system:'跟随原样',gray:'灰色',white:'白色',black:'黑色',blue:'蓝灰色',pink:'灰粉色'};
+            return '<button type="button" class="surface-preset-swatch" data-surface="' + surface + '" data-preset="' + preset + '" aria-label="' + names[preset] + '"></button>';
+        }).join('');
+    }
+
+    function buildControls() {
+        if (typeof settings === 'undefined') return;
+        var card = document.getElementById('header-preset-card');
+        if (!card || document.getElementById('additional-surface-presets')) return;
+        var wrap = document.createElement('div');
+        wrap.id = 'additional-surface-presets';
+        wrap.innerHTML =
+            '<div class="surface-preset-block"><p class="surface-preset-label">底栏颜色</p><div class="surface-preset-list">' + swatches('bottom') + '</div></div>' +
+            '<div class="surface-preset-block"><p class="surface-preset-label">状态栏颜色</p><div class="surface-preset-list">' + swatches('status') + '</div></div>';
+        card.appendChild(wrap);
+        wrap.querySelectorAll('.surface-preset-swatch').forEach(function (button) {
+            button.addEventListener('click', function () {
+                settings[button.dataset.surface + 'ColorPreset'] = button.dataset.preset;
+                applySurfacePresets();
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+            });
+        });
+        applySurfacePresets();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        [100, 400, 900, 1700, 2800].forEach(function (delay) {
+            window.setTimeout(function () { buildControls(); applySurfacePresets(); }, delay);
+        });
+        new MutationObserver(applySurfacePresets).observe(document.documentElement, {
+            attributes:true,
+            attributeFilter:['data-theme']
+        });
+    });
+})();
+</script>
+
+<style id="theme-editor-authoritative-ui-colors" media="not all">
+    :root {
+        --theme-popup-bg: var(--secondary-bg);
+        --theme-card-bg: var(--secondary-bg);
+        --theme-control-bg: var(--primary-bg);
+        --theme-header-surface: var(--header-bg);
+        --theme-bottom-surface: var(--input-area-bg);
+        --theme-status-surface: var(--header-bg);
+    }
+
+    /* The original theme editor is the single built-in color authority.
+       Chat bubbles are intentionally excluded so bubble CSS remains untouched. */
+    .modal-content,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    #reply-preview-container,
+    .consolidated-menu,
+    #ti-settings-panel,
+    #ti-inline-settings {
+        background: var(--theme-popup-bg) !important;
+        background-color: var(--theme-popup-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+    }
+    .modal-content [class*="card"],
+    .modal-content [class*="panel"],
+    .modal-content [class*="section"],
+    .modal-content [class*="preview"],
+    .modal-content [class*="container"],
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .dm-row-item,
+    .modal-content .picker-option-item,
+    .sticker-picker-popover [class*="card"],
+    .combo-picker [class*="card"],
+    .popover [class*="card"] {
+        background: var(--theme-card-bg) !important;
+        background-color: var(--theme-card-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+    }
+    .modal-content input:not([type="color"]):not([type="range"]),
+    .modal-content textarea,
+    .modal-content select,
+    .modal-content .modal-btn,
+    .sticker-picker-popover input,
+    .combo-picker input,
+    .popover input,
+    #ti-settings-panel input,
+    #ti-settings-panel select,
+    #ti-inline-settings input,
+    #ti-inline-settings select {
+        background: var(--theme-control-bg) !important;
+        background-color: var(--theme-control-bg) !important;
+        background-image: none !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        opacity: 1 !important;
+    }
+    .modal-content,
+    .modal-content *,
+    .sticker-picker-popover,
+    .sticker-picker-popover *,
+    .combo-picker,
+    .combo-picker *,
+    .popover,
+    .popover *,
+    #ti-settings-panel,
+    #ti-settings-panel *,
+    #ti-inline-settings,
+    #ti-inline-settings * {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .header {
+        background: var(--theme-header-surface) !important;
+        background-color: var(--theme-header-surface) !important;
+    }
+    .header .partner-name-line {
+        background-color: var(--theme-header-surface) !important;
+    }
+    .header-right > .user-info:first-child .status {
+        background-color: var(--theme-status-surface) !important;
+    }
+    .input-area {
+        background-color: var(--theme-bottom-surface) !important;
+    }
+
+    /* Hiding the received avatar must also remove its old reply-line reservation.
+       Geometry and decoration of the reply itself are left exactly as defined above. */
+    body.hide-received-avatar .message-wrapper.received.has-reply .discord-reply-line-col {
+        margin-left: 0 !important;
+    }
+    body.hide-received-avatar .message-wrapper.received.has-reply > .discord-reply-bar {
+        grid-column: 2 !important;
+        justify-self: start !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+</style>
+
+<script id="theme-editor-ui-priority-bridge" type="application/json">
+(function () {
+    'use strict';
+
+    function removeCompetingSurfaceControls() {
+        var extra = document.getElementById('additional-surface-presets');
+        if (extra) extra.remove();
+        var oldPresetCard = document.getElementById('header-preset-card');
+        if (oldPresetCard) {
+            var oldLabel = oldPresetCard.previousElementSibling;
+            if (oldLabel && oldLabel.classList.contains('cs-group-label') && oldLabel.textContent.trim() === '顶栏颜色') oldLabel.remove();
+            oldPresetCard.remove();
+        }
+        document.body && document.body.classList.remove('surface-bottom-colored', 'surface-status-colored');
+    }
+
+    function keepUserCssLast() {
+        if (!document.body) return;
+        ['user-custom-bubble-style', 'user-custom-global-theme-style'].forEach(function (id) {
+            var style = document.getElementById(id);
+            if (style) document.body.appendChild(style);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        [0, 120, 500, 1200, 2400, 3200, 4200].forEach(function (delay) {
+            window.setTimeout(function () {
+                removeCompetingSurfaceControls();
+                keepUserCssLast();
+            }, delay);
+        });
+        new MutationObserver(function () {
+            window.setTimeout(keepUserCssLast, 0);
+        }).observe(document.head, { childList: true, subtree: true });
+    });
+})();
+</script>
+
+<style id="final-solid-theme-controlled-popup-surfaces" media="not all">
+    /* Popup shells that do not use the generic .modal-content class. */
+    .modal > .modal-content,
+    [role="dialog"] > .modal-content,
+    .dm-drawer-sheet,
+    .daily-greeting-card,
+    .fl-modal-content,
+    #custom-mood-dialog,
+    #dg-editor-modal > div,
+    #daily-greeting-modal > .daily-greeting-card,
+    .batch-preview,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .consolidated-menu,
+    #reply-preview-container,
+    #ti-settings-panel,
+    #ti-inline-settings {
+        background: var(--theme-popup-bg) !important;
+        background-color: var(--theme-popup-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Remove decorative translucent layers from popup shells only. */
+    .modal-content::before,
+    .modal-content::after,
+    .dm-drawer-sheet::before,
+    .dm-drawer-sheet::after,
+    .fl-modal-content::before,
+    .fl-modal-content::after,
+    .daily-greeting-card::before,
+    .daily-greeting-card::after {
+        background: transparent !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Old panels frequently used inline rgba backgrounds. Inside a popup these
+       are real card surfaces, so make them solid and theme-controlled. */
+    .modal-content [style*="background:rgba"],
+    .modal-content [style*="background: rgba"],
+    .modal-content [style*="background-color:rgba"],
+    .modal-content [style*="background-color: rgba"],
+    .dm-drawer-sheet [style*="background:rgba"],
+    .dm-drawer-sheet [style*="background: rgba"],
+    .daily-greeting-card [style*="background:rgba"],
+    .daily-greeting-card [style*="background: rgba"] {
+        background: var(--theme-card-bg) !important;
+        background-color: var(--theme-card-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .modal-content .cs-card,
+    .modal-content .settings-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .appearance-sub-panel,
+    .modal-content .dm-row-item,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .picker-option-item,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content [class*="card"],
+    .modal-content [class*="panel"],
+    .modal-content [class*="section"],
+    .dm-drawer-sheet .dm-drawer-actions,
+    .dm-drawer-sheet .dm-drawer-action-btn,
+    .daily-greeting-card .dg-body,
+    .daily-greeting-card .dg-mood-panel,
+    .daily-greeting-card .dg-info-cell,
+    .daily-greeting-card .dg-note-box {
+        background: var(--theme-card-bg) !important;
+        background-color: var(--theme-card-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Form controls use their own editor color, also fully opaque. */
+    .modal-content input:not([type="color"]):not([type="range"]),
+    .modal-content textarea,
+    .modal-content select,
+    .modal-content button.modal-btn,
+    .dm-drawer-sheet button,
+    .daily-greeting-card button,
+    .sticker-picker-popover input,
+    .combo-picker input,
+    .popover input {
+        background: var(--theme-control-bg) !important;
+        background-color: var(--theme-control-bg) !important;
+        background-image: none !important;
+        border-color: var(--border-color) !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+</style>
+
+<style id="single-color-popups-and-simple-theme-editor" media="not all">
+    /* One solid material per popup. No nested card tint, glass or decorative box. */
+    .modal-content,
+    .dm-drawer-sheet,
+    .daily-greeting-card,
+    .fl-modal-content,
+    #custom-mood-dialog,
+    #ti-settings-panel,
+    #ti-inline-settings,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .batch-preview,
+    .consolidated-menu,
+    #reply-preview-container {
+        background: var(--theme-popup-bg) !important;
+        background-color: var(--theme-popup-bg) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .modal-content .cs-card,
+    .modal-content .settings-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .setting-pill-row,
+    .modal-content .appearance-sub-panel,
+    .modal-content .dm-row-item,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .picker-option-item,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content [class*="card"],
+    .modal-content [class*="panel"],
+    .modal-content [class*="section"],
+    .modal-content [class*="preview"],
+    .dm-drawer-sheet .dm-drawer-actions,
+    .dm-drawer-sheet .dm-drawer-action-btn,
+    .daily-greeting-card .dg-body,
+    .daily-greeting-card .dg-mood-panel,
+    .daily-greeting-card .dg-info-cell,
+    .daily-greeting-card .dg-note-box {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content [style*="background:rgba"],
+    .modal-content [style*="background: rgba"],
+    .modal-content [style*="background-color:rgba"],
+    .modal-content [style*="background-color: rgba"] {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Controls keep their shape, but use the same popup color instead of a second fill. */
+    .modal-content input:not([type="color"]):not([type="range"]),
+    .modal-content textarea,
+    .modal-content select,
+    .modal-content button.modal-btn,
+    .dm-drawer-sheet button,
+    .sticker-picker-popover input,
+    .combo-picker input,
+    .popover input {
+        background: var(--theme-popup-bg) !important;
+        background-color: var(--theme-popup-bg) !important;
+        background-image: none !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    #theme-editor-modal .modal-content {
+        max-width: 430px !important;
+    }
+    #theme-editor-grid.simple-theme-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+    }
+    .simple-theme-group {
+        grid-column: 1 / -1;
+        padding: 14px 2px 0;
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .08em;
+    }
+    .simple-theme-picker-hint {
+        grid-column: 1 / -1;
+        margin: 2px 2px 0;
+        color: var(--text-secondary);
+        font-size: 11px;
+        line-height: 1.45;
+    }
+    .simple-theme-row {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 7px;
+        min-width: 0;
+        min-height: 132px;
+        padding: 10px;
+        border: .5px solid var(--border-color);
+        border-radius: 13px;
+        background: transparent !important;
+    }
+    .simple-theme-copy { min-width: 0; }
+    .simple-theme-name {
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .simple-theme-code {
+        margin-top: 2px;
+        overflow: hidden;
+        color: var(--text-secondary);
+        font: 9px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .simple-theme-color {
+        order: -1;
+        display: block !important;
+        width: 100% !important;
+        height: 62px !important;
+        padding: 0 !important;
+        overflow: hidden;
+        border: .5px solid var(--border-color) !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        -webkit-appearance: auto !important;
+        appearance: auto !important;
+        cursor: pointer;
+    }
+    .simple-theme-color::-webkit-color-swatch-wrapper {
+        padding: 0 !important;
+    }
+    .simple-theme-color::-webkit-color-swatch {
+        border: 0 !important;
+        border-radius: 8px !important;
+    }
+    .simple-theme-hex {
+        width: 100% !important;
+        height: 26px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        color: var(--text-primary) !important;
+        font: 10px ui-monospace, SFMono-Regular, Menlo, monospace !important;
+        text-transform: uppercase;
+    }
+    @media (max-width: 420px) {
+        #theme-editor-grid.simple-theme-grid {
+            gap: 8px !important;
+        }
+        .simple-theme-row {
+            min-height: 126px;
+            padding: 8px;
+        }
+        .simple-theme-color { height: 56px !important; }
+    }
+</style>
+
+<script id="simplified-theme-editor-layout" type="application/json">
+(function () {
+    'use strict';
+
+    var simpleThemeGroups = [
+        { title:'界面', items:[
+            ['--theme-popup-bg','弹窗统一背景'],
+            ['--text-primary','主要文字'],
+            ['--text-secondary','次要文字'],
+            ['--border-color','边框与分割线'],
+            ['--accent-color','强调色']
+        ]},
+        { title:'主界面', items:[
+            ['--theme-header-surface','顶栏背景'],
+            ['--theme-bottom-surface','底栏背景'],
+            ['--theme-status-surface','状态栏背景']
+        ]},
+        { title:'消息气泡', items:[
+            ['--message-sent-bg','我方气泡'],
+            ['--message-sent-text','我方文字'],
+            ['--message-received-bg','对方气泡'],
+            ['--message-received-text','对方文字']
+        ]}
+    ];
+
+    function colorToHex(value) {
+        var probe = document.createElement('span');
+        probe.style.color = value || '#888888';
+        document.body.appendChild(probe);
+        var rgb = getComputedStyle(probe).color.match(/\d+/g);
+        probe.remove();
+        if (!rgb || rgb.length < 3) return '#888888';
+        return '#' + rgb.slice(0,3).map(function (part) {
+            return Number(part).toString(16).padStart(2,'0');
+        }).join('');
+    }
+
+    function applySimpleColor(variable, value) {
+        if (!/^#[0-9a-fA-F]{6}$/.test(value)) return false;
+        var root = document.documentElement;
+        root.style.setProperty(variable, value);
+        if (variable === '--theme-popup-bg') {
+            root.style.setProperty('--theme-card-bg', value);
+            root.style.setProperty('--theme-control-bg', value);
+        }
+        if (variable === '--accent-color') {
+            var hex = value.slice(1);
+            root.style.setProperty('--accent-color-rgb', [0,2,4].map(function (i) {
+                return parseInt(hex.slice(i,i+2),16);
+            }).join(','));
+        }
+        return true;
+    }
+
+    function renderSimpleThemeEditor(currentColors) {
+        var grid = document.getElementById('theme-editor-grid');
+        if (!grid) return;
+        grid.className = 'theme-editor-grid simple-theme-grid';
+        grid.innerHTML = '';
+        var computed = getComputedStyle(document.documentElement);
+
+        var hint = document.createElement('div');
+        hint.className = 'simple-theme-picker-hint';
+        hint.textContent = '点击色块打开系统选色器，可切换网格、光谱、滑块并使用吸色器。';
+        grid.appendChild(hint);
+
+        simpleThemeGroups.forEach(function (group) {
+            var heading = document.createElement('div');
+            heading.className = 'simple-theme-group';
+            heading.textContent = group.title;
+            grid.appendChild(heading);
+
+            group.items.forEach(function (item) {
+                var variable = item[0];
+                var raw = currentColors && currentColors[variable]
+                    ? currentColors[variable]
+                    : computed.getPropertyValue(variable).trim();
+                var value = colorToHex(raw);
+                var row = document.createElement('div');
+                row.className = 'simple-theme-row';
+                row.innerHTML =
+                    '<div class="simple-theme-copy"><div class="simple-theme-name">' + item[1] + '</div><div class="simple-theme-code">' + variable + '</div></div>' +
+                    '<input class="simple-theme-color" type="color" value="' + value + '" aria-label="' + item[1] + '">' +
+                    '<input class="simple-theme-hex" type="text" value="' + value.toUpperCase() + '" maxlength="7" aria-label="' + item[1] + '色值">';
+                var picker = row.querySelector('.simple-theme-color');
+                var text = row.querySelector('.simple-theme-hex');
+                picker.addEventListener('input', function () {
+                    text.value = picker.value.toUpperCase();
+                    applySimpleColor(variable, picker.value);
+                });
+                text.addEventListener('change', function () {
+                    var next = text.value.trim();
+                    if (next.charAt(0) !== '#') next = '#' + next;
+                    if (applySimpleColor(variable, next)) {
+                        picker.value = next;
+                        text.value = next.toUpperCase();
+                    } else {
+                        text.value = picker.value.toUpperCase();
+                    }
+                });
+                grid.appendChild(row);
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.setTimeout(function () {
+            if (typeof populateThemeEditor === 'function') {
+                populateThemeEditor = renderSimpleThemeEditor;
+                window.populateThemeEditor = renderSimpleThemeEditor;
+            }
+        }, 0);
+    });
+})();
+</script>
+
+<style id="index5-default-popup-and-editor-restoration" media="not all">
+    /* Restored from the user's earlier index-5.html defaults. */
+    .modal {
+        background: rgba(2,3,5,.72) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        backdrop-filter: blur(12px) !important;
+    }
+    .modal-content {
+        border: 1px solid rgba(255,255,255,.11) !important;
+        border-radius: 26px !important;
+        background: rgba(20,21,24,.82) !important;
+        background-color: rgba(20,21,24,.82) !important;
+        background-image: none !important;
+        box-shadow: 0 28px 90px rgba(0,0,0,.42) !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: blur(32px) saturate(135%) !important;
+        backdrop-filter: blur(32px) saturate(135%) !important;
+    }
+    .settings-card {
+        background-color: var(--primary-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,.05) !important;
+    }
+    .cs-card {
+        background: var(--primary-bg) !important;
+        background-color: var(--primary-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 14px !important;
+        box-shadow: none !important;
+    }
+    .cs-card .setting-pill-row {
+        background: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+    .cs-card .setting-pill-row:last-child { border-bottom: 0 !important; }
+    .ti-inline-section {
+        background: var(--primary-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 14px !important;
+    }
+    .dm-row-card {
+        background: var(--secondary-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 18px !important;
+    }
+    .dm-row-item {
+        background: var(--ui-glass-soft) !important;
+        border-bottom: 1px solid rgba(255,255,255,.075) !important;
+        box-shadow: none !important;
+    }
+    .dm-row-item:last-child { border-bottom: 0 !important; }
+    .picker-options-list {
+        background: var(--primary-bg) !important;
+        border: 1.5px solid var(--border-color) !important;
+        border-radius: 12px !important;
+    }
+    .picker-option-item {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    .consolidated-menu {
+        border: 1px solid var(--shell-line) !important;
+        background: rgba(22,23,27,.96) !important;
+        box-shadow: 0 24px 70px rgba(0,0,0,.45) !important;
+        -webkit-backdrop-filter: blur(26px) saturate(140%) !important;
+        backdrop-filter: blur(26px) saturate(140%) !important;
+    }
+    .batch-preview,
+    #reply-preview-container,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover {
+        background: var(--ui-glass-strong) !important;
+        background-color: var(--ui-glass-strong) !important;
+    }
+
+    #theme-editor-modal .modal-content {
+        width: 92% !important;
+        max-width: 580px !important;
+        max-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    #theme-editor-grid,
+    #theme-editor-grid.theme-editor-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        padding: 4px 2px !important;
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+    }
+    @media (max-width: 560px) {
+        #theme-editor-grid,
+        #theme-editor-grid.theme-editor-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    /* Preserve the active theme's real colors while stripping only alpha.
+       This avoids guessing light/dark mode from data-theme. */
+    .modal-content,
+    html[data-theme="dark"] .modal-content {
+        background: var(--secondary-bg) !important;
+        background: var(--solid-secondary-bg, var(--secondary-bg)) !important;
+        background-color: var(--solid-secondary-bg, var(--secondary-bg)) !important;
+    }
+    .modal-content .settings-card,
+    .modal-content .cs-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .appearance-sub-panel,
+    .modal-content [class*="sub-panel"],
+    .modal-content [class*="subpanel"],
+    .modal-content [class*="settings-panel"],
+    .modal-content [class*="settings-section"],
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content .picker-options-list,
+    html[data-theme="dark"] .modal-content .settings-card,
+    html[data-theme="dark"] .modal-content .cs-card,
+    html[data-theme="dark"] .modal-content .settings-section,
+    html[data-theme="dark"] .modal-content .settings-item,
+    html[data-theme="dark"] .modal-content .appearance-sub-panel,
+    html[data-theme="dark"] .modal-content [class*="sub-panel"],
+    html[data-theme="dark"] .modal-content [class*="subpanel"],
+    html[data-theme="dark"] .modal-content [class*="settings-panel"],
+    html[data-theme="dark"] .modal-content [class*="settings-section"] {
+        background: var(--primary-bg) !important;
+        background: var(--solid-primary-bg, var(--primary-bg)) !important;
+        background-color: var(--solid-primary-bg, var(--primary-bg)) !important;
+        background-image: none !important;
+    }
+    .modal-content input:not([type="color"]):not([type="range"]),
+    .modal-content textarea,
+    .modal-content select {
+        background: var(--primary-bg) !important;
+        background: var(--solid-primary-bg, var(--primary-bg)) !important;
+        background-color: var(--solid-primary-bg, var(--primary-bg)) !important;
+    }
+    .batch-preview,
+    #reply-preview-container,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .consolidated-menu,
+    .dm-drawer-sheet,
+    .daily-greeting-card,
+    .fl-modal-content,
+    #custom-mood-dialog,
+    #ti-settings-panel,
+    #ti-inline-settings,
+    html[data-theme="dark"] .batch-preview,
+    html[data-theme="dark"] #reply-preview-container,
+    html[data-theme="dark"] .sticker-picker-popover,
+    html[data-theme="dark"] .combo-picker,
+    html[data-theme="dark"] .popover,
+    html[data-theme="dark"] .consolidated-menu,
+    html[data-theme="dark"] .dm-drawer-sheet,
+    html[data-theme="dark"] .daily-greeting-card,
+    html[data-theme="dark"] .fl-modal-content,
+    html[data-theme="dark"] #custom-mood-dialog,
+    html[data-theme="dark"] #ti-settings-panel,
+    html[data-theme="dark"] #ti-inline-settings {
+        background: var(--secondary-bg) !important;
+        background: var(--solid-secondary-bg, var(--secondary-bg)) !important;
+        background-color: var(--solid-secondary-bg, var(--secondary-bg)) !important;
+        background-image: none !important;
+    }
+</style>
+
+<style id="index2-original-solid-popup-restoration" media="not all">
+    /* Exact material direction from the original index-2.html: solid popup,
+       solid cards, no glass on popup content. */
+    .modal {
+        background: rgba(0,0,0,.6) !important;
+        background-color: rgba(0,0,0,.6) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border: 1px solid var(--surface-border) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 18px 55px rgba(0,0,0,.24), 0 2px 10px rgba(0,0,0,.10) !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html[data-theme="dark"] .modal-content {
+        background: #1e1e1e !important;
+        background-color: #1e1e1e !important;
+    }
+    .modal-content::before,
+    .modal-content::after {
+        background: transparent !important;
+        background-image: none !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content *,
+    .modal-content *::before,
+    .modal-content *::after {
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal::before,
+    .modal::after,
+    [id$="-modal"]::before,
+    [id$="-modal"]::after {
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .modal-content .settings-card,
+    .modal-content .cs-card,
+    .modal-content .settings-section,
+    .modal-content .settings-item,
+    .modal-content .appearance-sub-panel,
+    .modal-content .ti-inline-section,
+    .modal-content .ti-inline-input-wrap,
+    .modal-content .ti-inline-preview,
+    .modal-content .suggestion-preview,
+    .modal-content .frame-settings-container,
+    .modal-content .frame-controls,
+    .modal-content .picker-options-list {
+        background: #f9f9f9 !important;
+        background-color: #f9f9f9 !important;
+        background-image: none !important;
+        border-color: var(--border-color) !important;
+        opacity: 1 !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html[data-theme="dark"] .modal-content .settings-card,
+    html[data-theme="dark"] .modal-content .cs-card,
+    html[data-theme="dark"] .modal-content .settings-section,
+    html[data-theme="dark"] .modal-content .settings-item,
+    html[data-theme="dark"] .modal-content .appearance-sub-panel,
+    html[data-theme="dark"] .modal-content .ti-inline-section,
+    html[data-theme="dark"] .modal-content .ti-inline-input-wrap,
+    html[data-theme="dark"] .modal-content .ti-inline-preview,
+    html[data-theme="dark"] .modal-content .suggestion-preview,
+    html[data-theme="dark"] .modal-content .frame-settings-container,
+    html[data-theme="dark"] .modal-content .frame-controls,
+    html[data-theme="dark"] .modal-content .picker-options-list {
+        background: #121212 !important;
+        background-color: #121212 !important;
+    }
+    .modal-content .cs-card .setting-pill-row,
+    .modal-content .dm-row-item,
+    .modal-content .picker-option-item {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-content input:not([type="color"]):not([type="range"]),
+    .modal-content textarea,
+    .modal-content select {
+        background: var(--primary-bg) !important;
+        background-color: var(--primary-bg) !important;
+        background-image: none !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .batch-preview,
+    #reply-preview-container,
+    .sticker-picker-popover,
+    .combo-picker,
+    .popover,
+    .consolidated-menu,
+    .dm-drawer-sheet,
+    .daily-greeting-card,
+    .fl-modal-content,
+    #custom-mood-dialog,
+    #ti-settings-panel,
+    #ti-inline-settings {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border-color: var(--border-color) !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html[data-theme="dark"] .batch-preview,
+    html[data-theme="dark"] #reply-preview-container,
+    html[data-theme="dark"] .sticker-picker-popover,
+    html[data-theme="dark"] .combo-picker,
+    html[data-theme="dark"] .popover,
+    html[data-theme="dark"] .consolidated-menu,
+    html[data-theme="dark"] .dm-drawer-sheet,
+    html[data-theme="dark"] .daily-greeting-card,
+    html[data-theme="dark"] .fl-modal-content,
+    html[data-theme="dark"] #custom-mood-dialog,
+    html[data-theme="dark"] #ti-settings-panel,
+    html[data-theme="dark"] #ti-inline-settings {
+        background: #1e1e1e !important;
+        background-color: #1e1e1e !important;
+    }
+    .dm-drawer-sheet *,
+    .daily-greeting-card *,
+    .fl-modal-content *,
+    #custom-mood-dialog *,
+    #ti-settings-panel *,
+    #ti-inline-settings *,
+    .sticker-picker-popover *,
+    .combo-picker *,
+    .popover *,
+    .consolidated-menu * {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Restore the original editor dimensions and two-column layout. */
+    #theme-editor-modal .modal-content {
+        width: 90% !important;
+        max-width: 580px !important;
+        max-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    #theme-editor-grid,
+    #theme-editor-grid.theme-editor-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        padding: 4px 2px !important;
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+    }
+    @media (max-width: 560px) {
+        #theme-editor-grid,
+        #theme-editor-grid.theme-editor-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<script id="keep-original-solid-popups-last" type="application/json">
+(function () {
+    'use strict';
+    function solidColorFrom(variable, fallback) {
+        var probe = document.createElement('span');
+        probe.style.color = 'var(' + variable + ', ' + fallback + ')';
+        document.body.appendChild(probe);
+        var parts = getComputedStyle(probe).color.match(/[\d.]+/g);
+        probe.remove();
+        return parts && parts.length >= 3
+            ? 'rgb(' + Math.round(Number(parts[0])) + ',' + Math.round(Number(parts[1])) + ',' + Math.round(Number(parts[2])) + ')'
+            : fallback;
+    }
+    function updateSolidPopupColors() {
+        if (!document.body) return;
+        var root = document.documentElement;
+        root.style.setProperty('--solid-primary-bg', solidColorFrom('--primary-bg', '#121212'));
+        root.style.setProperty('--solid-secondary-bg', solidColorFrom('--secondary-bg', '#1e1e1e'));
+    }
+    function keepSolidPopupRulesLast() {
+        updateSolidPopupColors();
+        var style = document.getElementById('index2-original-solid-popup-restoration');
+        if (style && document.body && style.parentNode === document.body && style !== document.body.lastElementChild) {
+            document.body.appendChild(style);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0, 100, 400, 1000, 2200, 4000].forEach(function (delay) {
+            window.setTimeout(keepSolidPopupRulesLast, delay);
+        });
+        new MutationObserver(function () {
+            window.setTimeout(keepSolidPopupRulesLast, 0);
+        }).observe(document.body, { childList: true });
+        new MutationObserver(function () {
+            window.setTimeout(updateSolidPopupColors, 0);
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    });
+})();
+</script>
+
+<style id="index333-original-popup-appearance" media="not all">
+    /* Popup appearance restored from /Users/planetz./Downloads/index333.html. */
+    .modal {
+        background: rgba(0,0,0,.6) !important;
+        background-color: rgba(0,0,0,.6) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        backdrop-filter: blur(8px) !important;
+        animation: modalBgFadeIn .3s ease !important;
+    }
+    .modal-content {
+        width: 90% !important;
+        max-width: 400px !important;
+        height: auto !important;
+        max-height: 85dvh !important;
+        padding: 24px 24px 0 !important;
+        overflow-y: auto !important;
+        background: var(--secondary-bg) !important;
+        background-color: var(--secondary-bg) !important;
+        background-image: none !important;
+        border: 1px solid var(--surface-border) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 18px 55px rgba(0,0,0,.24), 0 2px 10px rgba(0,0,0,.10) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        animation: modalSlideUp .32s cubic-bezier(.34,1.3,.64,1) !important;
+        transition: background-color .5s ease !important;
+        scrollbar-width: none !important;
+    }
+    .modal-content::-webkit-scrollbar { display:none !important; width:0 !important; }
+    .modal-content::before,
+    .modal-content::after {
+        background: transparent !important;
+        background-image: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-title {
+        margin-bottom: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+        color: var(--text-primary) !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        letter-spacing: normal !important;
+    }
+    .modal-title i { color:var(--accent-color) !important; }
+    html[data-theme="dark"] .modal-title i { color:var(--accent-color-dark) !important; }
+
+    .modal-input,
+    .modal-textarea,
+    .modal-content input:not([type="color"]):not([type="range"]),
+    .modal-content textarea,
+    .modal-content select {
+        background: var(--primary-bg) !important;
+        background-color: var(--primary-bg) !important;
+        background-image: none !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-input,
+    .modal-textarea {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        margin-bottom: 16px !important;
+        border-radius: 12px !important;
+        font-family: var(--font-family) !important;
+    }
+    .modal-textarea { min-height:80px !important; resize:vertical !important; }
+    .modal-input:focus,
+    .modal-textarea:focus {
+        border-color: var(--accent-color) !important;
+        outline: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    .modal-buttons {
+        display: flex !important;
+        justify-content: flex-end !important;
+        gap: 12px !important;
+        margin-top: 16px !important;
+        padding-bottom: max(14px, env(safe-area-inset-bottom,14px)) !important;
+        flex-shrink: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+    .modal-btn {
+        padding: 10px 20px !important;
+        border: 0 !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        font-family: var(--font-family) !important;
+        font-weight: 600 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .modal-btn-primary {
+        background: var(--accent-color) !important;
+        background-color: var(--accent-color) !important;
+        color: var(--message-sent-text) !important;
+    }
+    html[data-theme="dark"] .modal-btn-primary {
+        background: var(--accent-color-dark) !important;
+        background-color: var(--accent-color-dark) !important;
+    }
+    .modal-btn-secondary {
+        background: var(--message-received-bg) !important;
+        background-color: var(--message-received-bg) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .settings-card {
+        padding: 12px 16px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 14px !important;
+        position: relative !important;
+        overflow: hidden !important;
+        background: var(--primary-bg) !important;
+        background-color: var(--primary-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,.05) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .settings-card i {
+        width: 40px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        border-radius: 50% !important;
+        background: rgba(var(--accent-color-rgb),.1) !important;
+        color: var(--accent-color) !important;
+        font-size: 18px !important;
+    }
+    html[data-theme="dark"] .settings-card i {
+        background: rgba(var(--accent-color-rgb),.2) !important;
+    }
+    .settings-card span {
+        color: var(--text-primary) !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        letter-spacing: .5px !important;
+    }
+
+    .cs-card {
+        margin-bottom: 10px !important;
+        overflow: hidden !important;
+        background: var(--primary-bg) !important;
+        background-color: var(--primary-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 14px !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .cs-card .setting-pill-row {
+        margin: 0 !important;
+        padding: 12px 14px !important;
+        background: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+    .cs-card .setting-pill-row:last-child { border-bottom:0 !important; }
+
+    #theme-editor-modal .modal-content {
+        width: 90% !important;
+        max-width: 580px !important;
+        max-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    #theme-editor-grid,
+    #theme-editor-grid.theme-editor-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2,1fr) !important;
+        gap: 8px !important;
+        padding: 4px 2px !important;
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+    }
+    @media (max-width:560px) {
+        #theme-editor-grid,
+        #theme-editor-grid.theme-editor-grid { grid-template-columns:1fr !important; }
+    }
+</style>
+
+<style id="final-no-glass-popup-scope">
+    /* Final scoped fix: keep main-screen glass untouched, remove it from popups. */
+    html body .modal {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body .modal-content,
+    html body .dm-drawer-sheet,
+    html body .daily-greeting-card,
+    html body .fl-modal-content,
+    html body #custom-mood-dialog,
+    html body #ti-settings-panel,
+    html body #ti-inline-settings,
+    html body .sticker-picker-popover,
+    html body .combo-picker,
+    html body .popover,
+    html body .batch-preview,
+    html body .consolidated-menu,
+    html body #reply-preview-container {
+        background: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-color: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body .modal-content::before,
+    html body .modal-content::after,
+    html body .dm-drawer-sheet::before,
+    html body .dm-drawer-sheet::after,
+    html body .daily-greeting-card::before,
+    html body .daily-greeting-card::after,
+    html body .fl-modal-content::before,
+    html body .fl-modal-content::after {
+        background: transparent !important;
+        background-image: none !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body .modal-content *,
+    html body .dm-drawer-sheet *,
+    html body .daily-greeting-card *,
+    html body .fl-modal-content *,
+    html body #custom-mood-dialog *,
+    html body #ti-settings-panel *,
+    html body #ti-inline-settings *,
+    html body .sticker-picker-popover *,
+    html body .combo-picker *,
+    html body .popover *,
+    html body .consolidated-menu * {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    html body .modal-content .settings-card,
+    html body .modal-content .cs-card,
+    html body .modal-content .settings-section,
+    html body .modal-content .settings-item,
+    html body .modal-content .appearance-sub-panel,
+    html body .modal-content [class*="sub-panel"],
+    html body .modal-content [class*="subpanel"],
+    html body .modal-content [class*="settings-panel"],
+    html body .modal-content [class*="settings-section"],
+    html body .modal-content .ti-inline-section,
+    html body .modal-content .ti-inline-input-wrap,
+    html body .modal-content .ti-inline-preview,
+    html body .modal-content .suggestion-preview,
+    html body .modal-content .frame-settings-container,
+    html body .modal-content .frame-controls,
+    html body .modal-content .picker-options-list {
+        background: var(--popup-solid-primary, #121212) !important;
+        background-color: var(--popup-solid-primary, #121212) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body .modal-content .cs-card .setting-pill-row,
+    html body .modal-content .dm-row-item,
+    html body .modal-content .picker-option-item {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+    }
+    html body .modal-content input:not([type="color"]):not([type="range"]),
+    html body .modal-content textarea,
+    html body .modal-content select {
+        background: var(--popup-solid-primary, #121212) !important;
+        background-color: var(--popup-solid-primary, #121212) !important;
+        background-image: none !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        opacity: 1 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* The appearance dialog has its own navigation/panel stack. Target its
+       actual shell explicitly so older high-specificity glass rules cannot
+       leak through this one popup. */
+    html body #appearance-modal > .modal-content {
+        background: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-color: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        mix-blend-mode: normal !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body #appearance-modal #appearance-nav-grid,
+    html body #appearance-modal #appearance-panel-container,
+    html body #appearance-modal .appearance-sub-panel,
+    html body #appearance-modal .settings-section,
+    html body #appearance-modal .settings-card,
+    html body #appearance-modal .settings-item,
+    html body #appearance-modal .cs-panels,
+    html body #appearance-modal .cs-panel,
+    html body #appearance-modal .cs-card {
+        background-color: var(--popup-solid-primary, #121212) !important;
+        background-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        mix-blend-mode: normal !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body #appearance-modal #appearance-nav-grid,
+    html body #appearance-modal #appearance-panel-container,
+    html body #appearance-modal .cs-panels,
+    html body #appearance-modal .cs-panel {
+        background-color: transparent !important;
+    }
+
+    /* Unified popup language: one surface, separated only by hairlines.
+       Accent color stays on icons/active controls instead of large blocks. */
+    html body .modal-content .settings-card,
+    html body .modal-content .settings-section,
+    html body .modal-content .settings-item,
+    html body .modal-content .appearance-sub-panel,
+    html body .modal-content .cs-card,
+    html body .modal-content .preset-colors-container,
+    html body .modal-content .theme-schemes-list {
+        background: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-color: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-image: none !important;
+        border-color: color-mix(in srgb, var(--text-primary) 12%, transparent) !important;
+        box-shadow: none !important;
+    }
+    html body .modal-content .theme-editor-entry-btn {
+        background: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-color: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-image: none !important;
+        color: var(--accent-color) !important;
+        border: .5px solid color-mix(in srgb, var(--text-primary) 12%, transparent) !important;
+        box-shadow: none !important;
+    }
+    html body .modal-content .theme-editor-entry-btn i,
+    html body .modal-content .theme-editor-entry-btn span {
+        color: inherit !important;
+    }
+    html body .modal-content .modal-buttons,
+    html body .modal-content .modal-buttons[style] {
+        background: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-color: var(--popup-solid-secondary, #1e1e1e) !important;
+        background-image: none !important;
+        border-color: color-mix(in srgb, var(--text-primary) 12%, transparent) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    html body .modal-content .settings-section-title,
+    html body .modal-content .appearance-group,
+    html body .modal-content .preset-colors-title {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Compact header uses one editable foreground token for every visible
+       element, avoiding the previous black/white/gray mixture. */
+    :root {
+        --compact-header-content-color: var(--header-preset-text, #18181a);
+    }
+    body.compact-header-mode .header #dc-mobile-open-btn,
+    body.compact-header-mode .header #dc-mobile-open-btn i,
+    body.compact-header-mode .header .partner-name-line .username,
+    body.compact-header-mode .header .header-right > .user-info:first-child .status,
+    body.compact-header-mode .header .header-actions #call-toolbar-btn,
+    body.compact-header-mode .header .header-actions #call-toolbar-btn i {
+        color: var(--compact-header-content-color) !important;
+        fill: currentColor !important;
+        stroke: currentColor !important;
+        -webkit-text-fill-color: currentColor !important;
+        opacity: 1 !important;
+    }
+
+    /* Hidden partner avatar + quoted reply: use a real one-column grid.
+       Only the reserved avatar geometry is removed; reply visuals are untouched. */
+    body.hide-received-avatar .message-wrapper.received.has-reply {
+        grid-template-columns: minmax(0, 1fr) !important;
+        column-gap: 0 !important;
+        gap: 0 !important;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+    body.hide-received-avatar .message-wrapper.received.has-reply > .discord-reply-bar,
+    body.hide-received-avatar .message-wrapper.received.has-reply > .message-content-wrapper {
+        grid-column: 1 !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        justify-self: start !important;
+    }
+    body.hide-received-avatar .message-wrapper.received.has-reply .discord-reply-line-col {
+        margin-left: 0 !important;
+    }
+    html body .modal-content .settings-card::before,
+    html body .modal-content .settings-card::after,
+    html body .modal-content .settings-section::before,
+    html body .modal-content .settings-section::after,
+    html body .modal-content .theme-editor-entry-btn::before,
+    html body .modal-content .theme-editor-entry-btn::after {
+        background: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+    }
+</style>
+
+<script id="final-no-glass-popup-controller">
+(function () {
+    'use strict';
+    function opaqueRgb(variable, fallback) {
+        var probe = document.createElement('span');
+        probe.style.color = 'var(' + variable + ', ' + fallback + ')';
+        document.body.appendChild(probe);
+        var match = getComputedStyle(probe).color.match(/[\d.]+/g);
+        probe.remove();
+        if (!match || match.length < 3) return fallback;
+        return 'rgb(' + [0,1,2].map(function (index) {
+            return Math.round(Number(match[index]));
+        }).join(',') + ')';
+    }
+    function refreshPopupColors() {
+        if (!document.body) return;
+        var root = document.documentElement;
+        root.style.setProperty('--popup-solid-primary', opaqueRgb('--primary-bg', '#121212'));
+        root.style.setProperty('--popup-solid-secondary', opaqueRgb('--secondary-bg', '#1e1e1e'));
+    }
+    function importantStyle(element, property, value) {
+        if (!element) return;
+        if (element.style.getPropertyValue(property) !== value || element.style.getPropertyPriority(property) !== 'important') {
+            element.style.setProperty(property, value, 'important');
+        }
+    }
+    function hardenAllPopups() {
+        document.querySelectorAll('.modal-content, .dm-drawer-sheet, .daily-greeting-card, .fl-modal-content').forEach(function (shell) {
+            importantStyle(shell, 'background', 'var(--popup-solid-secondary, #1e1e1e)');
+            importantStyle(shell, 'background-color', 'var(--popup-solid-secondary, #1e1e1e)');
+            importantStyle(shell, 'background-image', 'none');
+            importantStyle(shell, 'opacity', '1');
+            importantStyle(shell, 'filter', 'none');
+            importantStyle(shell, '-webkit-backdrop-filter', 'none');
+            importantStyle(shell, 'backdrop-filter', 'none');
+            importantStyle(shell, 'mix-blend-mode', 'normal');
+        });
+        document.querySelectorAll('.modal-content .appearance-sub-panel, .modal-content .settings-section, .modal-content .settings-card, .modal-content .settings-item, .modal-content .cs-card').forEach(function (card) {
+            importantStyle(card, 'background', 'var(--popup-solid-secondary, #1e1e1e)');
+            importantStyle(card, 'background-color', 'var(--popup-solid-secondary, #1e1e1e)');
+            importantStyle(card, 'background-image', 'none');
+            importantStyle(card, 'opacity', '1');
+            importantStyle(card, 'filter', 'none');
+            importantStyle(card, '-webkit-backdrop-filter', 'none');
+            importantStyle(card, 'backdrop-filter', 'none');
+            importantStyle(card, 'mix-blend-mode', 'normal');
+        });
+    }
+    function keepPopupFixLast() {
+        refreshPopupColors();
+        hardenAllPopups();
+        var style = document.getElementById('final-no-glass-popup-scope');
+        if (style && document.body && style !== document.body.lastElementChild) document.body.appendChild(style);
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,100,350,900,1800,3200].forEach(function (delay) {
+            window.setTimeout(keepPopupFixLast, delay);
+        });
+        document.addEventListener('input', function (event) {
+            if (event.target && event.target.closest && event.target.closest('#theme-editor-modal')) {
+                refreshPopupColors();
+                hardenAllPopups();
+            }
+        }, true);
+        document.addEventListener('click', function () {
+            window.setTimeout(hardenAllPopups, 0);
+            window.setTimeout(hardenAllPopups, 180);
+        }, true);
+        new MutationObserver(function () {
+            window.setTimeout(keepPopupFixLast, 0);
+        }).observe(document.body, { childList:true });
+        new MutationObserver(function () {
+            window.setTimeout(refreshPopupColors, 0);
+        }).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme','data-color-theme'] });
+    });
+})();
+</script>
 
 
 
