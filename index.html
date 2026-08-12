@@ -40594,6 +40594,48 @@ window.addEventListener('load', function() {
     }
 </style>
 
+<style id="compact-bottom-composer-one-third">
+    /* Final composer sizing: roughly one third shorter, without changing its position or material. */
+    .input-area-wrapper {
+        bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+    }
+    .input-area {
+        height: 38px !important;
+        min-height: 38px !important;
+        max-height: 38px !important;
+        padding: 3px !important;
+        gap: 4px !important;
+        border-radius: 19px !important;
+    }
+    #chat-plus-btn,
+    #continue-btn,
+    html[data-theme="light"] #chat-plus-btn,
+    html[data-theme="light"] #continue-btn,
+    .input-buttons,
+    html[data-theme="light"] .input-buttons {
+        box-sizing: border-box !important;
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        flex: 0 0 32px !important;
+        padding: 0 !important;
+    }
+    #chat-plus-btn { font-size: 18px !important; }
+    #continue-btn { font-size: 10px !important; }
+    .message-input,
+    html[data-theme="light"] .message-input {
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        padding: 5px 6px !important;
+        font-size: 13px !important;
+        line-height: 22px !important;
+    }
+</style>
+
 <script id="compact-header-optional-glass-controller">
 (function () {
     'use strict';
