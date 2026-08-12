@@ -12710,7 +12710,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
             <p style="font-size:12px;margin-top:8px;opacity:0.65;letter-spacing:0.5px;color:var(--text-secondary);">说点什么，让对话开始吧</p>
     </div>
     <div id="typing-indicator-wrapper">
-        <div class="typing-indicator" id="typing-indicator">
+        <div class="typing-indicator wx-clean-time-capsule" id="typing-indicator">
             <div class="typing-indicator-avatar" id="typing-indicator-avatar">
                 <i class="fas fa-user"></i>
             </div>
@@ -40603,11 +40603,9 @@ window.addEventListener('load', function() {
 
     body.compact-header-mode.compact-header-glass {
         --compact-glass-alpha-decimal: .82;
+        background-color: rgb(var(--compact-glass-rgb, 226,226,228)) !important;
     }
     body.compact-header-mode.compact-header-glass .header {
-        position: absolute !important;
-        inset: 0 0 auto 0 !important;
-        z-index: 40 !important;
         background: rgba(var(--compact-glass-rgb, 226,226,228), var(--compact-glass-alpha-decimal, .82)) !important;
         background-color: rgba(var(--compact-glass-rgb, 226,226,228), var(--compact-glass-alpha-decimal, .82)) !important;
         -webkit-backdrop-filter: blur(var(--compact-glass-blur, 18px)) saturate(138%) !important;
@@ -40630,16 +40628,9 @@ window.addEventListener('load', function() {
         -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.25) 55%, transparent 100%) !important;
         mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.25) 55%, transparent 100%) !important;
     }
-    body.compact-header-mode.compact-header-glass .main-chat-area {
-        height: 100dvh !important;
-    }
-    body.compact-header-mode.compact-header-glass .chat-container {
-        padding-top: calc(60px + env(safe-area-inset-top, 0px)) !important;
-    }
     @media (max-width: 768px) {
         body.compact-header-mode.compact-header-glass #dc-main::after {
-            display: none !important;
-            content: none !important;
+            background: rgba(var(--compact-glass-rgb, 226,226,228), var(--compact-glass-alpha-decimal, .82)) !important;
         }
     }
 </style>
@@ -41120,74 +41111,81 @@ window.addEventListener('load', function() {
 </script>
 
 <style id="header-typing-indicator-style">
-    /* Typing state now lives in the header identity; retire the floating pill. */
+    /* Show typing as a quiet, timestamp-like transient status in the chat. */
     #typing-indicator-wrapper {
-        display: none !important;
-        visibility: hidden !important;
+        position: static !important;
+        inset: auto !important;
+        width: 100% !important;
+        flex: 0 0 auto !important;
+        align-self: center !important;
+        transform: none !important;
+        padding: 0 !important;
+        visibility: visible !important;
         pointer-events: none !important;
+        background: transparent !important;
     }
-    #partner-name {
-        transition: opacity .16s ease !important;
+    #typing-indicator-wrapper .typing-indicator {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        animation: none !important;
     }
-    body.partner-is-typing #partner-name {
-        font-family: var(--typing-name-font-family) !important;
-        font-size: var(--typing-name-font-size) !important;
-        font-weight: var(--typing-name-font-weight) !important;
-        line-height: var(--typing-name-line-height) !important;
-        letter-spacing: var(--typing-name-letter-spacing) !important;
+    #typing-indicator-wrapper .typing-indicator-avatar,
+    #typing-indicator-wrapper .typing-dots {
+        display: none !important;
+    }
+    #typing-indicator-wrapper .typing-indicator-label {
+        white-space: nowrap !important;
+        max-width: none !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
     }
 </style>
 
 <script id="header-typing-indicator-controller">
 (function () {
     'use strict';
-    var active = false;
     var wrapper = null;
-    var nameNode = null;
+    var chat = null;
 
     function normalName() {
         return (typeof settings !== 'undefined' && settings.partnerName) || '对方';
     }
-    function paintName() {
-        if (!nameNode) nameNode = document.getElementById('partner-name');
-        if (!nameNode) return;
-        var wanted = active ? '正在输入中···' : normalName();
-        if (nameNode.textContent !== wanted) nameNode.textContent = wanted;
-        nameNode.setAttribute('aria-label', active ? normalName() + '正在输入中' : normalName());
-    }
     function syncFromLegacyIndicator() {
         if (!wrapper) wrapper = document.getElementById('typing-indicator-wrapper');
         if (!wrapper) return;
-        var nextActive = wrapper.style.display === 'block' || wrapper.style.display === 'flex';
-        if (nextActive && !active) {
-            if (!nameNode) nameNode = document.getElementById('partner-name');
-            if (nameNode) {
-                var normalStyle = getComputedStyle(nameNode);
-                var root = document.documentElement.style;
-                root.setProperty('--typing-name-font-family', normalStyle.fontFamily);
-                root.setProperty('--typing-name-font-size', normalStyle.fontSize);
-                root.setProperty('--typing-name-font-weight', normalStyle.fontWeight);
-                root.setProperty('--typing-name-line-height', normalStyle.lineHeight);
-                root.setProperty('--typing-name-letter-spacing', normalStyle.letterSpacing);
-            }
+        keepAtMessageEnd();
+        var active = wrapper.style.display === 'block' || wrapper.style.display === 'flex';
+        var label = document.getElementById('typing-indicator-label');
+        if (active && label) {
+            label.textContent = normalName() + '正在输入···';
+            requestAnimationFrame(function () { if (chat) chat.scrollTop = chat.scrollHeight; });
         }
-        active = nextActive;
-        if (document.body) document.body.classList.toggle('partner-is-typing', active);
-        paintName();
+    }
+    function keepAtMessageEnd() {
+        if (!chat) chat = document.getElementById('chat-container');
+        if (!wrapper || !chat) return;
+        if (wrapper.parentNode !== chat || chat.lastElementChild !== wrapper) chat.appendChild(wrapper);
     }
     function bind() {
         wrapper = document.getElementById('typing-indicator-wrapper');
-        nameNode = document.getElementById('partner-name');
-        if (!wrapper || !nameNode) return false;
+        chat = document.getElementById('chat-container');
+        if (!wrapper || !chat) return false;
+        keepAtMessageEnd();
         if (wrapper.dataset.headerTypingBound !== '1') {
             wrapper.dataset.headerTypingBound = '1';
             new MutationObserver(syncFromLegacyIndicator).observe(wrapper, {
                 attributes:true,
                 attributeFilter:['style','class']
             });
-            new MutationObserver(function () {
-                if (active) paintName();
-            }).observe(nameNode, {childList:true, characterData:true, subtree:true});
+            new MutationObserver(keepAtMessageEnd).observe(chat, { childList:true });
         }
         syncFromLegacyIndicator();
         return true;
@@ -41316,11 +41314,9 @@ window.addEventListener('load', function() {
 </script>
 
 
-<style id="glass-header-actions-and-mobile-keyboard-layout">
+<style id="glass-header-actions-style">
     :root {
         --glass-header-action-color: #ffffff;
-        --mobile-visible-height: 100dvh;
-        --mobile-visible-top: 0px;
     }
 
     /* Expanded progressive-glass header: both controls share one editable color. */
@@ -41335,98 +41331,7 @@ window.addEventListener('load', function() {
         -webkit-text-fill-color: currentColor !important;
     }
 
-    @media (max-width: 768px) {
-        /* When the software keyboard opens, keep the whole app inside the
-           visual viewport. The header remains present; only chat height falls. */
-        body.mobile-keyboard-open {
-            position: fixed !important;
-            top: var(--mobile-visible-top, 0px) !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: auto !important;
-            width: 100vw !important;
-            height: var(--mobile-visible-height, 100dvh) !important;
-            min-height: 0 !important;
-            overflow: hidden !important;
-        }
-        body.mobile-keyboard-open #dc-layout,
-        body.mobile-keyboard-open #dc-main {
-            height: 100% !important;
-            min-height: 0 !important;
-            max-height: 100% !important;
-            overflow: hidden !important;
-        }
-        body.mobile-keyboard-open:not(.compact-header-mode) .header {
-            top: 0 !important;
-        }
-        body.mobile-keyboard-open:not(.compact-header-mode) .main-chat-area {
-            height: 100% !important;
-            min-height: 0 !important;
-            max-height: 100% !important;
-        }
-        body.mobile-keyboard-open.compact-header-mode .main-chat-area {
-            flex: 1 1 auto !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
-        }
-        body.mobile-keyboard-open .chat-container {
-            min-height: 0 !important;
-        }
-    }
 </style>
-
-<script id="mobile-keyboard-visual-viewport-controller">
-(function () {
-    'use strict';
-    var root = document.documentElement;
-    var viewport = window.visualViewport;
-    var baselineHeight = Math.max(window.innerHeight || 0, viewport ? viewport.height : 0);
-    var frame = 0;
-
-    function isTextEntry(element) {
-        return !!(element && (element.matches('textarea, input:not([type]), input[type="text"], input[type="search"], input[type="url"], input[type="email"], [contenteditable="true"]')));
-    }
-
-    function syncVisibleViewport() {
-        frame = 0;
-        if (!document.body) return;
-        var height = viewport ? viewport.height : window.innerHeight;
-        var offsetTop = viewport ? viewport.offsetTop : 0;
-        if (!height) return;
-        baselineHeight = Math.max(baselineHeight, window.innerHeight || 0, height);
-        var focused = isTextEntry(document.activeElement);
-        var keyboardOpen = focused && height < baselineHeight - 120;
-        root.style.setProperty('--mobile-visible-height', Math.round(height) + 'px');
-        root.style.setProperty('--mobile-visible-top', Math.round(offsetTop) + 'px');
-        document.body.classList.toggle('mobile-keyboard-open', keyboardOpen);
-        if (keyboardOpen) {
-            var chat = document.getElementById('chat-container');
-            if (chat) requestAnimationFrame(function () { chat.scrollTop = chat.scrollHeight; });
-        }
-    }
-
-    function scheduleSync() {
-        if (frame) cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(syncVisibleViewport);
-    }
-
-    document.addEventListener('DOMContentLoaded', scheduleSync);
-    document.addEventListener('focusin', scheduleSync, true);
-    document.addEventListener('focusout', function () {
-        window.setTimeout(scheduleSync, 80);
-    }, true);
-    window.addEventListener('resize', scheduleSync, { passive:true });
-    window.addEventListener('orientationchange', function () {
-        baselineHeight = 0;
-        window.setTimeout(scheduleSync, 180);
-    }, { passive:true });
-    if (viewport) {
-        viewport.addEventListener('resize', scheduleSync, { passive:true });
-        viewport.addEventListener('scroll', scheduleSync, { passive:true });
-    }
-})();
-</script>
 
 <style id="chat-input-global-font-size-sync">
     /* Keep typed text and its placeholder in lockstep with the global font-size setting. */
@@ -41435,6 +41340,5 @@ window.addEventListener('load', function() {
         font-size: var(--font-size, 16px) !important;
     }
 </style>
-
 
 </html>
