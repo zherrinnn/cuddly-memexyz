@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-theme="light" data-color-theme="black-white">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25189,7 +25189,7 @@ window.scrollToMessage = function(msgId) {
     border:1px solid rgba(255,255,255,.18);border-radius:32px;
     padding:44px 28px 36px;
     display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;
-    box-shadow:0 32px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.15);
+    box-shadow:none;
     animation:cCu .45s cubic-bezier(.22,1,.36,1);
     position:relative;overflow:hidden;
 }
@@ -25806,23 +25806,13 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
             S.incomingTimer = setTimeout(() => {
                 if (!ov.classList.contains('visible')) return;
                 ov.classList.remove('visible');
-                const myName = (typeof settings !== 'undefined' && settings.myName) || '我';
-                const partnerName = getName();
-                const rejectLabels = [
-                    `${partnerName} 的来电，${myName}未接听`,
-                    `${myName}拒绝了 ${partnerName} 的通话`,
-                    `错过了 ${partnerName} 的来电`,
-                    `${myName}暂时无法接听 ${partnerName} 的通话`,
-                ];
-                const label = rejectLabels[Math.floor(Math.random() * rejectLabels.length)];
-                sendCallEvent('fa-phone-slash', label, null);
+                sendCallEvent('fa-phone-slash', '通话未接听', null);
             }, rejectDelay);
         } else {
             S.incomingTimer = setTimeout(() => {
                 if (!ov.classList.contains('visible')) return;
                 ov.classList.remove('visible');
-                const myName = (typeof settings !== 'undefined' && settings.myName) || '我';
-                sendCallEvent('fa-phone-slash', `${myName}未接听 ${getName()} 的来电`, null);
+                sendCallEvent('fa-phone-slash', '通话未接听', null);
             }, 22000);
         }
     }
@@ -25975,8 +25965,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         document.getElementById('call-inc-reject')?.addEventListener('click', () => {
             document.getElementById('call-incoming-overlay')?.classList.remove('visible');
             clearTimeout(S.incomingTimer);
-            const myName = (typeof settings !== 'undefined' && settings.myName) || '我';
-            sendCallEvent('fa-phone-slash', `${myName}拒绝了 ${getName()} 的通话`, null);
+            sendCallEvent('fa-phone-slash', '通话已拒绝', null);
         });
         document.getElementById('call-inc-accept')?.addEventListener('click', () => {
             document.getElementById('call-incoming-overlay')?.classList.remove('visible');
@@ -37576,10 +37565,10 @@ window.addEventListener('load', function() {
     /* Chat bubbles keep their native appearance; only vertical rhythm changes. */
     .chat-container > .message-wrapper:not(:has(.wx-clean-time-capsule)) {
         margin-top: 0 !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 5px !important;
     }
     .chat-container > .message-wrapper.sent:not(:has(.wx-clean-time-capsule)) {
-        margin-top: 2px !important;
+        margin-top: 0 !important;
     }
     .chat-container > .message-wrapper.has-image-only:not(:has(.wx-clean-time-capsule)) {
         padding-bottom: 0 !important;
@@ -40614,9 +40603,11 @@ window.addEventListener('load', function() {
 
     body.compact-header-mode.compact-header-glass {
         --compact-glass-alpha-decimal: .82;
-        background-color: rgb(var(--compact-glass-rgb, 226,226,228)) !important;
     }
     body.compact-header-mode.compact-header-glass .header {
+        position: absolute !important;
+        inset: 0 0 auto 0 !important;
+        z-index: 40 !important;
         background: rgba(var(--compact-glass-rgb, 226,226,228), var(--compact-glass-alpha-decimal, .82)) !important;
         background-color: rgba(var(--compact-glass-rgb, 226,226,228), var(--compact-glass-alpha-decimal, .82)) !important;
         -webkit-backdrop-filter: blur(var(--compact-glass-blur, 18px)) saturate(138%) !important;
@@ -40639,9 +40630,16 @@ window.addEventListener('load', function() {
         -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.25) 55%, transparent 100%) !important;
         mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.25) 55%, transparent 100%) !important;
     }
+    body.compact-header-mode.compact-header-glass .main-chat-area {
+        height: 100dvh !important;
+    }
+    body.compact-header-mode.compact-header-glass .chat-container {
+        padding-top: calc(60px + env(safe-area-inset-top, 0px)) !important;
+    }
     @media (max-width: 768px) {
         body.compact-header-mode.compact-header-glass #dc-main::after {
-            background: rgba(var(--compact-glass-rgb, 226,226,228), var(--compact-glass-alpha-decimal, .82)) !important;
+            display: none !important;
+            content: none !important;
         }
     }
 </style>
@@ -41338,11 +41336,17 @@ window.addEventListener('load', function() {
     }
 
     @media (max-width: 768px) {
+        /* Keep the expanded glass header below the iPhone sensor housing.
+           The compact header has its own safe-area rule above. */
+        body:not(.compact-header-mode) .header {
+            padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+        }
+
         /* When the software keyboard opens, keep the whole app inside the
            visual viewport. The header remains present; only chat height falls. */
         body.mobile-keyboard-open {
             position: fixed !important;
-            top: var(--mobile-visible-top, 0px) !important;
+            top: 0 !important;
             left: 0 !important;
             right: 0 !important;
             bottom: auto !important;
@@ -41385,6 +41389,7 @@ window.addEventListener('load', function() {
     var viewport = window.visualViewport;
     var baselineHeight = Math.max(window.innerHeight || 0, viewport ? viewport.height : 0);
     var frame = 0;
+    var settleTimers = [];
 
     function isTextEntry(element) {
         return !!(element && (element.matches('textarea, input:not([type]), input[type="text"], input[type="search"], input[type="url"], input[type="email"], [contenteditable="true"]')));
@@ -41394,13 +41399,13 @@ window.addEventListener('load', function() {
         frame = 0;
         if (!document.body) return;
         var height = viewport ? viewport.height : window.innerHeight;
-        var offsetTop = viewport ? viewport.offsetTop : 0;
         if (!height) return;
-        baselineHeight = Math.max(baselineHeight, window.innerHeight || 0, height);
         var focused = isTextEntry(document.activeElement);
+        /* Only learn a new baseline while no editor is focused. During keyboard
+           animation iOS may temporarily report a reduced innerHeight. */
+        if (!focused) baselineHeight = Math.max(baselineHeight, window.innerHeight || 0, height);
         var keyboardOpen = focused && height < baselineHeight - 120;
         root.style.setProperty('--mobile-visible-height', Math.round(height) + 'px');
-        root.style.setProperty('--mobile-visible-top', Math.round(offsetTop) + 'px');
         document.body.classList.toggle('mobile-keyboard-open', keyboardOpen);
         if (keyboardOpen) {
             var chat = document.getElementById('chat-container');
@@ -41413,15 +41418,20 @@ window.addEventListener('load', function() {
         frame = requestAnimationFrame(syncVisibleViewport);
     }
 
+    function settleViewport() {
+        settleTimers.forEach(window.clearTimeout);
+        settleTimers = [0, 60, 140, 280, 520].map(function (delay) {
+            return window.setTimeout(scheduleSync, delay);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', scheduleSync);
-    document.addEventListener('focusin', scheduleSync, true);
-    document.addEventListener('focusout', function () {
-        window.setTimeout(scheduleSync, 80);
-    }, true);
+    document.addEventListener('focusin', settleViewport, true);
+    document.addEventListener('focusout', settleViewport, true);
     window.addEventListener('resize', scheduleSync, { passive:true });
     window.addEventListener('orientationchange', function () {
         baselineHeight = 0;
-        window.setTimeout(scheduleSync, 180);
+        settleViewport();
     }, { passive:true });
     if (viewport) {
         viewport.addEventListener('resize', scheduleSync, { passive:true });
@@ -41430,6 +41440,13 @@ window.addEventListener('load', function() {
 })();
 </script>
 
+<style id="chat-input-global-font-size-sync">
+    /* Keep typed text and its placeholder in lockstep with the global font-size setting. */
+    .message-input,
+    .message-input::placeholder {
+        font-size: var(--font-size, 16px) !important;
+    }
+</style>
 
 
 </html>
