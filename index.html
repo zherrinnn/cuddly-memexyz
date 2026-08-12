@@ -12762,7 +12762,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
     <textarea class="message-input" id="message-input" placeholder="" rows="1"></textarea>
     
     <div class="input-buttons">
-    <button class="continue-btn input-btn" id="continue-btn" title="让对方继续说"><i class="fas fa-microphone"></i></button>
+    <button class="continue-btn input-btn" id="continue-btn" title="让对方继续说"><svg class="continue-mic-outline" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2.5" width="8" height="12.5" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5v.8a6.5 6.5 0 0 0 13 0v-.8M12 18.8v2.7M8.8 21.5h6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         <button class="batch-btn input-btn collapse-hideable" id="batch-btn" title="批量发送模式"><i class="fas fa-layer-group"></i></button>
         <button class="send-btn input-btn" id="send-btn" title="发送消息"><i class="fas fa-paper-plane"></i></button>
         
@@ -13109,6 +13109,16 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
     <div class="settings-card" onclick="showAppearancePanel('bubble-css')" style="cursor:pointer;">
         <i class="fas fa-comment"></i><span>气泡 & CSS</span>
     </div>
+</div>
+
+<div class="composer-mode-setting" id="composer-mode-setting">
+    <div class="composer-mode-copy">
+        <i class="fas fa-grip-lines"></i>
+        <span><strong>底栏模式</strong><small id="composer-mode-label">玻璃胶囊</small></span>
+    </div>
+    <button type="button" class="composer-mode-switch" id="composer-mode-switch" role="switch" aria-checked="false" aria-label="切换底栏模式">
+        <span></span>
+    </button>
 </div>
 
 <div id="appearance-panel-container" style="display:none;">
@@ -13621,6 +13631,25 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                             <span class="cs-slider-label">最长等待</span>
                             <input type="range" min="1000" max="240000" step="1000" value="7000" class="font-size-slider" id="reply-delay-max-slider">
                             <span class="cs-slider-val" id="reply-delay-max-value">7s</span>
+                        </div>
+                    </div>
+
+                    <p class="cs-group-label" style="margin-top:4px;">回复句数</p>
+                    <div class="cs-card reply-count-card">
+                        <div class="reply-count-row">
+                            <span class="setting-pill-icon"><i class="fas fa-comment-dots"></i></span>
+                            <div class="reply-count-copy">
+                                <strong>每轮回复</strong>
+                                <small>在设定范围内随机发送</small>
+                            </div>
+                            <select id="reply-count-min" aria-label="最少回复句数">
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                            </select>
+                            <span class="reply-count-separator">–</span>
+                            <select id="reply-count-max" aria-label="最多回复句数">
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                            </select>
+                            <span class="reply-count-unit">句</span>
                         </div>
                     </div>
 
@@ -16717,6 +16746,8 @@ function loadMoreHistory() {
                 musicPlayerEnabled: false,
                 replyDelayMin: 3000,
                 replyDelayMax: 7000,
+                replyCountMin: 1,
+                replyCountMax: 3,
                 inChatAvatarEnabled: true,
                 inChatAvatarSize: 36,
                 inChatAvatarPosition: 'center',
@@ -16757,6 +16788,7 @@ autoSendInterval: 5,
         compactHeaderGlassColor: '#e2e2e4',
         compactHeaderGlassOpacity: 82,
         compactHeaderGlassBlur: 18,
+        composerMode: 'glass',
         emojiMixEnabled: true,
         stickerSendChance: 0.2
             };
@@ -18308,7 +18340,7 @@ if (!isBatchMode && type === 'normal') {
             const tiWrapper = document.getElementById('typing-indicator-wrapper');
             const tiLabel = document.getElementById('typing-indicator-label');
             const tiAvatar = document.getElementById('typing-indicator-avatar');
-            if (tiLabel) tiLabel.textContent = (settings.partnerName || '对方') + ' 正在输入';
+            if (tiLabel) tiLabel.textContent = (settings.partnerName || '对方') + '正在输入···';
             if (tiWrapper) { 
                 positionTypingIndicator(); 
                 tiWrapper.style.display = 'block'; 
@@ -18456,7 +18488,7 @@ if (!isBatchMode && type === 'normal') {
                 const tiWrapper = document.getElementById('typing-indicator-wrapper');
                 const tiLabel = document.getElementById('typing-indicator-label');
                 const tiAvatar = document.getElementById('typing-indicator-avatar');
-                if (tiLabel) tiLabel.textContent = (settings.partnerName || '对方') + ' 正在输入';
+                if (tiLabel) tiLabel.textContent = (settings.partnerName || '对方') + '正在输入···';
                 if (tiWrapper) { 
                     positionTypingIndicator(); 
                     tiWrapper.style.display = 'block'; 
@@ -18504,7 +18536,9 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
                 return;
             }
 
-            const replyCount = Math.floor(Math.random() * 3) + 1;
+            const replyCountMin = Math.max(1, Math.min(5, Number(settings.replyCountMin) || 1));
+            const replyCountMax = Math.max(replyCountMin, Math.min(5, Number(settings.replyCountMax) || 3));
+            const replyCount = replyCountMin + Math.floor(Math.random() * (replyCountMax - replyCountMin + 1));
             if (!customReplies || customReplies.length === 0) {
                 showNotification('回复库为空，请先到「自定义回复」中添加内容', 'info', 3500);
                 finishReplyCycle();
@@ -20682,6 +20716,8 @@ window.showAppearancePanel = function(panel) {
         'bubble-css': ['bubble', 'css']
     };
     document.getElementById('appearance-nav-grid').style.display = 'none';
+    var composerModeSetting = document.getElementById('composer-mode-setting');
+    if (composerModeSetting) composerModeSetting.style.display = 'none';
     var unBtn = document.getElementById('update-notice-btn');
     if (unBtn) unBtn.style.display = 'none';
     document.getElementById('appearance-panel-container').style.display = 'block';
@@ -20708,6 +20744,8 @@ window.hideAppearancePanel = function() {
         return;
     }
     document.getElementById('appearance-nav-grid').style.display = 'grid';
+    var composerModeSetting = document.getElementById('composer-mode-setting');
+    if (composerModeSetting) composerModeSetting.style.display = 'flex';
     document.getElementById('appearance-panel-container').style.display = 'none';
     document.querySelectorAll('.appearance-sub-panel').forEach(p => p.style.display = 'none');
     var unBtn = document.getElementById('update-notice-btn');
@@ -23886,6 +23924,9 @@ function applyAvatarShapeToDOM(type, shape) {
             '--compact-header-bg': '收起顶栏背景色',
             '--compact-header-content-color': '收起顶栏内容颜色（箭头 / 昵称 / 状态 / 视频）',
             '--input-area-bg':     '输入框区域背景',
+            '--composer-surface-color': '底栏底色（两种模式）',
+            '--composer-content-color': '底栏图标与文字',
+            '--composer-border-color':  '底栏所有线条（统一）',
             '--text-primary':      '主要文字颜色',
             '--text-secondary':    '次要文字 / 说明文字',
             '--border-color':      '边框 / 分割线颜色',
@@ -24085,6 +24126,7 @@ function initThemeEditor() {
 
             const groups = [
                 { label: '🖼 背景颜色',  vars: ['--primary-bg','--secondary-bg','--header-bg','--compact-header-bg','--input-area-bg'] },
+                { label: '⌨️ 底栏模式', vars: ['--composer-surface-color','--composer-content-color','--composer-border-color'] },
                 { label: '✏️ 文字 & 线条', vars: ['--text-primary','--text-secondary','--compact-header-content-color','--timestamp-color','--border-color'] },
                 { label: '✨ 强调色（影响全局）', vars: ['--accent-color','--accent-color-dark'] },
                 { label: '💬 我方气泡',  vars: ['--message-sent-bg','--message-sent-text'] },
@@ -30130,7 +30172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function getTiLabel() {
         if (tiCustomText) return tiCustomText;
         var name = (window.settings && settings.partnerName) ? settings.partnerName : '对方';
-        return name + ' 正在输入';
+        return name + '正在输入···';
     }
 
     function updatePreview() {
@@ -35018,7 +35060,7 @@ window.addEventListener('load', function() {
         var wrapper = document.getElementById('typing-indicator-wrapper');
         var label = document.getElementById('typing-indicator-label');
         var avatar = document.getElementById('typing-indicator-avatar');
-        if (label) label.textContent = ((typeof settings !== 'undefined' && settings.partnerName) || '对方') + ' 正在选择';
+        if (label) label.textContent = ((typeof settings !== 'undefined' && settings.partnerName) || '对方') + '正在输入···';
         if (avatar && typeof DOMElements !== 'undefined' && DOMElements.partner && DOMElements.partner.avatar) {
             var image = DOMElements.partner.avatar.querySelector('img');
             avatar.innerHTML = image ? '<img src="' + image.src + '">' : '<i class="fas fa-user"></i>';
@@ -35090,10 +35132,19 @@ window.addEventListener('load', function() {
         updateSuggestionPreview();
         showSuggestionTyping();
 
+        /* Keep the indicator alive for the entire card-selection wait. Other
+           reply timers may briefly hide the shared indicator. */
+        if (window._suggestionTypingKeepAlive) window.clearInterval(window._suggestionTypingKeepAlive);
+        window._suggestionTypingKeepAlive = window.setInterval(showSuggestionTyping, 250);
+
         var minDelay = Math.max(0, Number(settings.replyDelayMin) || 3000);
         var maxDelay = Math.max(minDelay, Number(settings.replyDelayMax) || 7000);
         var delay = minDelay + Math.random() * (maxDelay - minDelay);
         window.setTimeout(function () {
+            if (window._suggestionTypingKeepAlive) {
+                window.clearInterval(window._suggestionTypingKeepAlive);
+                window._suggestionTypingKeepAlive = null;
+            }
             var choice = options[Math.floor(Math.random() * options.length)];
             hideSuggestionTyping();
             addMessage({
@@ -40485,7 +40536,7 @@ window.addEventListener('load', function() {
 
 <style id="compact-header-optional-glass-style">
     body.compact-header-mode .header-actions {
-        right: 8px !important;
+        right: max(calc(var(--composer-edge-inset, 17px) + 5px), env(safe-area-inset-right, 0px)) !important;
     }
     #theme-editor-modal .theme-editor-scroll {
         flex: 1 1 auto;
@@ -40678,6 +40729,15 @@ window.addEventListener('load', function() {
         font-size: 18px !important;
         line-height: 1 !important;
     }
+    #continue-btn .continue-mic-outline,
+    html[data-theme="light"] #continue-btn .continue-mic-outline {
+        display: block !important;
+        width: 21px !important;
+        height: 21px !important;
+        overflow: visible !important;
+        color: currentColor !important;
+        fill: none !important;
+    }
     .message-input,
     html[data-theme="light"] .message-input {
         height: 37px !important;
@@ -40812,6 +40872,407 @@ window.addEventListener('load', function() {
         setTimeout(bind, 0);
     }, true);
     window.applyCompactHeaderGlass = applyCompactGlass;
+})();
+</script>
+
+<style id="composer-mode-selector-style">
+    :root {
+        --composer-edge-inset: 17px;
+        --composer-surface-color: #ffffff;
+        --composer-content-color: #ffffff;
+        --composer-border-color: #ffffff;
+        --composer-line-width: 1px;
+    }
+    .composer-mode-setting {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin: 0 0 12px;
+        padding: 11px 13px;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        background: var(--primary-bg);
+        color: var(--text-primary);
+    }
+    .composer-mode-copy { display:flex; align-items:center; gap:11px; min-width:0; }
+    .composer-mode-copy > i { width:22px; text-align:center; color:var(--accent-color); }
+    .composer-mode-copy > span { display:flex; flex-direction:column; gap:2px; }
+    .composer-mode-copy strong { font-size:13px; font-weight:650; }
+    .composer-mode-copy small { font-size:10px; color:var(--text-secondary); }
+    .composer-mode-switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex: 0 0 42px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: var(--border-color);
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+    .composer-mode-switch span {
+        position:absolute;
+        top:3px;
+        left:3px;
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        background:#fff;
+        box-shadow:0 1px 4px rgba(0,0,0,.18);
+        transition:transform .2s ease;
+    }
+    .composer-mode-switch[aria-checked="true"] { background:var(--accent-color); }
+    .composer-mode-switch[aria-checked="true"] span { transform:translateX(18px); }
+
+    /* Reference icon: three open rails with offset circular terminals. */
+    #chat-plus-btn .composer-rail-icon {
+        display:block;
+        width:23px;
+        height:23px;
+        overflow:visible;
+        color:currentColor;
+        fill:none;
+    }
+    .input-area,
+    #chat-plus-btn {
+        color: var(--composer-content-color) !important;
+        border: var(--composer-line-width) solid color-mix(in srgb, var(--composer-border-color) 38%, transparent) !important;
+        background: color-mix(in srgb, var(--composer-surface-color) 7%, rgba(18,18,22,.24)) !important;
+        box-shadow: none !important;
+        background-clip: padding-box !important;
+    }
+    html[data-theme="light"] .input-area,
+    html[data-theme="light"] #chat-plus-btn {
+        color: var(--composer-content-color) !important;
+        border: var(--composer-line-width) solid color-mix(in srgb, var(--composer-border-color) 44%, transparent) !important;
+        background: color-mix(in srgb, var(--composer-surface-color) 16%, rgba(38,38,42,.10)) !important;
+        box-shadow: none !important;
+        background-clip: padding-box !important;
+    }
+    #continue-btn,
+    .message-input {
+        color: var(--composer-content-color) !important;
+    }
+    .message-input::placeholder { color: color-mix(in srgb, var(--composer-content-color) 48%, transparent) !important; }
+
+    /* Optional second mode: icon + single writing line + compact voice action. */
+    body.composer-line-mode .input-area-wrapper {
+        grid-template-columns: 35px minmax(0, 1fr) !important;
+        column-gap: 9px !important;
+        padding-inline: max(var(--composer-edge-inset), env(safe-area-inset-left, 0px)) max(var(--composer-edge-inset), env(safe-area-inset-right, 0px)) !important;
+    }
+    body.composer-line-mode #chat-plus-btn,
+    html[data-theme="light"] body.composer-line-mode #chat-plus-btn {
+        width:35px !important;
+        min-width:35px !important;
+        max-width:35px !important;
+        height:35px !important;
+        min-height:35px !important;
+        max-height:35px !important;
+        border:0 !important;
+        border-radius:0 !important;
+        background:transparent !important;
+        box-shadow:none !important;
+        -webkit-backdrop-filter:none !important;
+        backdrop-filter:none !important;
+    }
+    body.composer-line-mode .input-area,
+    html[data-theme="light"] body.composer-line-mode .input-area {
+        position:relative !important;
+        height:39px !important;
+        min-height:39px !important;
+        max-height:39px !important;
+        padding:0 0 4px 2px !important;
+        border:0 !important;
+        border-bottom:var(--composer-line-width) solid var(--composer-border-color) !important;
+        border-radius:0 !important;
+        background:transparent !important;
+        box-shadow:none !important;
+        -webkit-backdrop-filter:none !important;
+        backdrop-filter:none !important;
+        color:var(--composer-content-color) !important;
+    }
+    body.composer-line-mode .message-input,
+    html[data-theme="light"] body.composer-line-mode .message-input {
+        height:34px !important;
+        min-height:34px !important;
+        max-height:34px !important;
+        padding:6px 8px 5px 3px !important;
+        line-height:23px !important;
+        background:transparent !important;
+    }
+    body.composer-line-mode #continue-btn,
+    html[data-theme="light"] body.composer-line-mode #continue-btn {
+        width:32px !important;
+        min-width:32px !important;
+        max-width:32px !important;
+        height:32px !important;
+        min-height:32px !important;
+        max-height:32px !important;
+        margin:0 !important;
+        border:var(--composer-line-width) solid var(--composer-border-color) !important;
+        border-radius:50% !important;
+        color:var(--composer-content-color) !important;
+    }
+    body.composer-line-mode #continue-btn .continue-mic-outline {
+        width:17px !important;
+        height:17px !important;
+    }
+    @media (max-width: 480px) {
+        :root { --composer-edge-inset: 14px; }
+        body.composer-line-mode .input-area-wrapper {
+            padding-inline:max(var(--composer-edge-inset), env(safe-area-inset-left, 0px)) max(var(--composer-edge-inset), env(safe-area-inset-right, 0px)) !important;
+        }
+    }
+</style>
+
+<script id="composer-mode-selector-controller">
+(function () {
+    'use strict';
+    var storageKey = 'chatComposerMode';
+    var railSvg = '<svg class="composer-rail-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"><circle cx="4.5" cy="5" r="1.45"/><path d="M8 5h11.5"/><circle cx="4.5" cy="12" r="1.45"/><path d="M8 12h8.5"/><circle cx="4.5" cy="19" r="1.45"/><path d="M8 19h11.5"/></g></svg>';
+
+    function readMode() {
+        try {
+            var value = localStorage.getItem(storageKey);
+            return value === 'line' || value === 'glass' ? value : null;
+        } catch (e) { return null; }
+    }
+    function applyMode(mode, persist) {
+        mode = mode === 'line' ? 'line' : 'glass';
+        if (document.body) document.body.classList.toggle('composer-line-mode', mode === 'line');
+        var control = document.getElementById('composer-mode-switch');
+        var label = document.getElementById('composer-mode-label');
+        if (control) control.setAttribute('aria-checked', String(mode === 'line'));
+        if (label) label.textContent = mode === 'line' ? '极简横线' : '玻璃胶囊';
+        if (persist) {
+            try { localStorage.setItem(storageKey, mode); } catch (e) {}
+            if (typeof settings !== 'undefined') settings.composerMode = mode;
+            if (typeof throttledSaveData === 'function') throttledSaveData();
+        }
+    }
+    function refreshPlusIcon() {
+        var plus = document.getElementById('chat-plus-btn');
+        if (!plus) return false;
+        if (!plus.querySelector('.composer-rail-icon')) plus.innerHTML = railSvg;
+        plus.setAttribute('aria-label', '更多输入功能');
+        return true;
+    }
+    function bind() {
+        refreshPlusIcon();
+        var control = document.getElementById('composer-mode-switch');
+        if (control && control.dataset.bound !== '1') {
+            control.dataset.bound = '1';
+            control.addEventListener('click', function () {
+                applyMode(document.body.classList.contains('composer-line-mode') ? 'glass' : 'line', true);
+            });
+        }
+        var saved = readMode() || (typeof settings !== 'undefined' && settings.composerMode) || 'glass';
+        applyMode(saved, false);
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,80,250,700,1500].forEach(function (delay) { setTimeout(bind, delay); });
+        new MutationObserver(refreshPlusIcon).observe(document.body, {childList:true, subtree:true});
+    });
+    window.applyComposerMode = applyMode;
+})();
+</script>
+
+<style id="header-typing-indicator-style">
+    /* Typing state now lives in the header identity; retire the floating pill. */
+    #typing-indicator-wrapper {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+    #partner-name {
+        transition: opacity .16s ease !important;
+    }
+    body.partner-is-typing #partner-name {
+        font-family: var(--typing-name-font-family) !important;
+        font-size: var(--typing-name-font-size) !important;
+        font-weight: var(--typing-name-font-weight) !important;
+        line-height: var(--typing-name-line-height) !important;
+        letter-spacing: var(--typing-name-letter-spacing) !important;
+    }
+</style>
+
+<script id="header-typing-indicator-controller">
+(function () {
+    'use strict';
+    var active = false;
+    var wrapper = null;
+    var nameNode = null;
+
+    function normalName() {
+        return (typeof settings !== 'undefined' && settings.partnerName) || '对方';
+    }
+    function paintName() {
+        if (!nameNode) nameNode = document.getElementById('partner-name');
+        if (!nameNode) return;
+        var wanted = active ? '正在输入中···' : normalName();
+        if (nameNode.textContent !== wanted) nameNode.textContent = wanted;
+        nameNode.setAttribute('aria-label', active ? normalName() + '正在输入中' : normalName());
+    }
+    function syncFromLegacyIndicator() {
+        if (!wrapper) wrapper = document.getElementById('typing-indicator-wrapper');
+        if (!wrapper) return;
+        var nextActive = wrapper.style.display === 'block' || wrapper.style.display === 'flex';
+        if (nextActive && !active) {
+            if (!nameNode) nameNode = document.getElementById('partner-name');
+            if (nameNode) {
+                var normalStyle = getComputedStyle(nameNode);
+                var root = document.documentElement.style;
+                root.setProperty('--typing-name-font-family', normalStyle.fontFamily);
+                root.setProperty('--typing-name-font-size', normalStyle.fontSize);
+                root.setProperty('--typing-name-font-weight', normalStyle.fontWeight);
+                root.setProperty('--typing-name-line-height', normalStyle.lineHeight);
+                root.setProperty('--typing-name-letter-spacing', normalStyle.letterSpacing);
+            }
+        }
+        active = nextActive;
+        if (document.body) document.body.classList.toggle('partner-is-typing', active);
+        paintName();
+    }
+    function bind() {
+        wrapper = document.getElementById('typing-indicator-wrapper');
+        nameNode = document.getElementById('partner-name');
+        if (!wrapper || !nameNode) return false;
+        if (wrapper.dataset.headerTypingBound !== '1') {
+            wrapper.dataset.headerTypingBound = '1';
+            new MutationObserver(syncFromLegacyIndicator).observe(wrapper, {
+                attributes:true,
+                attributeFilter:['style','class']
+            });
+            new MutationObserver(function () {
+                if (active) paintName();
+            }).observe(nameNode, {childList:true, characterData:true, subtree:true});
+        }
+        syncFromLegacyIndicator();
+        return true;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,80,250,700,1500].forEach(function (delay) { window.setTimeout(bind, delay); });
+    });
+    window.syncHeaderTypingIndicator = syncFromLegacyIndicator;
+})();
+</script>
+
+<style id="outline-video-call-icon-style">
+    #call-toolbar-btn .outline-video-icon {
+        display: block !important;
+        width: 25px !important;
+        height: 25px !important;
+        overflow: visible !important;
+        color: currentColor !important;
+        fill: none !important;
+        stroke: currentColor !important;
+    }
+    #call-toolbar-btn .outline-video-icon * {
+        fill: none !important;
+        stroke: currentColor !important;
+        vector-effect: non-scaling-stroke;
+    }
+</style>
+
+<script id="outline-video-call-icon-controller">
+(function () {
+    'use strict';
+    var icon = '<svg class="outline-video-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12.5" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M15.5 10.1 20 7.6a.7.7 0 0 1 1.05.61v7.58A.7.7 0 0 1 20 16.4l-4.5-2.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg>';
+    function applyOutlineVideoIcon() {
+        var button = document.getElementById('call-toolbar-btn');
+        if (!button) return false;
+        if (!button.querySelector('.outline-video-icon')) button.innerHTML = icon;
+        return true;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,80,250,700,1500].forEach(function (delay) { window.setTimeout(applyOutlineVideoIcon, delay); });
+        new MutationObserver(applyOutlineVideoIcon).observe(document.body, {childList:true, subtree:true});
+    });
+})();
+</script>
+
+<style id="reply-count-setting-style">
+    .reply-count-row {
+        display:flex;
+        align-items:center;
+        gap:8px;
+        min-height:50px;
+        padding:8px 12px;
+    }
+    .reply-count-copy { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+    .reply-count-copy strong { color:var(--text-primary); font-size:13px; font-weight:600; }
+    .reply-count-copy small { color:var(--text-secondary); font-size:10.5px; }
+    .reply-count-row select {
+        width:48px;
+        height:32px;
+        padding:0 7px;
+        border:1px solid var(--border-color);
+        border-radius:9px;
+        background:var(--primary-bg);
+        color:var(--text-primary);
+        font:600 13px var(--font-family);
+        text-align:center;
+        outline:none;
+    }
+    .reply-count-separator,
+    .reply-count-unit { color:var(--text-secondary); font-size:12px; }
+    @media (max-width:420px) {
+        .reply-count-row { gap:6px; padding-inline:10px; }
+        .reply-count-row select { width:44px; }
+    }
+</style>
+
+<script id="reply-count-setting-controller">
+(function () {
+    'use strict';
+    function clamp(value, fallback) {
+        var number = Number(value);
+        return Number.isFinite(number) ? Math.max(1, Math.min(5, Math.round(number))) : fallback;
+    }
+    function sync() {
+        if (typeof settings === 'undefined') return false;
+        var min = document.getElementById('reply-count-min');
+        var max = document.getElementById('reply-count-max');
+        if (!min || !max) return false;
+        settings.replyCountMin = clamp(settings.replyCountMin, 1);
+        settings.replyCountMax = Math.max(settings.replyCountMin, clamp(settings.replyCountMax, 3));
+        min.value = String(settings.replyCountMin);
+        max.value = String(settings.replyCountMax);
+        Array.from(min.options).forEach(function (option) {
+            option.disabled = Number(option.value) > settings.replyCountMax;
+        });
+        Array.from(max.options).forEach(function (option) {
+            option.disabled = Number(option.value) < settings.replyCountMin;
+        });
+        return true;
+    }
+    function save() {
+        if (typeof throttledSaveData === 'function') throttledSaveData();
+    }
+    function bind() {
+        if (!sync()) return false;
+        var min = document.getElementById('reply-count-min');
+        var max = document.getElementById('reply-count-max');
+        if (min.dataset.bound === '1') return true;
+        min.dataset.bound = max.dataset.bound = '1';
+        min.addEventListener('change', function () {
+            settings.replyCountMin = clamp(min.value, 1);
+            if (settings.replyCountMin > settings.replyCountMax) settings.replyCountMax = settings.replyCountMin;
+            sync(); save();
+        });
+        max.addEventListener('change', function () {
+            settings.replyCountMax = clamp(max.value, 3);
+            if (settings.replyCountMax < settings.replyCountMin) settings.replyCountMin = settings.replyCountMax;
+            sync(); save();
+        });
+        return true;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,100,350,900,1800].forEach(function (delay) { window.setTimeout(bind, delay); });
+    });
 })();
 </script>
 
