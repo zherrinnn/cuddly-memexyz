@@ -23923,6 +23923,7 @@ function applyAvatarShapeToDOM(type, shape) {
             '--header-bg':         '展开顶栏底色（通常保持透明）',
             '--compact-header-bg': '收起顶栏背景色',
             '--compact-header-content-color': '收起顶栏内容颜色（箭头 / 昵称 / 状态 / 视频）',
+            '--glass-header-action-color': '玻璃顶栏按钮图标（返回 / 视频）',
             '--input-area-bg':     '输入框区域背景',
             '--composer-surface-color': '底栏底色（两种模式）',
             '--composer-content-color': '底栏图标与文字',
@@ -24127,7 +24128,7 @@ function initThemeEditor() {
             const groups = [
                 { label: '🖼 背景颜色',  vars: ['--primary-bg','--secondary-bg','--header-bg','--compact-header-bg','--input-area-bg'] },
                 { label: '⌨️ 底栏模式', vars: ['--composer-surface-color','--composer-content-color','--composer-border-color'] },
-                { label: '✏️ 文字 & 线条', vars: ['--text-primary','--text-secondary','--compact-header-content-color','--timestamp-color','--border-color'] },
+                { label: '✏️ 文字 & 线条', vars: ['--text-primary','--text-secondary','--compact-header-content-color','--glass-header-action-color','--timestamp-color','--border-color'] },
                 { label: '✨ 强调色（影响全局）', vars: ['--accent-color','--accent-color-dark'] },
                 { label: '💬 我方气泡',  vars: ['--message-sent-bg','--message-sent-text'] },
                 { label: '💬 对方气泡',  vars: ['--message-received-bg','--message-received-text'] },
@@ -41313,6 +41314,119 @@ window.addEventListener('load', function() {
     document.addEventListener('DOMContentLoaded', function () {
         [0,100,350,900,1800].forEach(function (delay) { window.setTimeout(bind, delay); });
     });
+})();
+</script>
+
+
+<style id="glass-header-actions-and-mobile-keyboard-layout">
+    :root {
+        --glass-header-action-color: #ffffff;
+        --mobile-visible-height: 100dvh;
+        --mobile-visible-top: 0px;
+    }
+
+    /* Expanded progressive-glass header: both controls share one editable color. */
+    body:not(.compact-header-mode) .header #dc-mobile-open-btn,
+    body:not(.compact-header-mode) .header #dc-mobile-open-btn i,
+    body:not(.compact-header-mode) .header .header-actions #call-toolbar-btn,
+    body:not(.compact-header-mode) .header .header-actions #call-toolbar-btn i,
+    body:not(.compact-header-mode) .header .header-actions #call-toolbar-btn svg,
+    body:not(.compact-header-mode) .header .header-actions #call-toolbar-btn svg * {
+        color: var(--glass-header-action-color, #ffffff) !important;
+        stroke: currentColor !important;
+        -webkit-text-fill-color: currentColor !important;
+    }
+
+    @media (max-width: 768px) {
+        /* When the software keyboard opens, keep the whole app inside the
+           visual viewport. The header remains present; only chat height falls. */
+        body.mobile-keyboard-open {
+            position: fixed !important;
+            top: var(--mobile-visible-top, 0px) !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: auto !important;
+            width: 100vw !important;
+            height: var(--mobile-visible-height, 100dvh) !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+        body.mobile-keyboard-open #dc-layout,
+        body.mobile-keyboard-open #dc-main {
+            height: 100% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+        }
+        body.mobile-keyboard-open:not(.compact-header-mode) .header {
+            top: 0 !important;
+        }
+        body.mobile-keyboard-open:not(.compact-header-mode) .main-chat-area {
+            height: 100% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+        }
+        body.mobile-keyboard-open.compact-header-mode .main-chat-area {
+            flex: 1 1 auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+        }
+        body.mobile-keyboard-open .chat-container {
+            min-height: 0 !important;
+        }
+    }
+</style>
+
+<script id="mobile-keyboard-visual-viewport-controller">
+(function () {
+    'use strict';
+    var root = document.documentElement;
+    var viewport = window.visualViewport;
+    var baselineHeight = Math.max(window.innerHeight || 0, viewport ? viewport.height : 0);
+    var frame = 0;
+
+    function isTextEntry(element) {
+        return !!(element && (element.matches('textarea, input:not([type]), input[type="text"], input[type="search"], input[type="url"], input[type="email"], [contenteditable="true"]')));
+    }
+
+    function syncVisibleViewport() {
+        frame = 0;
+        if (!document.body) return;
+        var height = viewport ? viewport.height : window.innerHeight;
+        var offsetTop = viewport ? viewport.offsetTop : 0;
+        if (!height) return;
+        baselineHeight = Math.max(baselineHeight, window.innerHeight || 0, height);
+        var focused = isTextEntry(document.activeElement);
+        var keyboardOpen = focused && height < baselineHeight - 120;
+        root.style.setProperty('--mobile-visible-height', Math.round(height) + 'px');
+        root.style.setProperty('--mobile-visible-top', Math.round(offsetTop) + 'px');
+        document.body.classList.toggle('mobile-keyboard-open', keyboardOpen);
+        if (keyboardOpen) {
+            var chat = document.getElementById('chat-container');
+            if (chat) requestAnimationFrame(function () { chat.scrollTop = chat.scrollHeight; });
+        }
+    }
+
+    function scheduleSync() {
+        if (frame) cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(syncVisibleViewport);
+    }
+
+    document.addEventListener('DOMContentLoaded', scheduleSync);
+    document.addEventListener('focusin', scheduleSync, true);
+    document.addEventListener('focusout', function () {
+        window.setTimeout(scheduleSync, 80);
+    }, true);
+    window.addEventListener('resize', scheduleSync, { passive:true });
+    window.addEventListener('orientationchange', function () {
+        baselineHeight = 0;
+        window.setTimeout(scheduleSync, 180);
+    }, { passive:true });
+    if (viewport) {
+        viewport.addEventListener('resize', scheduleSync, { passive:true });
+        viewport.addEventListener('scroll', scheduleSync, { passive:true });
+    }
 })();
 </script>
 
