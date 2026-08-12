@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-theme="light" data-color-theme="black-white">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -41336,17 +41336,11 @@ window.addEventListener('load', function() {
     }
 
     @media (max-width: 768px) {
-        /* Keep the expanded glass header below the iPhone sensor housing.
-           The compact header has its own safe-area rule above. */
-        body:not(.compact-header-mode) .header {
-            padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
-        }
-
         /* When the software keyboard opens, keep the whole app inside the
            visual viewport. The header remains present; only chat height falls. */
         body.mobile-keyboard-open {
             position: fixed !important;
-            top: 0 !important;
+            top: var(--mobile-visible-top, 0px) !important;
             left: 0 !important;
             right: 0 !important;
             bottom: auto !important;
@@ -41389,7 +41383,6 @@ window.addEventListener('load', function() {
     var viewport = window.visualViewport;
     var baselineHeight = Math.max(window.innerHeight || 0, viewport ? viewport.height : 0);
     var frame = 0;
-    var settleTimers = [];
 
     function isTextEntry(element) {
         return !!(element && (element.matches('textarea, input:not([type]), input[type="text"], input[type="search"], input[type="url"], input[type="email"], [contenteditable="true"]')));
@@ -41399,13 +41392,13 @@ window.addEventListener('load', function() {
         frame = 0;
         if (!document.body) return;
         var height = viewport ? viewport.height : window.innerHeight;
+        var offsetTop = viewport ? viewport.offsetTop : 0;
         if (!height) return;
+        baselineHeight = Math.max(baselineHeight, window.innerHeight || 0, height);
         var focused = isTextEntry(document.activeElement);
-        /* Only learn a new baseline while no editor is focused. During keyboard
-           animation iOS may temporarily report a reduced innerHeight. */
-        if (!focused) baselineHeight = Math.max(baselineHeight, window.innerHeight || 0, height);
         var keyboardOpen = focused && height < baselineHeight - 120;
         root.style.setProperty('--mobile-visible-height', Math.round(height) + 'px');
+        root.style.setProperty('--mobile-visible-top', Math.round(offsetTop) + 'px');
         document.body.classList.toggle('mobile-keyboard-open', keyboardOpen);
         if (keyboardOpen) {
             var chat = document.getElementById('chat-container');
@@ -41418,20 +41411,15 @@ window.addEventListener('load', function() {
         frame = requestAnimationFrame(syncVisibleViewport);
     }
 
-    function settleViewport() {
-        settleTimers.forEach(window.clearTimeout);
-        settleTimers = [0, 60, 140, 280, 520].map(function (delay) {
-            return window.setTimeout(scheduleSync, delay);
-        });
-    }
-
     document.addEventListener('DOMContentLoaded', scheduleSync);
-    document.addEventListener('focusin', settleViewport, true);
-    document.addEventListener('focusout', settleViewport, true);
+    document.addEventListener('focusin', scheduleSync, true);
+    document.addEventListener('focusout', function () {
+        window.setTimeout(scheduleSync, 80);
+    }, true);
     window.addEventListener('resize', scheduleSync, { passive:true });
     window.addEventListener('orientationchange', function () {
         baselineHeight = 0;
-        settleViewport();
+        window.setTimeout(scheduleSync, 180);
     }, { passive:true });
     if (viewport) {
         viewport.addEventListener('resize', scheduleSync, { passive:true });
