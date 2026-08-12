@@ -12762,7 +12762,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
     <textarea class="message-input" id="message-input" placeholder="" rows="1"></textarea>
     
     <div class="input-buttons">
-    <button class="continue-btn input-btn" id="continue-btn" title="让对方继续说"><i class="fas fa-ellipsis-h"></i></button>
+    <button class="continue-btn input-btn" id="continue-btn" title="让对方继续说"><i class="fas fa-microphone"></i></button>
         <button class="batch-btn input-btn collapse-hideable" id="batch-btn" title="批量发送模式"><i class="fas fa-layer-group"></i></button>
         <button class="send-btn input-btn" id="send-btn" title="发送消息"><i class="fas fa-paper-plane"></i></button>
         
@@ -40595,46 +40595,142 @@ window.addEventListener('load', function() {
 </style>
 
 <style id="compact-bottom-composer-one-third">
-    /* Final composer sizing: roughly one third shorter, without changing its position or material. */
+    /* Reference layout: independent plus button + a separate input glass capsule. */
     .input-area-wrapper {
         bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+        display: grid !important;
+        grid-template-columns: 43px minmax(0, 1fr) !important;
+        grid-template-rows: auto !important;
+        column-gap: 10px !important;
+        align-items: end !important;
+    }
+    .input-area-wrapper > .batch-preview,
+    .input-area-wrapper > #reply-preview-container,
+    .input-area-wrapper > #collapsed-extras-panel {
+        grid-column: 1 / -1 !important;
+    }
+    .input-area-wrapper > #chat-plus-btn {
+        grid-column: 1 !important;
+    }
+    .input-area-wrapper > .input-area {
+        grid-column: 2 !important;
     }
     .input-area {
-        height: 38px !important;
-        min-height: 38px !important;
-        max-height: 38px !important;
+        height: 43px !important;
+        min-height: 43px !important;
+        max-height: 43px !important;
         padding: 3px !important;
         gap: 4px !important;
-        border-radius: 19px !important;
+        border: .5px solid rgba(255,255,255,.28) !important;
+        border-radius: 22px !important;
+        background: rgba(255,255,255,.10) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.20), 0 8px 24px rgba(0,0,0,.10) !important;
+        -webkit-backdrop-filter: blur(34px) saturate(165%) !important;
+        backdrop-filter: blur(34px) saturate(165%) !important;
     }
-    #chat-plus-btn,
     #continue-btn,
-    html[data-theme="light"] #chat-plus-btn,
     html[data-theme="light"] #continue-btn,
     .input-buttons,
     html[data-theme="light"] .input-buttons {
         box-sizing: border-box !important;
-        width: 32px !important;
-        min-width: 32px !important;
-        max-width: 32px !important;
-        height: 32px !important;
-        min-height: 32px !important;
-        max-height: 32px !important;
-        flex: 0 0 32px !important;
+        width: 37px !important;
+        min-width: 37px !important;
+        max-width: 37px !important;
+        height: 37px !important;
+        min-height: 37px !important;
+        max-height: 37px !important;
+        flex: 0 0 37px !important;
         padding: 0 !important;
     }
-    #chat-plus-btn { font-size: 18px !important; }
-    #continue-btn { font-size: 10px !important; }
+    #chat-plus-btn,
+    html[data-theme="light"] #chat-plus-btn {
+        box-sizing: border-box !important;
+        width: 43px !important;
+        min-width: 43px !important;
+        max-width: 43px !important;
+        height: 43px !important;
+        min-height: 43px !important;
+        max-height: 43px !important;
+        flex: 0 0 43px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: .5px solid rgba(255,255,255,.28) !important;
+        border-radius: 50% !important;
+        background: rgba(255,255,255,.10) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.18), 0 7px 20px rgba(0,0,0,.10) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(160%) !important;
+        backdrop-filter: blur(30px) saturate(160%) !important;
+        font-size: 20px !important;
+    }
+    #continue-btn,
+    html[data-theme="light"] #continue-btn {
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        font-size: 18px !important;
+    }
+    #continue-btn i,
+    html[data-theme="light"] #continue-btn i {
+        font-size: 18px !important;
+        line-height: 1 !important;
+    }
     .message-input,
     html[data-theme="light"] .message-input {
-        height: 32px !important;
-        min-height: 32px !important;
-        max-height: 32px !important;
-        padding: 5px 6px !important;
+        height: 37px !important;
+        min-height: 37px !important;
+        max-height: 37px !important;
+        padding: 7px 6px !important;
         font-size: 13px !important;
-        line-height: 22px !important;
+        line-height: 23px !important;
+    }
+    html[data-theme="light"] .input-area,
+    html[data-theme="light"] #chat-plus-btn {
+        border-color: rgba(255,255,255,.62) !important;
+        background: rgba(255,255,255,.34) !important;
+        box-shadow: inset 0 1px rgba(255,255,255,.70), 0 8px 24px rgba(30,35,45,.08) !important;
+    }
+    .input-area,
+    #chat-plus-btn,
+    html[data-theme="light"] .input-area,
+    html[data-theme="light"] #chat-plus-btn {
+        border-style: solid !important;
+        border-width: .5px !important;
+    }
+    .input-area,
+    #chat-plus-btn {
+        border-color: rgba(255,255,255,.24) !important;
+        box-shadow: inset 0 .5px rgba(255,255,255,.16), 0 7px 20px rgba(0,0,0,.09) !important;
+    }
+    html[data-theme="light"] .input-area,
+    html[data-theme="light"] #chat-plus-btn {
+        border-color: rgba(255,255,255,.52) !important;
+        box-shadow: inset 0 .5px rgba(255,255,255,.52), 0 7px 20px rgba(30,35,45,.07) !important;
     }
 </style>
+
+<script id="separate-chat-plus-structurally">
+(function () {
+    'use strict';
+    function separatePlusButton() {
+        var wrapper = document.querySelector('.input-area-wrapper');
+        var area = wrapper && wrapper.querySelector(':scope > .input-area');
+        var plus = document.getElementById('chat-plus-btn');
+        if (!wrapper || !area || !plus) return false;
+        if (plus.parentElement !== wrapper) wrapper.insertBefore(plus, area);
+        return true;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0, 80, 250, 700, 1500].forEach(function (delay) {
+            setTimeout(separatePlusButton, delay);
+        });
+        new MutationObserver(separatePlusButton).observe(document.body, { childList: true, subtree: true });
+    });
+})();
+</script>
 
 <script id="compact-header-optional-glass-controller">
 (function () {
