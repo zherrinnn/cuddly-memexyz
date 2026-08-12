@@ -40971,10 +40971,26 @@ window.addEventListener('load', function() {
         backdrop-filter: none !important;
     }
     body.composer-line-mode .input-area-wrapper::before,
-    body.composer-line-mode .input-area-wrapper::after {
+    body.composer-line-mode .input-area-wrapper::after,
+    body.composer-line-mode .input-area::before,
+    body.composer-line-mode .input-area::after,
+    body.composer-line-mode .input-buttons::before,
+    body.composer-line-mode .input-buttons::after,
+    body.composer-line-mode .message-input::before,
+    body.composer-line-mode .message-input::after {
         content: none !important;
         display: none !important;
         background: transparent !important;
+        box-shadow: none !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.composer-line-mode .input-buttons,
+    body.composer-line-mode .message-input {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
         box-shadow: none !important;
         filter: none !important;
         -webkit-backdrop-filter: none !important;
@@ -41060,6 +41076,13 @@ window.addEventListener('load', function() {
     function applyMode(mode, persist) {
         mode = mode === 'line' ? 'line' : 'glass';
         if (document.body) document.body.classList.toggle('composer-line-mode', mode === 'line');
+        var clearTargets = document.querySelectorAll('.input-area-wrapper, .input-area, .input-buttons, .message-input');
+        clearTargets.forEach(function (node) {
+            ['background','background-color','background-image','box-shadow','filter','-webkit-backdrop-filter','backdrop-filter'].forEach(function (property) {
+                if (mode === 'line') node.style.setProperty(property, property.indexOf('background') === 0 ? (property === 'background-image' ? 'none' : 'transparent') : 'none', 'important');
+                else node.style.removeProperty(property);
+            });
+        });
         var control = document.getElementById('composer-mode-switch');
         var label = document.getElementById('composer-mode-label');
         if (control) control.setAttribute('aria-checked', String(mode === 'line'));
