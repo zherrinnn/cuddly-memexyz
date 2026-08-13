@@ -14411,6 +14411,15 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                     <label><span>模糊强度 <b id="compact-glass-blur-value">18px</b></span><input type="range" id="compact-glass-blur" min="4" max="30" step="1" value="18"></label>
                 </div>
               </div>
+              <div id="chat-timestamp-color-editor" class="compact-header-glass-editor enabled">
+                <div class="compact-glass-heading">
+                    <div>
+                        <strong>消息时间与已读颜色</strong>
+                        <span>同时控制“发送于”、已读和未读提示</span>
+                    </div>
+                    <input type="color" id="chat-timestamp-color" value="#ffffff" aria-label="消息时间与已读颜色">
+                </div>
+              </div>
             </div>
             <div class="modal-buttons" style="margin-top:12px;">
                 <button class="modal-btn modal-btn-primary" id="apply-close-theme-editor" style="flex:2;"><i class="fas fa-check" style="margin-right:5px;"></i>应用并关闭</button>
@@ -34347,7 +34356,8 @@ window.addEventListener('load', function() {
                            1. 彻底脱离整行消息的 Flex 容器，排在大外壳外面，因此下方有消息时，它也是一个独立的行，绝不可能被挤进气泡！
                            2. clear: both !important; 让它强制换行，紧贴大壳子底部。
                            3. margin-top: 4px !important; 换任何气泡都能全自动靠着默认文档流完美紧贴！ */
-                        customEl.style.cssText = 'display: block !important; text-align: left !important; clear: both !important; float: left !important; width: 100% !important; margin-top: 4px !important; margin-left: 58px !important; font-size: 11px !important; line-height: 1.2 !important; position: static !important;';
+                        const receiptLeftOffset = document.body.classList.contains('hide-received-avatar') ? '0px' : '58px';
+                        customEl.style.cssText = 'display: block !important; text-align: left !important; clear: both !important; float: left !important; width: 100% !important; margin-top: 4px !important; margin-left: ' + receiptLeftOffset + ' !important; padding-left: 0 !important; font-size: 11px !important; line-height: 1.2 !important; position: static !important;';
                         
                         // 🚀 核心挪移：直接挂在整行大轨道的屁股后面（完全跳出 Flex 圈子）
                         messageRow.after(customEl);
@@ -34355,6 +34365,7 @@ window.addEventListener('load', function() {
 
                     // 确保显示，并写入繁体文字
                     customEl.style.setProperty('display', 'block', 'important');
+                    customEl.style.setProperty('margin-left', document.body.classList.contains('hide-received-avatar') ? '0px' : '58px', 'important');
                     const targetText = `發送於 ${timeStr}`;
                     if (customEl.textContent !== targetText) {
                         customEl.textContent = targetText;
@@ -41339,6 +41350,72 @@ window.addEventListener('load', function() {
     .message-input::placeholder {
         font-size: var(--font-size, 16px) !important;
     }
+    body.composer-line-mode .message-input {
+        line-height: calc(var(--font-size, 16px) * 1.45) !important;
+    }
 </style>
+
+<style id="editable-message-meta-color-and-hidden-avatar-edge">
+    :root { --message-meta-color: #ffffff; }
+    .timestamp,
+    .msg-timestamp,
+    .meta-timestamp,
+    .discord-inline-timestamp,
+    .inline-timestamp,
+    .message-time,
+    .read-receipt,
+    .discord-read-receipt,
+    .meta-read-receipt,
+    .custom-independent-label {
+        color: var(--message-meta-color) !important;
+    }
+    #chat-timestamp-color {
+        width: 48px !important;
+        min-width: 48px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        border: .5px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        background: transparent !important;
+    }
+    body.hide-received-avatar .custom-independent-label {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+</style>
+
+<script id="editable-message-meta-color-controller">
+(function () {
+    'use strict';
+    var key = 'chat-message-meta-color';
+    function apply(value, persist) {
+        if (!/^#[0-9a-fA-F]{6}$/.test(value || '')) value = '#ffffff';
+        document.documentElement.style.setProperty('--message-meta-color', value);
+        var input = document.getElementById('chat-timestamp-color');
+        if (input && input.value.toLowerCase() !== value.toLowerCase()) input.value = value;
+        if (persist) {
+            try { localStorage.setItem(key, value); } catch (e) {}
+            if (typeof settings !== 'undefined') settings.messageMetaColor = value;
+            if (typeof throttledSaveData === 'function') throttledSaveData();
+        }
+    }
+    function bind() {
+        var input = document.getElementById('chat-timestamp-color');
+        if (!input) return false;
+        var saved = (typeof settings !== 'undefined' && settings.messageMetaColor) || null;
+        try { saved = saved || localStorage.getItem(key); } catch (e) {}
+        apply(saved || '#ffffff', false);
+        if (input.dataset.bound !== '1') {
+            input.dataset.bound = '1';
+            input.addEventListener('input', function () { apply(input.value, false); });
+            input.addEventListener('change', function () { apply(input.value, true); });
+        }
+        return true;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,100,400,1000].forEach(function (delay) { window.setTimeout(bind, delay); });
+    });
+})();
+</script>
 
 </html>
