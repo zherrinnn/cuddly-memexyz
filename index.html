@@ -13111,15 +13111,6 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
     </div>
 </div>
 
-<div class="composer-mode-setting" id="composer-mode-setting">
-    <div class="composer-mode-copy">
-        <i class="fas fa-grip-lines"></i>
-        <span><strong>底栏模式</strong><small id="composer-mode-label">玻璃胶囊</small></span>
-    </div>
-    <button type="button" class="composer-mode-switch" id="composer-mode-switch" role="switch" aria-checked="false" aria-label="切换底栏模式">
-        <span></span>
-    </button>
-</div>
 
 <div id="appearance-panel-container" style="display:none;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
@@ -16797,7 +16788,7 @@ autoSendInterval: 5,
         compactHeaderGlassColor: '#e2e2e4',
         compactHeaderGlassOpacity: 82,
         compactHeaderGlassBlur: 18,
-        composerMode: 'glass',
+        composerMode: 'line',
         emojiMixEnabled: true,
         stickerSendChance: 0.2
             };
@@ -25166,6 +25157,18 @@ window.scrollToMessage = function(msgId) {
 
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+    function callSafeTop() {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding-top:max(16px,env(safe-area-inset-top,0px));';
+        document.body.appendChild(probe);
+        const top = parseFloat(getComputedStyle(probe).paddingTop) || 16;
+        probe.remove();
+        return top;
+    }
+    function callViewportHeight() {
+        return Math.round((window.visualViewport && window.visualViewport.height) || window.innerHeight);
+    }
+
     function loadBg() {
         if (!window.localforage) return;
         localforage.getItem(BG_LF_KEY).then(v => { if (v) { S.bgImage = v; applyBg(); } }).catch(() => {});
@@ -25248,7 +25251,7 @@ window.scrollToMessage = function(msgId) {
     box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1);
     user-select:none;touch-action:none;
     min-width:160px;min-height:240px;
-    max-width:90vw;max-height:90vh;
+    max-width:90vw;max-height:calc(100dvh - max(20px, env(safe-area-inset-top, 0px)) - 16px);
 }
 #call-window.visible{display:flex;animation:cWi .4s cubic-bezier(.22,1,.36,1);}
 
@@ -25672,14 +25675,16 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
     function positionWindow() {
         const win = document.getElementById('call-window');
         if (!win) return;
+        const safeTop = callSafeTop();
+        const viewportHeight = callViewportHeight();
         win.style.width = S.size.w + 'px';
         win.style.height = S.size.h + 'px';
         if (S.pos) {
             win.style.left   = clamp(S.pos.x, 0, window.innerWidth  - S.size.w) + 'px';
-            win.style.top    = clamp(S.pos.y, 0, window.innerHeight - S.size.h) + 'px';
+            win.style.top    = clamp(S.pos.y, safeTop, Math.max(safeTop, viewportHeight - S.size.h - 12)) + 'px';
             win.style.right  = 'auto'; win.style.bottom = 'auto';
         } else {
-            win.style.right  = '20px'; win.style.top = '72px';
+            win.style.right  = '20px'; win.style.top = Math.max(72, safeTop) + 'px';
             win.style.left   = 'auto'; win.style.bottom = 'auto';
         }
     }
@@ -25885,8 +25890,9 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         });
         hdr.addEventListener('pointermove', e => {
             if (!on || !S.dragOff) return; e.preventDefault();
+            const safeTop = callSafeTop();
             win.style.left   = clamp(e.clientX - S.dragOff.x, 0, window.innerWidth  - win.offsetWidth)  + 'px';
-            win.style.top    = clamp(e.clientY - S.dragOff.y, 0, window.innerHeight - win.offsetHeight) + 'px';
+            win.style.top    = clamp(e.clientY - S.dragOff.y, safeTop, Math.max(safeTop, callViewportHeight() - win.offsetHeight - 12)) + 'px';
             win.style.right  = 'auto'; win.style.bottom = 'auto';
         });
         const stop = e => {
@@ -26032,6 +26038,16 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
             S.enabled ? scheduleRandomCall() : clearTimeout(S.randomCallTimer);
         });
 
+        window.addEventListener('resize', function () {
+            const win = document.getElementById('call-window');
+            if (win && win.classList.contains('visible')) positionWindow();
+        }, { passive:true });
+        window.addEventListener('orientationchange', function () {
+            window.setTimeout(function () {
+                const win = document.getElementById('call-window');
+                if (win && win.classList.contains('visible')) positionWindow();
+            }, 160);
+        }, { passive:true });
         initDrag(); initPillDrag(); initResize();
     }
 
@@ -28071,8 +28087,13 @@ function initComboMenu() {
         _audio.setAttribute('playsinline', '');
         _audio.setAttribute('webkit-playsinline', '');
         _audio.setAttribute('disableremoteplayback', '');
+        _audio.style.display = 'none';
+        document.body.appendChild(_audio);
         _audio.addEventListener('play',  function(){ _setUI(true);  });
         _audio.addEventListener('pause', function(){ _setUI(false); });
+        _audio.addEventListener('canplay', function(){
+            if (_get() && _audio.paused) _audio.play().catch(function(){});
+        });
         return _audio;
     }
 
@@ -28116,15 +28137,22 @@ function initComboMenu() {
     function _start() {
         _suppressSystemMediaSurface();
         var a = _createAudio();
+        a.load();
         var p = a.play();
         if (p && p.then) {
             p.catch(function(){
                 _setUI(false);
                 if (!_unlockBound) {
                     _unlockBound = true;
-                    function unlock(){ if(_get()) a.play().catch(function(){}); _unlockBound=false; }
-                    document.addEventListener('touchstart', unlock, { once:true });
-                    document.addEventListener('click',      unlock, { once:true });
+                    function unlock(){
+                        if (_get()) {
+                            a.load();
+                            a.play().then(function(){ _setUI(true); }).catch(function(){});
+                        }
+                        _unlockBound=false;
+                    }
+                    document.addEventListener('pointerdown', unlock, { once:true, capture:true });
+                    document.addEventListener('touchend', unlock, { once:true, capture:true });
                 }
             });
         }
@@ -28147,6 +28175,14 @@ function initComboMenu() {
         }
         _setUI(next && _audio && !_audio.paused);
     };
+
+    /* Bind before the toggle click happens, so that same trusted interaction
+       can unlock media playback on iOS instead of requiring a second tap. */
+    function _unlockOnInteraction() {
+        if (_get() && (!_audio || _audio.paused)) _start();
+    }
+    document.addEventListener('pointerdown', _unlockOnInteraction, { capture:true, passive:true });
+    document.addEventListener('touchend', _unlockOnInteraction, { capture:true, passive:true });
 
     document.addEventListener('visibilitychange', function(){
         if (_get() && document.visibilityState === 'visible' && _audio && _audio.paused) {
@@ -40884,49 +40920,6 @@ window.addEventListener('load', function() {
         --composer-border-color: #ffffff;
         --composer-line-width: 1px;
     }
-    .composer-mode-setting {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        margin: 0 0 12px;
-        padding: 11px 13px;
-        border: 1px solid var(--border-color);
-        border-radius: 14px;
-        background: var(--primary-bg);
-        color: var(--text-primary);
-    }
-    .composer-mode-copy { display:flex; align-items:center; gap:11px; min-width:0; }
-    .composer-mode-copy > i { width:22px; text-align:center; color:var(--accent-color); }
-    .composer-mode-copy > span { display:flex; flex-direction:column; gap:2px; }
-    .composer-mode-copy strong { font-size:13px; font-weight:650; }
-    .composer-mode-copy small { font-size:10px; color:var(--text-secondary); }
-    .composer-mode-switch {
-        position: relative;
-        width: 42px;
-        height: 24px;
-        flex: 0 0 42px;
-        padding: 0;
-        border: 0;
-        border-radius: 999px;
-        background: var(--border-color);
-        cursor: pointer;
-        transition: background .2s ease;
-    }
-    .composer-mode-switch span {
-        position:absolute;
-        top:3px;
-        left:3px;
-        width:18px;
-        height:18px;
-        border-radius:50%;
-        background:#fff;
-        box-shadow:0 1px 4px rgba(0,0,0,.18);
-        transition:transform .2s ease;
-    }
-    .composer-mode-switch[aria-checked="true"] { background:var(--accent-color); }
-    .composer-mode-switch[aria-checked="true"] span { transform:translateX(18px); }
-
     /* Reference icon: three open rails with offset circular terminals. */
     #chat-plus-btn .composer-rail-icon {
         display:block;
@@ -41065,34 +41058,18 @@ window.addEventListener('load', function() {
 <script id="composer-mode-selector-controller">
 (function () {
     'use strict';
-    var storageKey = 'chatComposerMode';
     var railSvg = '<svg class="composer-rail-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"><circle cx="4.5" cy="5" r="1.45"/><path d="M8 5h11.5"/><circle cx="4.5" cy="12" r="1.45"/><path d="M8 12h8.5"/><circle cx="4.5" cy="19" r="1.45"/><path d="M8 19h11.5"/></g></svg>';
 
-    function readMode() {
-        try {
-            var value = localStorage.getItem(storageKey);
-            return value === 'line' || value === 'glass' ? value : null;
-        } catch (e) { return null; }
-    }
-    function applyMode(mode, persist) {
-        mode = mode === 'line' ? 'line' : 'glass';
-        if (document.body) document.body.classList.toggle('composer-line-mode', mode === 'line');
+    function applyMode() {
+        if (document.body) document.body.classList.add('composer-line-mode');
         var clearTargets = document.querySelectorAll('.input-area-wrapper, .input-area, .input-buttons, .message-input');
         clearTargets.forEach(function (node) {
             ['background','background-color','background-image','box-shadow','filter','-webkit-backdrop-filter','backdrop-filter'].forEach(function (property) {
-                if (mode === 'line') node.style.setProperty(property, property.indexOf('background') === 0 ? (property === 'background-image' ? 'none' : 'transparent') : 'none', 'important');
-                else node.style.removeProperty(property);
+                node.style.setProperty(property, property.indexOf('background') === 0 ? (property === 'background-image' ? 'none' : 'transparent') : 'none', 'important');
             });
         });
-        var control = document.getElementById('composer-mode-switch');
-        var label = document.getElementById('composer-mode-label');
-        if (control) control.setAttribute('aria-checked', String(mode === 'line'));
-        if (label) label.textContent = mode === 'line' ? '极简横线' : '玻璃胶囊';
-        if (persist) {
-            try { localStorage.setItem(storageKey, mode); } catch (e) {}
-            if (typeof settings !== 'undefined') settings.composerMode = mode;
-            if (typeof throttledSaveData === 'function') throttledSaveData();
-        }
+        try { localStorage.removeItem('chatComposerMode'); } catch (e) {}
+        if (typeof settings !== 'undefined') settings.composerMode = 'line';
     }
     function refreshPlusIcon() {
         var plus = document.getElementById('chat-plus-btn');
@@ -41103,16 +41080,9 @@ window.addEventListener('load', function() {
     }
     function bind() {
         refreshPlusIcon();
-        var control = document.getElementById('composer-mode-switch');
-        if (control && control.dataset.bound !== '1') {
-            control.dataset.bound = '1';
-            control.addEventListener('click', function () {
-                applyMode(document.body.classList.contains('composer-line-mode') ? 'glass' : 'line', true);
-            });
-        }
-        var saved = readMode() || (typeof settings !== 'undefined' && settings.composerMode) || 'glass';
-        applyMode(saved, false);
+        applyMode();
     }
+    applyMode();
     document.addEventListener('DOMContentLoaded', function () {
         [0,80,250,700,1500].forEach(function (delay) { setTimeout(bind, delay); });
         new MutationObserver(refreshPlusIcon).observe(document.body, {childList:true, subtree:true});
