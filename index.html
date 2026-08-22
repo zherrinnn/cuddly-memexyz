@@ -28072,6 +28072,7 @@ function initComboMenu() {
     var SRC = 'https://img.heliar.top/file/1772885159972_silence.m4a';
     var _audio = null;
     var _unlockBound = false;
+    var _verifyTimer = 0;
 
     function _get() { return localStorage.getItem(KEY) === 'true'; }
 
@@ -28089,32 +28090,32 @@ function initComboMenu() {
         _audio.setAttribute('disableremoteplayback', '');
         _audio.style.display = 'none';
         document.body.appendChild(_audio);
-        _audio.addEventListener('play',  function(){ _setUI(true);  });
-        _audio.addEventListener('pause', function(){ _setUI(false); });
+        _audio.addEventListener('play',    function(){ _setUI(false, '检测播放状态…'); });
+        _audio.addEventListener('playing', function(){ _verifyPlayback(); });
+        _audio.addEventListener('pause',   function(){ _setUI(false, '音频已暂停，点击页面重试'); });
+        _audio.addEventListener('waiting', function(){ _setUI(false, '音频缓冲中…'); });
+        _audio.addEventListener('stalled', function(){ _setUI(false, '音频加载停滞，正在重试…'); });
+        _audio.addEventListener('error',   function(){ _setUI(false, '音频加载失败'); });
         _audio.addEventListener('canplay', function(){
             if (_get() && _audio.paused) _audio.play().catch(function(){});
         });
         return _audio;
     }
 
-    function _suppressSystemMediaSurface() {
-        try {
-            if ('audioSession' in navigator && navigator.audioSession) {
-                navigator.audioSession.type = 'ambient';
-            }
-        } catch (e) {}
-        try {
-            if ('mediaSession' in navigator && navigator.mediaSession) {
-                navigator.mediaSession.metadata = null;
-                ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto',
-                 'previoustrack', 'nexttrack'].forEach(function(action) {
+function _suppressSystemMediaSurface() {
+    try {
+        if ('mediaSession' in navigator && navigator.mediaSession) {
+            navigator.mediaSession.metadata = null;
+            try { navigator.mediaSession.playbackState = 'none'; } catch (e) {}
+            ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto',
+             'previoustrack', 'nexttrack'].forEach(function(action) {
                     try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
                 });
             }
         } catch (e) {}
     }
 
-    function _setUI(playing) {
+    function _setUI(playing, status) {
         var dot  = document.getElementById('keepalive-dot');
         var desc = document.getElementById('keepalive-audio-desc');
         var sw   = document.getElementById('keepalive-audio-switch');
@@ -28126,7 +28127,8 @@ function initComboMenu() {
         }
         if (desc) {
             if (!_get())      desc.textContent = '静音循环音频，防止页面被系统挂起';
-            else if (playing) desc.textContent = '运行中 · 页面已保活';
+            else if (status)  desc.textContent = status;
+            else if (playing) desc.textContent = '音频正在播放';
             else              desc.textContent = '等待交互后启动…';
         }
         if (row)  row.style.display = _get() ? 'flex' : 'none';
@@ -28134,21 +28136,34 @@ function initComboMenu() {
         bars.forEach(function(b){ b.style.animationPlayState = playing ? 'running' : 'paused'; });
     }
 
-    function _start() {
-        _suppressSystemMediaSurface();
-        var a = _createAudio();
-        a.load();
-        var p = a.play();
+    function _verifyPlayback() {
+        if (!_get() || !_audio || _audio.paused || _audio.error) {
+            _setUI(false, _audio && _audio.error ? '音频加载失败' : '音频已暂停，点击页面重试');
+            return;
+        }
+        window.clearTimeout(_verifyTimer);
+        var startedAt = _audio.currentTime;
+        _setUI(false, '检测播放状态…');
+        _verifyTimer = window.setTimeout(function () {
+            var advancing = _audio && !_audio.paused && !_audio.error &&
+                (_audio.currentTime > startedAt + 0.02 || (startedAt > 0.2 && _audio.currentTime < startedAt));
+            _setUI(advancing, advancing ? '音频正在播放' : '未检测到播放进度，点击页面重试');
+        }, 900);
+    }
+
+function _start() {
+    _suppressSystemMediaSurface();
+    var a = _createAudio();
+    var p = a.play();
         if (p && p.then) {
             p.catch(function(){
                 _setUI(false);
                 if (!_unlockBound) {
                     _unlockBound = true;
-                    function unlock(){
-                        if (_get()) {
-                            a.load();
-                            a.play().then(function(){ _setUI(true); }).catch(function(){});
-                        }
+                function unlock(){
+                    if (_get()) {
+                        a.play().then(function(){ _setUI(true); }).catch(function(){});
+                    }
                         _unlockBound=false;
                     }
                     document.addEventListener('pointerdown', unlock, { once:true, capture:true });
@@ -28185,8 +28200,14 @@ function initComboMenu() {
     document.addEventListener('touchend', _unlockOnInteraction, { capture:true, passive:true });
 
     document.addEventListener('visibilitychange', function(){
-        if (_get() && document.visibilityState === 'visible' && _audio && _audio.paused) {
-            _audio.play().catch(function(){});
+        if (!_get() || document.visibilityState !== 'visible') return;
+        if (_audio && !_audio.paused) {
+            _verifyPlayback();
+        } else if (_audio) {
+            _setUI(false, '已返回页面，正在恢复播放…');
+            _audio.play().then(_verifyPlayback).catch(function(){
+                _setUI(false, '恢复失败，点击页面重试');
+            });
         }
     });
 
@@ -37064,9 +37085,6 @@ window.addEventListener('load', function() {
     }
 
     function suppressSystemMediaUi() {
-        try {
-            if (navigator.audioSession) navigator.audioSession.type = 'ambient';
-        } catch (e) {}
         try {
             if (!navigator.mediaSession) return;
             navigator.mediaSession.metadata = null;
