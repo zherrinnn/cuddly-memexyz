@@ -28095,7 +28095,7 @@ function initComboMenu() {
         _audio.addEventListener('pause',   function(){ _setUI(false, '音频已暂停，点击页面重试'); });
         _audio.addEventListener('waiting', function(){ _setUI(false, '音频缓冲中…'); });
         _audio.addEventListener('stalled', function(){ _setUI(false, '音频加载停滞，正在重试…'); });
-        _audio.addEventListener('error',   function(){ _setUI(false, '音频加载失败'); });
+        _audio.addEventListener('error',   function(){ _setUI(false, '音频启动失败，请关闭后重新开启'); });
         _audio.addEventListener('canplay', function(){
             if (_get() && _audio.paused) _audio.play().catch(function(){});
         });
@@ -28104,9 +28104,17 @@ function initComboMenu() {
 
 function _suppressSystemMediaSurface() {
     try {
+        if ('audioSession' in navigator && navigator.audioSession) {
+            navigator.audioSession.type = 'playback';
+        }
+    } catch (e) {}
+    try {
         if ('mediaSession' in navigator && navigator.mediaSession) {
-            navigator.mediaSession.metadata = null;
-            try { navigator.mediaSession.playbackState = 'none'; } catch (e) {}
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: '未在播放',
+                artist: '',
+                album: ''
+            });
             ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto',
              'previoustrack', 'nexttrack'].forEach(function(action) {
                     try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
@@ -28154,10 +28162,11 @@ function _suppressSystemMediaSurface() {
 function _start() {
     _suppressSystemMediaSurface();
     var a = _createAudio();
+    _setUI(false, '正在启动静音保活音频…');
     var p = a.play();
         if (p && p.then) {
             p.catch(function(){
-                _setUI(false);
+                _setUI(false, '轻点页面以允许播放');
                 if (!_unlockBound) {
                     _unlockBound = true;
                 function unlock(){
@@ -28188,7 +28197,7 @@ function _start() {
             _stop();
             if (typeof showNotification === 'function') showNotification('保活音频已关闭', 'info', 1500);
         }
-        _setUI(next && _audio && !_audio.paused);
+        if (!next) _setUI(false);
     };
 
     /* Bind before the toggle click happens, so that same trusted interaction
@@ -37086,9 +37095,15 @@ window.addEventListener('load', function() {
 
     function suppressSystemMediaUi() {
         try {
+            if (navigator.audioSession) navigator.audioSession.type = 'playback';
+        } catch (e) {}
+        try {
             if (!navigator.mediaSession) return;
-            navigator.mediaSession.metadata = null;
-            try { navigator.mediaSession.playbackState = 'none'; } catch (e) {}
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: '未在播放',
+                artist: '',
+                album: ''
+            });
             ['play','pause','stop','seekbackward','seekforward','seekto','previoustrack','nexttrack']
                 .forEach(function (action) {
                     try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
