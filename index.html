@@ -41454,4 +41454,22 @@ window.addEventListener('load', function() {
 })();
 </script>
 
+<style id="remove-call-window-shadows">
+    /* 视频通话主窗与缩小浮窗：完全移除外阴影、内阴影和边缘投影。 */
+    #call-window,
+    #call-window-inner,
+    #call-mini-pill,
+    #call-mini-pill.visible,
+    #call-window .call-top-btn,
+    #call-window .call-util-btn {
+        box-shadow: none !important;
+    }
+    #call-window::before,
+    #call-window::after,
+    #call-mini-pill::before,
+    #call-mini-pill::after {
+        box-shadow: none !important;
+    }
+</style>
+
 </html>
