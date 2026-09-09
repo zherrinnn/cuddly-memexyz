@@ -28131,17 +28131,9 @@ function initComboMenu() {
 
 function _suppressSystemMediaSurface() {
     try {
-        if ('audioSession' in navigator && navigator.audioSession) {
-            navigator.audioSession.type = 'playback';
-        }
-    } catch (e) {}
-    try {
         if ('mediaSession' in navigator && navigator.mediaSession) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: '未在播放',
-                artist: '',
-                album: ''
-            });
+            navigator.mediaSession.metadata = null;
+            try { navigator.mediaSession.playbackState = 'none'; } catch (e) {}
             ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto',
              'previoustrack', 'nexttrack'].forEach(function(action) {
                     try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
@@ -30183,7 +30175,7 @@ window._sendPartnerNotification = function(title, body) {
         if (localStorage.getItem('notifEnabled') !== '1') return;
         if (!('Notification' in window)) return;
         if (Notification.permission !== 'granted') return;
-        if (!document.hidden) return;
+        // 允许页面在前台测试通知；浏览器/系统仍会按自身策略展示。
         new Notification(title || '传讯', {
             body: body || '对方发来了消息',
             icon: (document.querySelector('#partner-avatar img') || {}).src,
@@ -30232,6 +30224,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!toggle) return;
     var enabled = localStorage.getItem('notifEnabled') === '1';
     var granted = ('Notification' in window) && Notification.permission === 'granted';
+    // 浏览器权限是最终准入条件；权限已允许时同步修正旧的本地开关状态。
+    // 这样用户即使是在浏览器设置中重新允许通知，也不会继续显示“无权限”。
+    if (granted && localStorage.getItem('notifEnabled') !== '1') {
+        enabled = true;
+        localStorage.setItem('notifEnabled', '1');
+    }
     toggle.checked = enabled && granted;
     if (!statusEl) return;
     if (toggle.checked) {
@@ -33921,6 +33919,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     const permission = await Notification.requestPermission();
                     if (permission === 'granted') {
+                        localStorage.setItem('notifEnabled', '1');
                         showNotification('已开启系统通知，收到消息时会提醒你', 'success', 3000);
                     }
                 } catch(e) {
@@ -34727,7 +34726,22 @@ window.addEventListener('load', function() {
         position: absolute;
         inset: 0;
         pointer-events: none;
-        background: linear-gradient(90deg, rgba(0,0,0,.2), transparent 20%, transparent 80%, rgba(0,0,0,.12));
+        display: none !important;
+        background: none !important;
+    }
+
+    /* 浅色主题不应被全局深色壳层变量覆盖。 */
+    html[data-theme="light"] {
+        --primary-bg: #f9f9f9;
+        --secondary-bg: #ffffff;
+        --text-primary: #1a1a1a;
+        --text-secondary: #7a7a7a;
+        --border-color: #ebebeb;
+        --header-bg: #ffffff;
+        --input-area-bg: #ffffff;
+        --primary-bg-rgb: 249, 249, 249;
+        --secondary-bg-rgb: 255, 255, 255;
+        color-scheme: light;
     }
 
     .header {
@@ -35596,7 +35610,7 @@ window.addEventListener('load', function() {
 
     /* Restore the selected chat background across the complete viewport. */
     body {
-        background-color: #0d0e11 !important;
+        background-color: var(--primary-bg) !important;
         background-image: none !important;
     }
     body::before {
@@ -35606,9 +35620,7 @@ window.addEventListener('load', function() {
         z-index: 0 !important;
         opacity: 1 !important;
         background-color: var(--primary-bg) !important;
-        background-image:
-            linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.18)),
-            var(--chat-bg-image, linear-gradient(145deg, #26282d 0%, #101114 48%, #050607 100%)) !important;
+        background-image: var(--chat-bg-image, linear-gradient(145deg, #26282d 0%, #101114 48%, #050607 100%)) !important;
         background-size: cover !important;
         background-position: center center !important;
         background-repeat: no-repeat !important;
@@ -37122,15 +37134,9 @@ window.addEventListener('load', function() {
 
     function suppressSystemMediaUi() {
         try {
-            if (navigator.audioSession) navigator.audioSession.type = 'playback';
-        } catch (e) {}
-        try {
             if (!navigator.mediaSession) return;
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: '未在播放',
-                artist: '',
-                album: ''
-            });
+            navigator.mediaSession.metadata = null;
+            try { navigator.mediaSession.playbackState = 'none'; } catch (e) {}
             ['play','pause','stop','seekbackward','seekforward','seekto','previoustrack','nexttrack']
                 .forEach(function (action) {
                     try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
