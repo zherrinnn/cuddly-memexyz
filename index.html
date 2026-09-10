@@ -41546,4 +41546,35 @@ window.addEventListener('load', function() {
     .typing-indicator-label, .typing-indicator-settings-hint { color: var(--typing-custom-color, #fff) !important; }
 </style>
 
+<script id="force-live-meta-color-controls">
+(function () {
+    function valid(v, fallback) { return /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback; }
+    function applyMetaColors() {
+        var ts = document.getElementById('custom-timestamp-color') || document.getElementById('chat-timestamp-color');
+        var st = document.getElementById('custom-status-color');
+        var ti = document.getElementById('custom-typing-color');
+        var tsColor = valid(ts && ts.value, '#ffffff');
+        var stColor = valid(st && st.value, '#ffffff');
+        var tiColor = valid(ti && ti.value, '#ffffff');
+        document.documentElement.style.setProperty('--timestamp-color', tsColor, 'important');
+        document.documentElement.style.setProperty('--status-custom-color', stColor, 'important');
+        document.documentElement.style.setProperty('--typing-custom-color', tiColor, 'important');
+        document.querySelectorAll('.meta-timestamp,.discord-inline-timestamp,.discord-read-receipt,.meta-read-receipt,.timestamp,.msg-timestamp,.inline-timestamp,.wx-clean-time-capsule,.wx-clean-time-capsule span').forEach(function (el) { el.style.setProperty('color', tsColor, 'important'); });
+        document.querySelectorAll('.header .status,.status,.group-mode-status').forEach(function (el) { el.style.setProperty('color', stColor, 'important'); });
+        document.querySelectorAll('.typing-indicator-label,.typing-indicator-settings-hint,.typing-indicator .typing-dot').forEach(function (el) { el.style.setProperty('color', tiColor, 'important'); });
+    }
+    function bind() {
+        ['chat-timestamp-color','custom-timestamp-color','custom-status-color','custom-typing-color'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el && el.dataset.metaColorBound !== '1') { el.dataset.metaColorBound = '1'; el.addEventListener('input', applyMetaColors); el.addEventListener('change', applyMetaColors); }
+        });
+        applyMetaColors();
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        [0,300,1000,2000].forEach(function (n) { setTimeout(bind,n); });
+        new MutationObserver(applyMetaColors).observe(document.body, {childList:true, subtree:true});
+    });
+})();
+</script>
+
 </html>
