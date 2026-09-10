@@ -14410,6 +14410,11 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                     </div>
                     <input type="color" id="chat-timestamp-color" value="#ffffff" aria-label="消息时间与已读颜色">
                 </div>
+                <div class="compact-glass-controls" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <label><span>时间戳/已读</span><input type="color" id="custom-timestamp-color" value="#ffffff"></label>
+                    <label><span>状态提示</span><input type="color" id="custom-status-color" value="#ffffff"></label>
+                    <label><span>正在输入</span><input type="color" id="custom-typing-color" value="#ffffff"></label>
+                </div>
               </div>
             </div>
             <div class="modal-buttons" style="margin-top:12px;">
@@ -14542,7 +14547,7 @@ html[data-theme="dark"] .wx-clean-time-capsule span {
                 </div>
     
                 <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-primary" id="add-custom-reply" style="flex: 1;">
+                    <button class="modal-btn modal-btn-primary" id="add-custom-reply" style="flex: 1;" onclick="window.__addEmojiCard && window.__addEmojiCard(event)">
                         <i class="fas fa-plus"></i> 新增
                     </button>
                     <button class="modal-btn modal-btn-secondary" id="close-custom-replies">关闭</button>
@@ -16912,6 +16917,7 @@ const loadData = async () => {
             localforage.getItem(getStorageKey('customStatusGroups')),
             localforage.getItem(getStorageKey('customActivities')),
             localforage.getItem(getStorageKey('customActivityGroups'))
+            ,localforage.getItem(getStorageKey('customEmojis'))
         ]);
         const getVal = (index) => results[index].status === 'fulfilled' ? results[index].value : null;
 
@@ -16932,6 +16938,7 @@ const loadData = async () => {
         const savedPartnerPersonas = getVal(14);
         const savedShowNameConfig = getVal(15);
         const savedThemeSchemes = getVal(16);
+        const savedCustomEmojis = getVal(23);
         const savedMyStickers = getVal(17);
         const savedReplyGroups = getVal(18);
         const savedPokeGroups = getVal(19);
@@ -17021,7 +17028,13 @@ const loadData = async () => {
         if (savedMyStickers) myStickerLibrary = savedMyStickers;
         if (savedCustomThemes) customThemes = savedCustomThemes;
         if (savedThemeSchemes) themeSchemes = savedThemeSchemes;
-        try { const ce = await localforage.getItem(getStorageKey('customEmojis')); if (ce && Array.isArray(ce)) customEmojis = ce; } catch(e) {}
+        if (savedCustomEmojis && Array.isArray(savedCustomEmojis)) customEmojis = savedCustomEmojis;
+        else {
+            try {
+                const ce = JSON.parse(localStorage.getItem(getStorageKey('customEmojis')) || 'null');
+                if (Array.isArray(ce)) customEmojis = ce;
+            } catch(e) {}
+        }
         window._customReplies = customReplies;
         window._CONSTANTS = CONSTANTS;
 
@@ -22139,6 +22152,8 @@ function _renderEmojiTab(list, itemsToRender) {
             div.querySelector('.emoji-custom-del').addEventListener('click', e => {
                 e.stopPropagation();
                 customEmojis.splice(idx, 1);
+                try { localStorage.setItem(getStorageKey('customEmojis'), JSON.stringify(customEmojis)); } catch(e) {}
+                try { localforage.setItem(getStorageKey('customEmojis'), customEmojis); } catch(e) {}
                 throttledSaveData();
                 renderReplyLibrary();
             });
@@ -23461,12 +23476,15 @@ function _showBatchAddDialog() {
                 ? customStatuses.some(r => normalizeStringStrict(r) === norm)
                 : currentSubTab === 'activities'
                 ? customActivities.some(r => normalizeStringStrict(r) === norm)
+                : (currentSubTab === 'emojis' || currentSubTab === 'emoji')
+                ? customEmojis.some(r => r === val)
                 : false;
             if (isDup) { skipped++; return; }
             if (currentSubTab === 'custom') { customReplies.push(val); newItems.push(val); }
             else if (currentSubTab === 'pokes') { customPokes.push(val); newItems.push(val); }
             else if (currentSubTab === 'statuses') { customStatuses.push(val); newItems.push(val); }
             else if (currentSubTab === 'activities') { customActivities.push(val); newItems.push(val); }
+            else if (currentSubTab === 'emojis' || currentSubTab === 'emoji') { customEmojis.push(val); newItems.push(val); }
             else if (currentSubTab === 'mottos') customMottos.push(val);
             added++;
         });
@@ -23605,15 +23623,7 @@ function initReplyLibraryListeners() {
             if (currentSubTab === 'stickers') {
                 document.getElementById('sticker-file-input')?.click(); return;
             }
-            if (currentSubTab === 'emojis') {
-                const input = prompt('请输入要添加的 Emoji（支持组合表情）:');
-                if (input?.trim()) {
-                    customEmojis.push(input.trim());
-                    throttledSaveData(); renderReplyLibrary();
-                    showNotification('✓ Emoji 已添加', 'success');
-                }
-                return;
-            }
+            if (currentSubTab === 'emojis' || currentSubTab === 'emoji') { _showBatchAddDialog(); return; }
             if (currentSubTab === 'custom' || currentSubTab === 'pokes' || currentSubTab === 'statuses' || currentSubTab === 'activities') {
                 _showBatchAddDialog(); return;
             }
@@ -41470,6 +41480,70 @@ window.addEventListener('load', function() {
     #call-mini-pill::after {
         box-shadow: none !important;
     }
+</style>
+
+<style id="emoji-editor-black-text">
+    /* 仅 Emoji 字卡编辑界面使用黑色文字，不影响聊天消息和其他提示颜色。 */
+    #custom-replies-modal .emoji-item,
+    #custom-replies-modal .emoji-item span { color: #000 !important; }
+</style>
+
+<script id="emoji-add-delegated-fix">
+(function () {
+    window.__addEmojiCard = function (event) {
+        var activeTab = document.querySelector('#cr-sub-tabs .reply-tab-btn.active');
+        var tabId = activeTab ? activeTab.getAttribute('data-id') : (typeof currentSubTab !== 'undefined' ? currentSubTab : '');
+        if (tabId !== 'emojis' && tabId !== 'emoji') return;
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        if (typeof _showBatchAddDialog === 'function') _showBatchAddDialog();
+    };
+    document.addEventListener('click', function (event) {
+        var btn = event.target && event.target.closest ? event.target.closest('#add-custom-reply') : null;
+        if (!btn) return;
+        var activeTab = document.querySelector('#cr-sub-tabs .reply-tab-btn.active');
+        var tabId = activeTab ? activeTab.getAttribute('data-id') : (typeof currentSubTab !== 'undefined' ? currentSubTab : '');
+        if (tabId !== 'emojis' && tabId !== 'emoji') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.__addEmojiCard(event);
+    }, true);
+})();
+</script>
+
+<script id="message-meta-color-controls">
+(function () {
+    var defs = [
+        ['customTimestampColor','--timestamp-color','custom-timestamp-color','#ffffff'],
+        ['customStatusColor','--status-custom-color','custom-status-color','#ffffff'],
+        ['customTypingColor','--typing-custom-color','custom-typing-color','#ffffff']
+    ];
+    function bind() {
+        if (typeof settings === 'undefined') return;
+        defs.forEach(function (d) {
+            var value = /^#[\da-f]{6}$/i.test(settings[d[0]] || '') ? settings[d[0]] : d[3];
+            settings[d[0]] = value;
+            document.documentElement.style.setProperty(d[1], value);
+            var input = document.getElementById(d[2]);
+            if (input && input.dataset.bound !== '1') {
+                input.value = value; input.dataset.bound = '1';
+                input.addEventListener('input', function () {
+                    settings[d[0]] = input.value;
+                    document.documentElement.style.setProperty(d[1], input.value);
+                    if (typeof throttledSaveData === 'function') throttledSaveData();
+                });
+            } else if (input) input.value = value;
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () { [300,1000,2000].forEach(function (n) { setTimeout(bind,n); }); });
+})();
+</script>
+
+<style id="message-meta-color-vars">
+    .meta-timestamp, .discord-inline-timestamp, .discord-read-receipt,
+    .meta-read-receipt, .timestamp, .msg-timestamp, .inline-timestamp,
+    .wx-clean-time-capsule, .wx-clean-time-capsule span { color: var(--timestamp-color, #fff) !important; }
+    .header .status, .status, .group-mode-status { color: var(--status-custom-color, #fff) !important; }
+    .typing-indicator-label, .typing-indicator-settings-hint { color: var(--typing-custom-color, #fff) !important; }
 </style>
 
 </html>
