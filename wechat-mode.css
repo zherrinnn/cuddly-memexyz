@@ -323,6 +323,26 @@ html[data-wechat-mode="true"] body.wechat-mode .message-avatar img {
     overflow: hidden !important;
 }
 
+/* WeChat always renders an avatar for every message.  These rules deliberately
+   neutralize the page's grouping and one-side-hide CSS only while this mode is on. */
+html[data-wechat-mode="true"] body.wechat-mode .message-avatar,
+html[data-wechat-mode="true"] body.wechat-mode .message-avatar.hidden,
+html[data-wechat-mode="true"] body.wechat-mode.hide-sent-avatar .message-wrapper.sent > .message-avatar,
+html[data-wechat-mode="true"] body.wechat-mode.hide-received-avatar .message-wrapper.received > .message-avatar,
+html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.discord-msg-cont .message-avatar.hidden,
+html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.discord-msg-cont.has-reply .message-avatar.hidden {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
 html[data-wechat-mode="true"] body.wechat-mode .message-content-wrapper {
     max-width: calc(100% - 50px) !important;
 }
@@ -1008,8 +1028,8 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-main .withdrawn-content {
 html[data-wechat-mode="true"] body.wechat-mode .header,
 html[data-wechat-mode="true"] body.wechat-mode.compact-header-mode .header,
 html[data-wechat-mode="true"] body.wechat-mode:not(.compact-header-mode) .header {
-    height: calc(47px + env(safe-area-inset-top, 0px)) !important;
-    min-height: calc(47px + env(safe-area-inset-top, 0px)) !important;
+    height: calc(38px + env(safe-area-inset-top, 0px)) !important;
+    min-height: calc(38px + env(safe-area-inset-top, 0px)) !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .header-inner,
@@ -1017,8 +1037,8 @@ html[data-wechat-mode="true"] body.wechat-mode .header-right,
 html[data-wechat-mode="true"] body.wechat-mode .header-left,
 html[data-wechat-mode="true"] body.wechat-mode .header-right > .user-info:first-child,
 html[data-wechat-mode="true"] body.wechat-mode .header-actions {
-    height: 47px !important;
-    min-height: 47px !important;
+    height: 38px !important;
+    min-height: 38px !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .header-left,
@@ -1030,7 +1050,7 @@ html[data-wechat-mode="true"] body.wechat-mode .header-right > .user-info:first-
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .header-left {
-    left: -8px !important;
+    left: -6px !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .header-actions {
@@ -1045,7 +1065,7 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-mobile-open-btn {
     margin: 0 !important;
     align-self: center !important;
     background-size: 22px 22px !important;
-    background-position: 50% calc(50% - 0.1px) !important;
+    background-position: 50% calc(50% - 2.6px) !important;
     transform: none !important;
 }
 
@@ -1060,7 +1080,7 @@ html[data-wechat-mode="true"] body.wechat-mode .partner-name-line #partner-name 
 html[data-wechat-mode="true"] body.wechat-mode #partner-name {
     align-self: center !important;
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif !important;
-    transform: none !important;
+    transform: translateY(3.85px) !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .partner-name-line {
@@ -1074,15 +1094,15 @@ html[data-wechat-mode="true"] body.wechat-mode #wechat-more-btn {
     height: 38px !important;
     min-height: 38px !important;
     margin: 0 !important;
-    background-size: 25px 25px !important;
-    background-position: 50% calc(50% + 0.36px) !important;
+    background-size: 21px 21px !important;
+    background-position: calc(50% + 0.5px) calc(50% - 2.14px) !important;
     transform: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .main-chat-area,
 html[data-wechat-mode="true"] body.wechat-mode:not(.compact-header-mode) .main-chat-area,
 html[data-wechat-mode="true"] body.wechat-mode.compact-header-mode .main-chat-area {
-    padding-top: calc(47px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: calc(38px + env(safe-area-inset-top, 0px)) !important;
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
@@ -1092,7 +1112,7 @@ html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode .input-area-wr
     column-gap: 4px !important;
     height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
     min-height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 8px !important;
+    padding: 7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .input-area,
@@ -1125,15 +1145,15 @@ html[data-wechat-mode="true"] body.wechat-mode #wechat-continue-btn {
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #chat-plus-btn {
-    background-size: 31px 31px !important;
-    background-position: 50% calc(50% - 0.14px) !important;
+    background-size: 29.5px 29.5px !important;
+    background-position: 50% calc(50% - 0.13px) !important;
+    transform: translateX(-1.5px) !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #combo-btn {
     background-image: url("./assets/sticker.svg") !important;
-    background-size: 80px 80px !important;
-    /* 36px crop; the visible smile is about 30px, matching the side icons. */
-    background-position: -44.05px -21.85px !important;
+    background-size: 72px 72px !important;
+    background-position: -37.845px -17.665px !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #combo-btn.input-typing-hidden,
@@ -1147,8 +1167,118 @@ html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode #combo-btn.inp
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #wechat-continue-btn {
-    background-size: 33px 33px !important;
-    background-position: 50% calc(50% - 0.5px) !important;
+    margin-left: 4px !important;
+    background-size: 29px 29px !important;
+    background-position: 50% calc(50% - 0.44px) !important;
+}
+
+/* The title-side disclosure control is not part of the WeChat reference. */
+html[data-wechat-mode="true"] body.wechat-mode .partner-status-arrow,
+html[data-wechat-mode="true"] body.wechat-mode .partner-status-arrow::before,
+html[data-wechat-mode="true"] body.wechat-mode .partner-status-arrow::after {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* WeChat-style quoted message: it lives below the bubble, matching the native
+   compact preview card.  The Discord connector is never shown in this mode. */
+html[data-wechat-mode="true"] body.wechat-mode .discord-reply-line-col,
+html[data-wechat-mode="true"] body.wechat-mode .discord-reply-line-col::before,
+html[data-wechat-mode="true"] body.wechat-mode .discord-reply-line-col::after,
+html[data-wechat-mode="true"] body.wechat-mode .discord-reply-avatar,
+html[data-wechat-mode="true"] body.wechat-mode .discord-reply-bar {
+    display: none !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below {
+    display: flex !important;
+    align-items: center !important;
+    align-self: flex-start !important;
+    gap: 6px !important;
+    width: fit-content !important;
+    min-width: 0 !important;
+    min-height: 32px !important;
+    max-width: min(280px, calc(100vw - 112px)) !important;
+    margin: 4px 0 0 !important;
+    padding: 5px 7px !important;
+    color: #6c6c6c !important;
+    background: rgba(248, 248, 248, 0.98) !important;
+    border: 0.8px solid rgba(160, 160, 160, 0.22) !important;
+    border-radius: 3px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    font-size: 13px !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    line-height: 18px !important;
+    opacity: 1 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.sent .reply-inline-below {
+    align-self: flex-end !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-copy {
+    display: flex !important;
+    align-items: baseline !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-sender,
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-text {
+    display: inline !important;
+    min-width: 0 !important;
+    color: #6c6c6c !important;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif !important;
+    font-size: 13px !important;
+    font-style: normal !important;
+    line-height: 18px !important;
+    opacity: 1 !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-sender {
+    flex: 0 0 auto !important;
+    font-weight: 500 !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-text {
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below.has-image {
+    padding: 4px 5px 4px 7px !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-image {
+    display: block !important;
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 2px !important;
+    object-fit: cover !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode #reply-preview-container .reply-preview,
+html[data-wechat-mode="true"] body.wechat-mode #reply-preview-bar {
+    padding: 6px 10px !important;
+    color: #6c6c6c !important;
+    background: #f7f7f7 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

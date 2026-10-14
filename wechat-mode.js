@@ -7,20 +7,21 @@
     var runtimeObserver = null;
     var typingObserver = null;
     var runtimeFrame = 0;
+    var savedPresentationSettings = null;
 
     var RUNTIME_OVERRIDES = [
         {
             selector: '.header',
             properties: {
-                'height': 'calc(47px + env(safe-area-inset-top, 0px))',
-                'min-height': 'calc(47px + env(safe-area-inset-top, 0px))'
+                'height': 'calc(38px + env(safe-area-inset-top, 0px))',
+                'min-height': 'calc(38px + env(safe-area-inset-top, 0px))'
             }
         },
         {
             selector: '.header-inner, .header-right, .header-left, .header-actions',
             properties: {
-                'height': '47px',
-                'min-height': '47px'
+                'height': '38px',
+                'min-height': '38px'
             }
         },
         {
@@ -30,7 +31,7 @@
                 'place-items': 'center',
                 'top': 'auto',
                 'bottom': '0',
-                'left': '-8px',
+                'left': '-6px',
                 'transform': 'none'
             }
         },
@@ -52,8 +53,8 @@
                 'place-items': 'center',
                 'top': 'auto',
                 'bottom': '0',
-                'height': '47px',
-                'min-height': '47px'
+                'height': '38px',
+                'min-height': '38px'
             }
         },
         {
@@ -73,7 +74,7 @@
                 'background-image': 'url("./assets/back.svg")',
                 'background-repeat': 'no-repeat',
                 'background-size': '22px 22px',
-                'background-position': '50% calc(50% - 0.1px)',
+                'background-position': '50% calc(50% - 2.6px)',
                 'transform': 'none'
             }
         },
@@ -98,7 +99,7 @@
             properties: {
                 'align-self': 'center',
                 'font-family': '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
-                'transform': 'none'
+                'transform': 'translateY(3.85px)'
             }
         },
         {
@@ -117,15 +118,29 @@
                 'background-color': 'transparent',
                 'background-image': 'url("./assets/more.svg")',
                 'background-repeat': 'no-repeat',
-                'background-size': '25px 25px',
-                'background-position': '50% calc(50% + 0.36px)',
+                'background-size': '21px 21px',
+                'background-position': 'calc(50% + 0.5px) calc(50% - 2.14px)',
                 'transform': 'none'
+            }
+        },
+        {
+            selector: '#dc-main .message-avatar',
+            properties: {
+                'display': 'block',
+                'visibility': 'visible',
+                'opacity': '1',
+                'width': '40px',
+                'min-width': '40px',
+                'height': '40px',
+                'min-height': '40px',
+                'margin': '0',
+                'padding': '0'
             }
         },
         {
             selector: '.main-chat-area',
             properties: {
-                'padding-top': 'calc(47px + env(safe-area-inset-top, 0px))',
+                'padding-top': 'calc(38px + env(safe-area-inset-top, 0px))',
                 'padding-bottom': 'calc(56px + env(safe-area-inset-bottom, 0px))'
             }
         },
@@ -143,7 +158,7 @@
                 'column-gap': '4px',
                 'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
                 'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
-                'padding': '8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 8px'
+                'padding': '7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px'
             }
         },
         {
@@ -196,8 +211,9 @@
             selector: '#chat-plus-btn',
             properties: {
                 'background-image': 'url("./assets/plus.svg")',
-                'background-size': '31px 31px',
-                'background-position': '50% calc(50% - 0.14px)'
+                'background-size': '29.5px 29.5px',
+                'background-position': '50% calc(50% - 0.13px)',
+                'transform': 'translateX(-1.5px)'
             }
         },
         {
@@ -208,18 +224,26 @@
                 'opacity': '1',
                 'background-image': 'url("./assets/sticker.svg")',
                 'background-repeat': 'no-repeat',
-                'background-size': '80px 80px',
-                'background-position': '-44.05px -21.85px'
+                'background-size': '72px 72px',
+                'background-position': '-37.845px -17.665px'
             }
         },
         {
             selector: '#wechat-continue-btn',
             properties: {
                 'display': 'inline-flex',
+                'margin-left': '4px',
                 'background-image': 'url("./assets/send.svg")',
                 'background-repeat': 'no-repeat',
-                'background-size': '33px 33px',
-                'background-position': '50% calc(50% - 0.5px)'
+                'background-size': '29px 29px',
+                'background-position': '50% calc(50% - 0.44px)'
+            }
+        },
+        {
+            selector: '.partner-status-arrow',
+            properties: {
+                'display': 'none',
+                'visibility': 'hidden'
             }
         },
         {
@@ -332,6 +356,7 @@
 
     function applyRuntimeOverrides() {
         if (!document.body) return;
+        if (enabled) syncWechatPresentationSettings(true);
         var comboButton = document.getElementById('combo-btn');
         if (enabled && comboButton) comboButton.classList.remove('input-typing-hidden');
         RUNTIME_OVERRIDES.forEach(function (entry) {
@@ -403,11 +428,49 @@
         meta.setAttribute('content', enabled ? '#ededed' : originalThemeColor);
     }
 
+    function syncWechatPresentationSettings(value) {
+        try {
+            if (!document.body) return false;
+
+            if (value) {
+                if (!savedPresentationSettings) {
+                    savedPresentationSettings = {
+                        alwaysShowAvatar: document.body.classList.contains('always-show-avatar'),
+                        hideReceivedAvatar: document.body.classList.contains('hide-received-avatar'),
+                        hideSentAvatar: document.body.classList.contains('hide-sent-avatar')
+                    };
+                }
+                document.body.classList.add('always-show-avatar');
+                document.body.classList.remove('hide-received-avatar', 'hide-sent-avatar');
+                return true;
+            }
+
+            if (savedPresentationSettings) {
+                document.body.classList.toggle('always-show-avatar', !!savedPresentationSettings.alwaysShowAvatar);
+                document.body.classList.toggle('hide-received-avatar', !!savedPresentationSettings.hideReceivedAvatar);
+                document.body.classList.toggle('hide-sent-avatar', !!savedPresentationSettings.hideSentAvatar);
+                savedPresentationSettings = null;
+            }
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function rerenderConversation() {
+        try {
+            if (typeof renderMessages === 'function') renderMessages(true);
+        } catch (error) {}
+    }
+
     function applyMode(value, options) {
         options = options || {};
+        var changed = enabled !== Boolean(value);
         enabled = Boolean(value);
         document.documentElement.setAttribute('data-wechat-mode', enabled ? 'true' : 'false');
         if (document.body) document.body.classList.toggle('wechat-mode', enabled);
+        syncWechatPresentationSettings(enabled);
+        if (changed || options.forceRender) rerenderConversation();
         applyRuntimeOverrides();
         syncThemeColor();
         updateSettingsCard();
@@ -525,6 +588,7 @@
                 if (needsRefresh) scheduleRuntimeOverrides();
             });
             runtimeObserver.observe(document.getElementById('dc-main') || document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] });
+            runtimeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
         }
 
         /* The original page rebuilds a few panels after load; reattach only if needed. */
@@ -533,6 +597,7 @@
                 createSettingsCard();
                 createHeaderMoreButton();
                 createWechatContinueButton();
+                syncWechatPresentationSettings(enabled);
                 updateSettingsCard();
                 syncThemeColor();
                 applyRuntimeOverrides();
