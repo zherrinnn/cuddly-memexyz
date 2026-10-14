@@ -154,13 +154,26 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-mobile-open-btn {
     padding: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
-    background: url("./assets/back.svg") center / 26px 26px no-repeat transparent !important;
+    background: url("./assets/back-clean.svg") center / 26px 26px no-repeat transparent !important;
     box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     color: transparent !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #dc-mobile-open-btn i {
     display: none !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .header-left::before,
+html[data-wechat-mode="true"] body.wechat-mode .header-left::after,
+html[data-wechat-mode="true"] body.wechat-mode #dc-mobile-open-btn::before,
+html[data-wechat-mode="true"] body.wechat-mode #dc-mobile-open-btn::after {
+    content: none !important;
+    display: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .header-right > .user-info:first-child {
@@ -214,6 +227,11 @@ html[data-wechat-mode="true"] body.wechat-mode .partner-name-line #partner-name 
     text-align: center !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+    position: relative !important;
+    z-index: 12 !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    clip-path: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .partner-name-line {
@@ -225,6 +243,7 @@ html[data-wechat-mode="true"] body.wechat-mode .partner-name-line {
     align-items: center !important;
     justify-content: center !important;
     gap: 0 !important;
+    overflow: visible !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .header-actions {
@@ -263,7 +282,7 @@ html[data-wechat-mode="true"] body.wechat-mode #wechat-more-btn {
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #wechat-more-btn {
-    background: url("./assets/more.svg") center / 25px 25px no-repeat transparent !important;
+    background: url("./assets/more-clean.svg") center / 25px 25px no-repeat transparent !important;
 }
 
 /* Conversation surface. */
@@ -1066,15 +1085,21 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-mobile-open-btn {
     align-self: center !important;
     background-size: 22px 22px !important;
     background-position: 50% calc(50% - 2.6px) !important;
+    background-image: url("./assets/back-clean.svg") !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     transform: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #partner-name,
-html[data-wechat-mode="true"] body.wechat-mode .partner-name-line,
 html[data-wechat-mode="true"] body.wechat-mode .partner-name-line #partner-name {
-    height: 20px !important;
-    min-height: 20px !important;
-    line-height: 20px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    line-height: 28px !important;
+    overflow: visible !important;
+    clip-path: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #partner-name {
@@ -1085,6 +1110,11 @@ html[data-wechat-mode="true"] body.wechat-mode #partner-name {
 
 html[data-wechat-mode="true"] body.wechat-mode .partner-name-line {
     align-self: center !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    line-height: normal !important;
+    overflow: visible !important;
+    clip-path: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #wechat-more-btn {
@@ -1096,6 +1126,11 @@ html[data-wechat-mode="true"] body.wechat-mode #wechat-more-btn {
     margin: 0 !important;
     background-size: 21px 21px !important;
     background-position: calc(50% + 0.5px) calc(50% - 2.14px) !important;
+    background-image: url("./assets/more-clean.svg") !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     transform: none !important;
 }
 

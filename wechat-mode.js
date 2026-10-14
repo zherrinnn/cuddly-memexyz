@@ -71,10 +71,14 @@
                 'color': 'transparent',
                 'border': '0',
                 'background-color': 'transparent',
-                'background-image': 'url("./assets/back.svg")',
+                'background-image': 'url("./assets/back-clean.svg")',
                 'background-repeat': 'no-repeat',
                 'background-size': '22px 22px',
                 'background-position': '50% calc(50% - 2.6px)',
+                'box-shadow': 'none',
+                'filter': 'none',
+                '-webkit-backdrop-filter': 'none',
+                'backdrop-filter': 'none',
                 'transform': 'none'
             }
         },
@@ -85,13 +89,27 @@
             }
         },
         {
-            selector: '#partner-name, .partner-name-line, .partner-name-line #partner-name',
+            selector: '#partner-name, .partner-name-line #partner-name',
             properties: {
-                'height': '20px',
-                'min-height': '20px',
-                'line-height': '20px',
+                'height': '28px',
+                'min-height': '28px',
+                'line-height': '28px',
                 'margin': '0',
-                'padding': '0'
+                'padding': '0',
+                'overflow': 'visible',
+                'clip-path': 'none'
+            }
+        },
+        {
+            selector: '.partner-name-line',
+            properties: {
+                'height': '38px',
+                'min-height': '38px',
+                'line-height': 'normal',
+                'margin': '0',
+                'padding': '0',
+                'overflow': 'visible',
+                'clip-path': 'none'
             }
         },
         {
@@ -99,6 +117,8 @@
             properties: {
                 'align-self': 'center',
                 'font-family': '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
+                'position': 'relative',
+                'z-index': '12',
                 'transform': 'translateY(3.85px)'
             }
         },
@@ -116,7 +136,7 @@
                 'padding': '0',
                 'border': '0',
                 'background-color': 'transparent',
-                'background-image': 'url("./assets/more.svg")',
+                'background-image': 'url("./assets/more-clean.svg")',
                 'background-repeat': 'no-repeat',
                 'background-size': '21px 21px',
                 'background-position': 'calc(50% + 0.5px) calc(50% - 2.14px)',
@@ -459,6 +479,7 @@
 
     function rerenderConversation() {
         try {
+            if (typeof SESSION_ID !== 'undefined' && !SESSION_ID) return;
             if (typeof renderMessages === 'function') renderMessages(true);
         } catch (error) {}
     }

@@ -16889,6 +16889,7 @@ autoSendInterval: 5,
 
 
 const loadData = async () => {
+    window.__CHAT_DATA_LOAD_OK__ = false;
     try {
         settings = getDefaultSettings();
 
@@ -16920,6 +16921,9 @@ const loadData = async () => {
             ,localforage.getItem(getStorageKey('customEmojis'))
         ]);
         const getVal = (index) => results[index].status === 'fulfilled' ? results[index].value : null;
+        if (!results.some(item => item.status === 'fulfilled')) {
+            throw new Error('本地存储读取全部失败，已停止空数据覆盖');
+        }
 
         const savedSettings = getVal(0);
         const savedMessages = getVal(1);
@@ -17037,6 +17041,7 @@ const loadData = async () => {
         }
         window._customReplies = customReplies;
         window._CONSTANTS = CONSTANTS;
+        window.__CHAT_DATA_LOAD_OK__ = true;
 
         if (DOMElements && DOMElements.partner && DOMElements.me) {
             updateAvatar(DOMElements.partner.avatar, partnerAvatarSrc);
@@ -17071,8 +17076,8 @@ const loadData = async () => {
     } catch (e) {
         console.error("LoadData 内部致命错误:", e);
         settings = getDefaultSettings();
-        messages = [];
         updateUI();
+        showNotification('本地数据读取失败，已暂停自动保存以保护原记录', 'error', 8000);
     }
 };
 
@@ -17141,6 +17146,7 @@ window.deleteAnniversaryItem = function(id) {
 const _BACKUP_PREFIX = 'BACKUP_V1_';
 function _backupCriticalData() {
     if (window._skipBackup) return;
+    if (window.__CHAT_DATA_LOAD_OK__ !== true) return;
     try {
         const backupPayload = {
             ts: Date.now(),
@@ -17239,6 +17245,10 @@ function scheduleChatSizeWarning(force) {
 }
 
 const saveData = async () => {
+    if (window.__CHAT_DATA_LOAD_OK__ !== true) {
+        console.warn('[saveData] 本地数据尚未安全加载，跳过保存以防空数据覆盖');
+        return;
+    }
     if (!SESSION_ID) {
         console.warn('[saveData] SESSION_ID 尚未初始化，跳过保存以防数据写入临时 key');
         return;
@@ -41610,6 +41620,6 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<link rel="stylesheet" href="./wechat-mode.css?v=20261014-7">
-<script src="./wechat-mode.js?v=20261014-7"></script>
+<link rel="stylesheet" href="./wechat-mode.css?v=20261014-9">
+<script src="./wechat-mode.js?v=20261014-9"></script>
 </html>
