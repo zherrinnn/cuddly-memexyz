@@ -10,6 +10,126 @@
 
     var RUNTIME_OVERRIDES = [
         {
+            selector: '.header',
+            properties: {
+                'height': 'calc(47px + env(safe-area-inset-top, 0px))',
+                'min-height': 'calc(47px + env(safe-area-inset-top, 0px))'
+            }
+        },
+        {
+            selector: '.header-inner, .header-right, .header-left, .header-actions',
+            properties: {
+                'height': '47px',
+                'min-height': '47px'
+            }
+        },
+        {
+            selector: '.header-left',
+            properties: {
+                'display': 'grid',
+                'place-items': 'center',
+                'top': 'auto',
+                'bottom': '0',
+                'left': '-8px',
+                'transform': 'none'
+            }
+        },
+        {
+            selector: '.header-actions',
+            properties: {
+                'display': 'flex',
+                'align-items': 'center',
+                'justify-content': 'flex-end',
+                'top': 'auto',
+                'bottom': '0',
+                'transform': 'none'
+            }
+        },
+        {
+            selector: '.header-right > .user-info:first-child',
+            properties: {
+                'display': 'grid',
+                'place-items': 'center',
+                'top': 'auto',
+                'bottom': '0',
+                'height': '47px',
+                'min-height': '47px'
+            }
+        },
+        {
+            selector: '#dc-mobile-open-btn',
+            properties: {
+                'display': 'grid',
+                'place-items': 'center',
+                'width': '38px',
+                'min-width': '38px',
+                'height': '38px',
+                'min-height': '38px',
+                'margin': '0',
+                'align-self': 'center',
+                'color': 'transparent',
+                'border': '0',
+                'background-color': 'transparent',
+                'background-image': 'url("./assets/back.svg")',
+                'background-repeat': 'no-repeat',
+                'background-size': '22px 22px',
+                'background-position': '50% calc(50% - 0.1px)',
+                'transform': 'none'
+            }
+        },
+        {
+            selector: '#dc-mobile-open-btn > *, #wechat-more-btn > *, #chat-plus-btn > *, #combo-btn > *',
+            properties: {
+                'display': 'none'
+            }
+        },
+        {
+            selector: '#partner-name, .partner-name-line, .partner-name-line #partner-name',
+            properties: {
+                'height': '20px',
+                'min-height': '20px',
+                'line-height': '20px',
+                'margin': '0',
+                'padding': '0'
+            }
+        },
+        {
+            selector: '#partner-name',
+            properties: {
+                'align-self': 'center',
+                'font-family': '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
+                'transform': 'none'
+            }
+        },
+        {
+            selector: '#wechat-more-btn',
+            properties: {
+                'display': 'grid',
+                'place-items': 'center',
+                'width': '38px',
+                'min-width': '38px',
+                'height': '38px',
+                'min-height': '38px',
+                'margin': '0',
+                'align-self': 'center',
+                'padding': '0',
+                'border': '0',
+                'background-color': 'transparent',
+                'background-image': 'url("./assets/more.svg")',
+                'background-repeat': 'no-repeat',
+                'background-size': '25px 25px',
+                'background-position': '50% calc(50% + 0.36px)',
+                'transform': 'none'
+            }
+        },
+        {
+            selector: '.main-chat-area',
+            properties: {
+                'padding-top': 'calc(47px + env(safe-area-inset-top, 0px))',
+                'padding-bottom': 'calc(56px + env(safe-area-inset-bottom, 0px))'
+            }
+        },
+        {
             selector: '#dc-main .input-area-wrapper',
             properties: {
                 'background': 'rgba(247, 247, 247, 0.96)',
@@ -17,7 +137,25 @@
                 'width': '100%',
                 'max-width': 'none',
                 'margin': '0',
-                'transform': 'none'
+                'transform': 'none',
+                'display': 'grid',
+                'grid-template-columns': '36px minmax(0, 1fr)',
+                'column-gap': '4px',
+                'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
+                'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
+                'padding': '8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 8px'
+            }
+        },
+        {
+            selector: '#dc-main .input-area',
+            properties: {
+                'display': 'flex',
+                'align-items': 'center',
+                'gap': '0',
+                'height': '40px',
+                'min-height': '40px',
+                'max-height': '40px',
+                'padding': '0'
             }
         },
         {
@@ -27,7 +165,67 @@
                 'background-color': '#ffffff',
                 'box-shadow': 'none',
                 'filter': 'none',
-                'backdrop-filter': 'none'
+                'backdrop-filter': 'none',
+                'height': '40px',
+                'min-height': '40px',
+                'max-height': '40px',
+                'margin': '0 7px 0 0'
+            }
+        },
+        {
+            selector: '#chat-plus-btn, #combo-btn, #wechat-continue-btn',
+            properties: {
+                'display': 'inline-flex',
+                'width': '36px',
+                'min-width': '36px',
+                'max-width': '36px',
+                'height': '40px',
+                'min-height': '40px',
+                'max-height': '40px',
+                'align-self': 'center',
+                'margin': '0',
+                'padding': '0',
+                'border': '0',
+                'border-radius': '0',
+                'background-color': 'transparent',
+                'background-repeat': 'no-repeat',
+                'transform': 'none'
+            }
+        },
+        {
+            selector: '#chat-plus-btn',
+            properties: {
+                'background-image': 'url("./assets/plus.svg")',
+                'background-size': '31px 31px',
+                'background-position': '50% calc(50% - 0.14px)'
+            }
+        },
+        {
+            selector: '#combo-btn',
+            properties: {
+                'display': 'inline-flex',
+                'visibility': 'visible',
+                'opacity': '1',
+                'background-image': 'url("./assets/sticker.svg")',
+                'background-repeat': 'no-repeat',
+                'background-size': '80px 80px',
+                'background-position': '-44.05px -21.85px'
+            }
+        },
+        {
+            selector: '#wechat-continue-btn',
+            properties: {
+                'display': 'inline-flex',
+                'background-image': 'url("./assets/send.svg")',
+                'background-repeat': 'no-repeat',
+                'background-size': '33px 33px',
+                'background-position': '50% calc(50% - 0.5px)'
+            }
+        },
+        {
+            selector: '#continue-btn, #send-btn',
+            properties: {
+                'display': 'none'
             }
         },
         {
@@ -35,6 +233,15 @@
             properties: {
                 'color': '#7f7f7f',
                 'text-shadow': 'none'
+            }
+        },
+        {
+            /* The page creates the last received-message label with inline !important. */
+            selector: '#dc-main .custom-independent-label, #dc-main .message-time, #dc-main .msg-time, #dc-main .time-label, #dc-main .read-receipt, #dc-main .discord-read-receipt, #dc-main .meta-read-receipt, #dc-main .message-meta, #dc-main .meta-timestamp, #dc-main .discord-inline-timestamp, #dc-main .inline-timestamp, #dc-main .timestamp, #dc-main .msg-timestamp',
+            properties: {
+                'display': 'none',
+                'opacity': '0',
+                'visibility': 'hidden'
             }
         },
         {
@@ -125,6 +332,8 @@
 
     function applyRuntimeOverrides() {
         if (!document.body) return;
+        var comboButton = document.getElementById('combo-btn');
+        if (enabled && comboButton) comboButton.classList.remove('input-typing-hidden');
         RUNTIME_OVERRIDES.forEach(function (entry) {
             document.querySelectorAll(entry.selector).forEach(function (element) {
                 if (enabled) {
@@ -311,7 +520,7 @@
                     if (mutation.type === 'childList') return true;
                     return mutation.type === 'attributes' && mutation.attributeName === 'style' &&
                         mutation.target && mutation.target.matches &&
-                        mutation.target.matches('.input-area-wrapper, .message-input, .wx-clean-time-capsule, .wx-clean-time-capsule span, .meta-timestamp, .discord-inline-timestamp, .timestamp, .msg-timestamp, .inline-timestamp, .typing-indicator-label, .typing-indicator-settings-hint');
+                        mutation.target.matches('.header, .header-inner, .header-right, .header-left, .header-actions, .header-right > .user-info:first-child, #dc-mobile-open-btn, #partner-name, .partner-name-line, .main-chat-area, .input-area-wrapper, .input-area, .message-input, #chat-plus-btn, #combo-btn, #wechat-continue-btn, .wx-clean-time-capsule, .wx-clean-time-capsule span, .custom-independent-label, .message-time, .msg-time, .time-label, .message-meta, .meta-timestamp, .discord-inline-timestamp, .timestamp, .msg-timestamp, .inline-timestamp, .read-receipt, .discord-read-receipt, .meta-read-receipt, .typing-indicator-label, .typing-indicator-settings-hint');
                 });
                 if (needsRefresh) scheduleRuntimeOverrides();
             });

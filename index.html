@@ -32904,8 +32904,9 @@ playlist.style.top = (rect.top + (player.classList.contains('collapsed') ? 65 : 
                 const hasText = input.value.length > 0;
                 if (hasText !== _inputWasTyping) {
                     _inputWasTyping = hasText;
+                    const keepWechatComposerStable = document.documentElement.getAttribute('data-wechat-mode') === 'true';
                     _inputExpandTargets.forEach(btn => {
-                        btn.classList.toggle('input-typing-hidden', hasText);
+                        btn.classList.toggle('input-typing-hidden', hasText && !keepWechatComposerStable);
                     });
                 }
             }
@@ -34422,6 +34423,17 @@ window.addEventListener('load', function() {
         // 1. 精准锁定说明书中的聊天消息滚动区域 id
         const container = document.getElementById('chat-container');
         if (!container) return;
+
+        // 微信模式不显示逐条“发送于 / 已读 / 未读”信息。
+        // 这里必须同时处理行内 !important，避免最后一条对方消息的独立标签重新出现。
+        if (document.documentElement.getAttribute('data-wechat-mode') === 'true') {
+            container.querySelectorAll('.custom-independent-label, .message-time, .msg-time, .time-label, .message-meta, .meta-timestamp, .discord-inline-timestamp, .inline-timestamp, .timestamp, .msg-timestamp, .read-receipt, .discord-read-receipt, .meta-read-receipt').forEach(function (element) {
+                element.style.setProperty('display', 'none', 'important');
+                element.style.setProperty('opacity', '0', 'important');
+                element.style.setProperty('visibility', 'hidden', 'important');
+            });
+            return;
+        }
 
         const timeStr = getCurrentTimeStr();
 
@@ -41553,13 +41565,15 @@ window.addEventListener('load', function() {
         var ts = document.getElementById('custom-timestamp-color') || document.getElementById('chat-timestamp-color');
         var st = document.getElementById('custom-status-color');
         var ti = document.getElementById('custom-typing-color');
-        var tsColor = valid(ts && ts.value, '#ffffff');
+        var tsColor = document.documentElement.getAttribute('data-wechat-mode') === 'true'
+            ? '#7f7f7f'
+            : valid(ts && ts.value, '#ffffff');
         var stColor = valid(st && st.value, '#ffffff');
         var tiColor = valid(ti && ti.value, '#ffffff');
         document.documentElement.style.setProperty('--timestamp-color', tsColor, 'important');
         document.documentElement.style.setProperty('--status-custom-color', stColor, 'important');
         document.documentElement.style.setProperty('--typing-custom-color', tiColor, 'important');
-        document.querySelectorAll('.meta-timestamp,.discord-inline-timestamp,.discord-read-receipt,.meta-read-receipt,.timestamp,.msg-timestamp,.inline-timestamp,.wx-clean-time-capsule,.wx-clean-time-capsule span').forEach(function (el) { el.style.setProperty('color', tsColor, 'important'); });
+        document.querySelectorAll('.meta-timestamp,.discord-inline-timestamp,.discord-read-receipt,.meta-read-receipt,.timestamp,.msg-timestamp,.inline-timestamp').forEach(function (el) { el.style.setProperty('color', tsColor, 'important'); });
         document.querySelectorAll('.header .status,.status,.group-mode-status').forEach(function (el) { el.style.setProperty('color', stColor, 'important'); });
         document.querySelectorAll('.typing-indicator-label,.typing-indicator-settings-hint,.typing-indicator .typing-dot').forEach(function (el) { el.style.setProperty('color', tiColor, 'important'); });
     }
@@ -41577,6 +41591,6 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<link rel="stylesheet" href="./wechat-mode.css">
-<script src="./wechat-mode.js"></script>
+<link rel="stylesheet" href="./wechat-mode.css?v=20261014-5">
+<script src="./wechat-mode.js?v=20261014-5"></script>
 </html>
