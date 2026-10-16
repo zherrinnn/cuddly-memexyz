@@ -7,20 +7,21 @@
     var runtimeObserver = null;
     var typingObserver = null;
     var runtimeFrame = 0;
+    var savedPresentationSettings = null;
 
     var RUNTIME_OVERRIDES = [
         {
             selector: '.header',
             properties: {
-                'height': 'calc(47px + env(safe-area-inset-top, 0px))',
-                'min-height': 'calc(47px + env(safe-area-inset-top, 0px))'
+                'height': 'calc(38px + env(safe-area-inset-top, 0px))',
+                'min-height': 'calc(38px + env(safe-area-inset-top, 0px))'
             }
         },
         {
             selector: '.header-inner, .header-right, .header-left, .header-actions',
             properties: {
-                'height': '47px',
-                'min-height': '47px'
+                'height': '38px',
+                'min-height': '38px'
             }
         },
         {
@@ -30,7 +31,7 @@
                 'place-items': 'center',
                 'top': 'auto',
                 'bottom': '0',
-                'left': '-8px',
+                'left': '-6px',
                 'transform': 'none'
             }
         },
@@ -52,8 +53,8 @@
                 'place-items': 'center',
                 'top': 'auto',
                 'bottom': '0',
-                'height': '47px',
-                'min-height': '47px'
+                'height': '38px',
+                'min-height': '38px'
             }
         },
         {
@@ -70,10 +71,14 @@
                 'color': 'transparent',
                 'border': '0',
                 'background-color': 'transparent',
-                'background-image': 'url("./assets/back.svg")',
+                'background-image': 'url("./assets/back-clean.svg")',
                 'background-repeat': 'no-repeat',
                 'background-size': '22px 22px',
-                'background-position': '50% calc(50% - 0.1px)',
+                'background-position': '50% calc(50% - 2.6px)',
+                'box-shadow': 'none',
+                'filter': 'none',
+                '-webkit-backdrop-filter': 'none',
+                'backdrop-filter': 'none',
                 'transform': 'none'
             }
         },
@@ -84,13 +89,27 @@
             }
         },
         {
-            selector: '#partner-name, .partner-name-line, .partner-name-line #partner-name',
+            selector: '#partner-name, .partner-name-line #partner-name',
             properties: {
-                'height': '20px',
-                'min-height': '20px',
-                'line-height': '20px',
+                'height': '28px',
+                'min-height': '28px',
+                'line-height': '28px',
                 'margin': '0',
-                'padding': '0'
+                'padding': '0',
+                'overflow': 'visible',
+                'clip-path': 'none'
+            }
+        },
+        {
+            selector: '.partner-name-line',
+            properties: {
+                'height': '38px',
+                'min-height': '38px',
+                'line-height': 'normal',
+                'margin': '0',
+                'padding': '0',
+                'overflow': 'visible',
+                'clip-path': 'none'
             }
         },
         {
@@ -98,7 +117,9 @@
             properties: {
                 'align-self': 'center',
                 'font-family': '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
-                'transform': 'none'
+                'position': 'relative',
+                'z-index': '12',
+                'transform': 'translateY(3.85px)'
             }
         },
         {
@@ -115,25 +136,39 @@
                 'padding': '0',
                 'border': '0',
                 'background-color': 'transparent',
-                'background-image': 'url("./assets/more.svg")',
+                'background-image': 'url("./assets/more-clean.svg")',
                 'background-repeat': 'no-repeat',
-                'background-size': '25px 25px',
-                'background-position': '50% calc(50% + 0.36px)',
+                'background-size': '21px 21px',
+                'background-position': 'calc(50% + 0.5px) calc(50% - 2.14px)',
                 'transform': 'none'
+            }
+        },
+        {
+            selector: '#dc-main .message-avatar',
+            properties: {
+                'display': 'block',
+                'visibility': 'visible',
+                'opacity': '1',
+                'width': '40px',
+                'min-width': '40px',
+                'height': '40px',
+                'min-height': '40px',
+                'margin': '0',
+                'padding': '0'
             }
         },
         {
             selector: '.main-chat-area',
             properties: {
-                'padding-top': 'calc(47px + env(safe-area-inset-top, 0px))',
+                'padding-top': 'calc(38px + env(safe-area-inset-top, 0px))',
                 'padding-bottom': 'calc(56px + env(safe-area-inset-bottom, 0px))'
             }
         },
         {
             selector: '#dc-main .input-area-wrapper',
             properties: {
-                'background': 'rgba(247, 247, 247, 0.96)',
-                'background-color': 'rgba(247, 247, 247, 0.96)',
+                'background': 'rgba(246, 246, 246, 0.96)',
+                'background-color': 'rgba(246, 246, 246, 0.96)',
                 'width': '100%',
                 'max-width': 'none',
                 'margin': '0',
@@ -143,7 +178,7 @@
                 'column-gap': '4px',
                 'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
                 'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
-                'padding': '8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 8px'
+                'padding': '7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px'
             }
         },
         {
@@ -196,8 +231,9 @@
             selector: '#chat-plus-btn',
             properties: {
                 'background-image': 'url("./assets/plus.svg")',
-                'background-size': '31px 31px',
-                'background-position': '50% calc(50% - 0.14px)'
+                'background-size': '29.5px 29.5px',
+                'background-position': '50% calc(50% - 0.13px)',
+                'transform': 'translateX(-1.5px)'
             }
         },
         {
@@ -208,18 +244,28 @@
                 'opacity': '1',
                 'background-image': 'url("./assets/sticker.svg")',
                 'background-repeat': 'no-repeat',
-                'background-size': '80px 80px',
-                'background-position': '-44.05px -21.85px'
+                'background-size': '72px 72px',
+                'background-position': '-37.845px -17.665px'
             }
         },
         {
             selector: '#wechat-continue-btn',
             properties: {
                 'display': 'inline-flex',
+                'margin-left': '4px',
                 'background-image': 'url("./assets/send.svg")',
                 'background-repeat': 'no-repeat',
-                'background-size': '33px 33px',
-                'background-position': '50% calc(50% - 0.5px)'
+                'background-size': '29px 29px',
+                'background-position': '50% calc(50% - 0.44px)'
+            }
+        },
+        {
+            selector: '.partner-status-arrow',
+            properties: {
+                'display': 'none',
+                'visibility': 'hidden',
+                'opacity': '0',
+                'pointer-events': 'none'
             }
         },
         {
@@ -332,6 +378,8 @@
 
     function applyRuntimeOverrides() {
         if (!document.body) return;
+        if (enabled) syncWechatPresentationSettings(true);
+        syncCustomCssIsolation(enabled);
         var comboButton = document.getElementById('combo-btn');
         if (enabled && comboButton) comboButton.classList.remove('input-typing-hidden');
         RUNTIME_OVERRIDES.forEach(function (entry) {
@@ -356,6 +404,7 @@
         });
         syncTimestampLabels();
         syncTypingHeader();
+        updateSettingsCard();
     }
 
     function scheduleRuntimeOverrides() {
@@ -385,13 +434,13 @@
     function updateSettingsCard() {
         var card = document.getElementById('wechat-mode-settings-card');
         var status = document.getElementById('wechat-mode-card-status');
-        if (!card) return;
-        card.setAttribute('aria-checked', enabled ? 'true' : 'false');
-        if (status) {
+        if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
+        if (card && status) {
             status.textContent = enabled
                 ? '已开启 · 微信日间布局与配色'
                 : '已关闭 · 点击切换为微信日间样式';
         }
+
     }
 
     function syncThemeColor() {
@@ -403,11 +452,79 @@
         meta.setAttribute('content', enabled ? '#ededed' : originalThemeColor);
     }
 
+    function syncCustomCssIsolation(value) {
+        ['user-custom-bubble-style', 'user-custom-global-theme-style'].forEach(function (id) {
+            var style = document.getElementById(id);
+            if (!style) return;
+
+            if (value) {
+                if (!style.hasAttribute('data-wechat-original-media')) {
+                    style.setAttribute('data-wechat-original-media', style.getAttribute('media') || '__none__');
+                    style.setAttribute('data-wechat-original-disabled', style.disabled ? 'true' : 'false');
+                }
+                style.media = 'not all';
+                style.disabled = true;
+                style.setAttribute('data-wechat-css-suppressed', 'true');
+                return;
+            }
+
+            if (!style.hasAttribute('data-wechat-css-suppressed')) return;
+            var originalMedia = style.getAttribute('data-wechat-original-media');
+            var originalDisabled = style.getAttribute('data-wechat-original-disabled') === 'true';
+            if (originalMedia === '__none__') style.removeAttribute('media');
+            else style.setAttribute('media', originalMedia || '');
+            style.disabled = originalDisabled;
+            style.removeAttribute('data-wechat-original-media');
+            style.removeAttribute('data-wechat-original-disabled');
+            style.removeAttribute('data-wechat-css-suppressed');
+        });
+    }
+
+    function syncWechatPresentationSettings(value) {
+        try {
+            if (!document.body) return false;
+
+            if (value) {
+                if (!savedPresentationSettings) {
+                    savedPresentationSettings = {
+                        alwaysShowAvatar: document.body.classList.contains('always-show-avatar'),
+                        hideReceivedAvatar: document.body.classList.contains('hide-received-avatar'),
+                        hideSentAvatar: document.body.classList.contains('hide-sent-avatar')
+                    };
+                }
+                document.body.classList.add('always-show-avatar');
+                document.body.classList.remove('hide-received-avatar', 'hide-sent-avatar');
+                return true;
+            }
+
+            if (savedPresentationSettings) {
+                document.body.classList.toggle('always-show-avatar', !!savedPresentationSettings.alwaysShowAvatar);
+                document.body.classList.toggle('hide-received-avatar', !!savedPresentationSettings.hideReceivedAvatar);
+                document.body.classList.toggle('hide-sent-avatar', !!savedPresentationSettings.hideSentAvatar);
+                savedPresentationSettings = null;
+            }
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function rerenderConversation() {
+        try {
+            if (typeof SESSION_ID !== 'undefined' && !SESSION_ID) return;
+            if (typeof renderMessages === 'function') renderMessages(true);
+        } catch (error) {}
+    }
+
     function applyMode(value, options) {
         options = options || {};
+        var changed = enabled !== Boolean(value);
         enabled = Boolean(value);
         document.documentElement.setAttribute('data-wechat-mode', enabled ? 'true' : 'false');
         if (document.body) document.body.classList.toggle('wechat-mode', enabled);
+        syncWechatPresentationSettings(enabled);
+        syncCustomCssIsolation(enabled);
+        if (changed || options.forceRender) rerenderConversation();
         applyRuntimeOverrides();
         syncThemeColor();
         updateSettingsCard();
@@ -423,9 +540,10 @@
     }
 
     function createSettingsCard() {
-        if (document.getElementById('wechat-mode-settings-card')) return;
         var grid = document.querySelector('#settings-modal .settings-grid');
         if (!grid) return;
+
+        if (document.getElementById('wechat-mode-settings-card')) return;
 
         var card = document.createElement('div');
         card.id = 'wechat-mode-settings-card';
@@ -518,6 +636,8 @@
                 if (!enabled) return;
                 var needsRefresh = mutations.some(function (mutation) {
                     if (mutation.type === 'childList') return true;
+                    if (mutation.type === 'attributes' && mutation.target === document.documentElement && mutation.attributeName === 'style') return true;
+                    if (mutation.type === 'attributes' && mutation.target === document.body && mutation.attributeName === 'class') return true;
                     return mutation.type === 'attributes' && mutation.attributeName === 'style' &&
                         mutation.target && mutation.target.matches &&
                         mutation.target.matches('.header, .header-inner, .header-right, .header-left, .header-actions, .header-right > .user-info:first-child, #dc-mobile-open-btn, #partner-name, .partner-name-line, .main-chat-area, .input-area-wrapper, .input-area, .message-input, #chat-plus-btn, #combo-btn, #wechat-continue-btn, .wx-clean-time-capsule, .wx-clean-time-capsule span, .custom-independent-label, .message-time, .msg-time, .time-label, .message-meta, .meta-timestamp, .discord-inline-timestamp, .timestamp, .msg-timestamp, .inline-timestamp, .read-receipt, .discord-read-receipt, .meta-read-receipt, .typing-indicator-label, .typing-indicator-settings-hint');
@@ -525,6 +645,9 @@
                 if (needsRefresh) scheduleRuntimeOverrides();
             });
             runtimeObserver.observe(document.getElementById('dc-main') || document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] });
+            runtimeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+            runtimeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+            if (document.head) runtimeObserver.observe(document.head, { subtree: true, childList: true });
         }
 
         /* The original page rebuilds a few panels after load; reattach only if needed. */
@@ -533,6 +656,7 @@
                 createSettingsCard();
                 createHeaderMoreButton();
                 createWechatContinueButton();
+                syncWechatPresentationSettings(enabled);
                 updateSettingsCard();
                 syncThemeColor();
                 applyRuntimeOverrides();
