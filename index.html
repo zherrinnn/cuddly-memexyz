@@ -16889,7 +16889,6 @@ autoSendInterval: 5,
 
 
 const loadData = async () => {
-    window.__CHAT_DATA_LOAD_OK__ = false;
     try {
         settings = getDefaultSettings();
 
@@ -16921,9 +16920,6 @@ const loadData = async () => {
             ,localforage.getItem(getStorageKey('customEmojis'))
         ]);
         const getVal = (index) => results[index].status === 'fulfilled' ? results[index].value : null;
-        if (!results.some(item => item.status === 'fulfilled')) {
-            throw new Error('本地存储读取全部失败，已停止空数据覆盖');
-        }
 
         const savedSettings = getVal(0);
         const savedMessages = getVal(1);
@@ -17041,7 +17037,6 @@ const loadData = async () => {
         }
         window._customReplies = customReplies;
         window._CONSTANTS = CONSTANTS;
-        window.__CHAT_DATA_LOAD_OK__ = true;
 
         if (DOMElements && DOMElements.partner && DOMElements.me) {
             updateAvatar(DOMElements.partner.avatar, partnerAvatarSrc);
@@ -17076,8 +17071,8 @@ const loadData = async () => {
     } catch (e) {
         console.error("LoadData 内部致命错误:", e);
         settings = getDefaultSettings();
+        messages = [];
         updateUI();
-        showNotification('本地数据读取失败，已暂停自动保存以保护原记录', 'error', 8000);
     }
 };
 
@@ -17146,7 +17141,6 @@ window.deleteAnniversaryItem = function(id) {
 const _BACKUP_PREFIX = 'BACKUP_V1_';
 function _backupCriticalData() {
     if (window._skipBackup) return;
-    if (window.__CHAT_DATA_LOAD_OK__ !== true) return;
     try {
         const backupPayload = {
             ts: Date.now(),
@@ -17245,10 +17239,6 @@ function scheduleChatSizeWarning(force) {
 }
 
 const saveData = async () => {
-    if (window.__CHAT_DATA_LOAD_OK__ !== true) {
-        console.warn('[saveData] 本地数据尚未安全加载，跳过保存以防空数据覆盖');
-        return;
-    }
     if (!SESSION_ID) {
         console.warn('[saveData] SESSION_ID 尚未初始化，跳过保存以防数据写入临时 key');
         return;
@@ -17630,9 +17620,6 @@ function manageAutoSendTimer() {
 
 function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
     const fragment = new DocumentFragment();
-    const forceWechatAvatars = document.documentElement.getAttribute('data-wechat-mode') === 'true';
-    const effectiveAlwaysShowAvatar = forceWechatAvatars || !!settings.alwaysShowAvatar;
-    const effectiveInChatAvatarEnabled = forceWechatAvatars || !!settings.inChatAvatarEnabled;
     const messageDate = new Date(msg.timestamp).toDateString();
     const prevDate = prevMsg ? new Date(prevMsg.timestamp).toDateString() : null;
 
@@ -17762,7 +17749,7 @@ dateDivider.className = 'wx-clean-time-capsule';
     const wrapper = document.createElement('div');
     // discord-msg-first：每组第一条（或 alwaysShowAvatar 模式下每条）
     // discord-msg-cont：组内连续的后续消息
-    const wrapperGroupClass = (effectiveAlwaysShowAvatar || isFirstInGroup) ? 'discord-msg-first' : 'discord-msg-cont';
+    const wrapperGroupClass = (settings.alwaysShowAvatar || isFirstInGroup) ? 'discord-msg-first' : 'discord-msg-cont';
     wrapper.className = `message-wrapper ${msg.sender === 'user' ? 'sent' : 'received'} ${wrapperGroupClass}`;
     wrapper.dataset.id = msg.id;
     wrapper.dataset.msgId = msg.id;
@@ -17773,9 +17760,9 @@ dateDivider.className = 'wx-clean-time-capsule';
         avatarDiv.style.marginTop = settings.inChatAvatarCustomOffset + 'px';
     }
 
-    if (effectiveInChatAvatarEnabled) {
+    if (settings.inChatAvatarEnabled) {
         // 头像只在每组第一条显示（同人60秒内的后续消息隐藏头像）
-        const shouldHide = !effectiveAlwaysShowAvatar && !isFirstInGroup;
+        const shouldHide = !settings.alwaysShowAvatar && !isFirstInGroup;
         if (shouldHide) {
             avatarDiv.classList.add('hidden');
         } else if (groupMember) {
@@ -17808,7 +17795,7 @@ dateDivider.className = 'wx-clean-time-capsule';
 
     // ── 构建时间字符串（组末尾 或 alwaysShowAvatar 模式下每条都需要）──
     let timeStr = '';
-    if (settings.timeFormat !== 'off' && (isLastInGroup || isFirstInGroup || effectiveAlwaysShowAvatar)) {
+    if (settings.timeFormat !== 'off' && (isLastInGroup || isFirstInGroup || settings.alwaysShowAvatar)) {
         const ts = new Date(msg.timestamp);
         const fmt = settings.timeFormat || 'HH:mm';
         if (fmt === 'HH:mm:ss') {
@@ -17881,7 +17868,7 @@ dateDivider.className = 'wx-clean-time-capsule';
     }
 
     // ── 名字行显示判断：alwaysShowAvatar=true 时每条都显示，否则只显示每组第一条 ──
-    const showNameRow = effectiveAlwaysShowAvatar || isFirstInGroup;
+    const showNameRow = settings.alwaysShowAvatar || isFirstInGroup;
 
     if (groupMember && groupChatSettings.showName) {
         if (showNameRow) {
@@ -17903,9 +17890,7 @@ dateDivider.className = 'wx-clean-time-capsule';
     if (msg.replyTo) {
         const repliedText = msg.replyTo.text || (msg.replyTo.image ? '🖼 图片' : '[消息]');
         const repliedSender = msg.replyTo.sender === 'user' ? (settings.myName || '我') : (settings.partnerName || '对方');
-        // 微信模式固定使用气泡下方的引用卡片；退出后仍遵循用户原设置。
-        const _isWechatMode = document.documentElement.getAttribute('data-wechat-mode') === 'true';
-        const _replyBarStyle = _isWechatMode ? 'bottom' : (settings.replyBarStyle || 'top');
+        const _replyBarStyle = settings.replyBarStyle || 'top';
 
         if (_replyBarStyle === 'top') {
             // ── 风格：上部（Discord 折线式，显示在气泡上方）──
@@ -17957,11 +17942,8 @@ dateDivider.className = 'wx-clean-time-capsule';
         // bottom 风格的 DOM 元素在 contentWrapper 完成后追加，见下方 _pendingReplyBelow 处理
     }
     // 记录下部引用待追加信息（避免提前引用 contentWrapper 内容）
-    const _isWechatModeForReply = document.documentElement.getAttribute('data-wechat-mode') === 'true';
-    const _effectiveReplyBarStyle = _isWechatModeForReply ? 'bottom' : (settings.replyBarStyle || 'top');
-    const _pendingReplyBelow = (msg.replyTo && _effectiveReplyBarStyle === 'bottom')
-        ? { text: msg.replyTo.text || (msg.replyTo.image ? '' : '[消息]'),
-            image: msg.replyTo.image || '',
+    const _pendingReplyBelow = (msg.replyTo && (settings.replyBarStyle || 'top') === 'bottom')
+        ? { text: msg.replyTo.text || (msg.replyTo.image ? '🖼 图片' : '[消息]'),
             sender: msg.replyTo.sender === 'user' ? (settings.myName || '我') : (settings.partnerName || '对方'),
             id: msg.replyTo.id || '' }
         : null;
@@ -17998,32 +17980,21 @@ dateDivider.className = 'wx-clean-time-capsule';
         ribDiv.className = 'reply-inline-below';
         ribDiv.dataset.replyId = _pendingReplyBelow.id;
         ribDiv.setAttribute('onclick', 'scrollToQuotedMessage(this)');
-        const copyDiv = document.createElement('span');
-        copyDiv.className = 'rib-copy';
         const senderSpan = document.createElement('span');
         senderSpan.className = 'rib-sender';
         senderSpan.textContent = _pendingReplyBelow.sender + '：';
         const textSpan = document.createElement('span');
         textSpan.className = 'rib-text';
         textSpan.textContent = _pendingReplyBelow.text;
-        copyDiv.appendChild(senderSpan);
-        copyDiv.appendChild(textSpan);
-        ribDiv.appendChild(copyDiv);
-        if (_pendingReplyBelow.image) {
-            ribDiv.classList.add('has-image');
-            const image = document.createElement('img');
-            image.className = 'rib-image';
-            image.src = _pendingReplyBelow.image;
-            image.alt = '引用图片';
-            ribDiv.appendChild(image);
-        }
+        ribDiv.appendChild(senderSpan);
+        ribDiv.appendChild(textSpan);
         contentWrapper.appendChild(ribDiv);
     }
 
     // ── 气泡下方 meta（inlineTimestamp=false 时显示时间戳和已读）──
     if (settings.inlineTimestamp === false) {
-        const showTsInMeta = timeStr && (isLastInGroup || effectiveAlwaysShowAvatar);
-        const hasMeta = showTsInMeta || (msg.sender === 'user' && settings.readReceiptsEnabled && (isLastInGroup || effectiveAlwaysShowAvatar));
+        const showTsInMeta = timeStr && (isLastInGroup || settings.alwaysShowAvatar);
+        const hasMeta = showTsInMeta || (msg.sender === 'user' && settings.readReceiptsEnabled && (isLastInGroup || settings.alwaysShowAvatar));
         if (hasMeta) {
             const metaDiv = document.createElement('div');
             metaDiv.className = 'message-meta';
@@ -41620,6 +41591,6 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<link rel="stylesheet" href="./wechat-mode.css?v=20261014-9">
-<script src="./wechat-mode.js?v=20261014-9"></script>
+<link rel="stylesheet" href="./wechat-mode.css?v=20261014-5">
+<script src="./wechat-mode.js?v=20261014-5"></script>
 </html>
