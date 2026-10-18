@@ -179,7 +179,7 @@
             selector: '.main-chat-area',
             properties: {
                 'padding-top': 'calc(38px + env(safe-area-inset-top, 0px))',
-                'padding-bottom': 'calc(56px + env(safe-area-inset-bottom, 0px))'
+                'padding-bottom': 'calc(56px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px)))'
             }
         },
         {
@@ -194,9 +194,9 @@
                 'display': 'grid',
                 'grid-template-columns': '36px minmax(0, 1fr)',
                 'column-gap': '4px',
-                'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
-                'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
-                'padding': '7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px'
+                'height': 'calc(56px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px)))',
+                'min-height': 'calc(56px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px)))',
+                'padding': '7.667px 6px calc(8.333px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px))) 8px'
             },
             nightProperties: {
                 'background': 'rgba(20, 20, 20, 0.96)',
@@ -408,12 +408,25 @@
             if (!keyboardViewportBaseline) keyboardViewportBaseline = layoutHeight;
 
             var visibleBottom = viewport ? Math.round(viewport.height + viewport.offsetTop) : layoutHeight;
-            var keyboardOpen = !!(enabled && focused && viewport && keyboardViewportBaseline - visibleBottom > 80);
+            /* Some iOS WebViews report only a small viewport delta while the
+               keyboard is already open. Focus is the reliable signal here. */
+            var keyboardOpen = !!(enabled && focused);
             document.body.classList.toggle('wechat-keyboard-open', keyboardOpen);
             if (keyboardOpen) {
-                document.documentElement.style.setProperty('--wechat-visual-height', visibleBottom + 'px');
+                var visualHeightValue = visibleBottom + 'px';
+                if (document.documentElement.style.getPropertyValue('--wechat-visual-height') !== visualHeightValue) {
+                    document.documentElement.style.setProperty('--wechat-visual-height', visualHeightValue);
+                }
+                if (document.documentElement.style.getPropertyValue('--wechat-composer-safe-bottom') !== '0px') {
+                    document.documentElement.style.setProperty('--wechat-composer-safe-bottom', '0px');
+                }
             } else {
-                document.documentElement.style.removeProperty('--wechat-visual-height');
+                if (document.documentElement.style.getPropertyValue('--wechat-visual-height')) {
+                    document.documentElement.style.removeProperty('--wechat-visual-height');
+                }
+                if (document.documentElement.style.getPropertyValue('--wechat-composer-safe-bottom')) {
+                    document.documentElement.style.removeProperty('--wechat-composer-safe-bottom');
+                }
             }
         });
     }
