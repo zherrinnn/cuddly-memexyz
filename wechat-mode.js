@@ -315,8 +315,7 @@
         {
             selector: '#dc-main .wx-clean-time-capsule, #dc-main .wx-clean-time-capsule span, #dc-main .meta-timestamp, #dc-main .discord-inline-timestamp, #dc-main .timestamp, #dc-main .msg-timestamp, #dc-main .inline-timestamp',
             properties: {
-                'color': 'rgba(151, 151, 151, 0.97)',
-                '-webkit-text-fill-color': 'rgba(151, 151, 151, 0.97)',
+                'color': '#7f7f7f',
                 'text-shadow': 'none'
             }
         },

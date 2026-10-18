@@ -527,8 +527,8 @@ html[data-wechat-mode="true"] body.wechat-mode .custom-independent-label {
 
 html[data-wechat-mode="true"] body.wechat-mode .wx-clean-time-capsule,
 html[data-wechat-mode="true"] body.wechat-mode .system-message {
-    color: rgba(151, 151, 151, 0.97) !important;
-    -webkit-text-fill-color: rgba(151, 151, 151, 0.97) !important;
+    color: #7f7f7f !important;
+    -webkit-text-fill-color: #7f7f7f !important;
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
@@ -540,9 +540,9 @@ html[data-wechat-mode="true"] body.wechat-mode .system-message {
 html[data-wechat-mode="true"] body.wechat-mode .wx-clean-time-capsule span {
     display: inline-block !important;
     padding: 2px 7px 3px !important;
-    color: rgba(151, 151, 151, 0.97) !important;
-    -webkit-text-fill-color: rgba(151, 151, 151, 0.97) !important;
-    background: rgba(255, 255, 255, 0.82) !important;
+    color: #7f7f7f !important;
+    -webkit-text-fill-color: #7f7f7f !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
     border-radius: 4px !important;
     box-shadow: none !important;
@@ -1565,12 +1565,12 @@ html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .trans
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule,
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .system-message,
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule span {
-    color: rgba(151, 151, 151, 0.97) !important;
-    -webkit-text-fill-color: rgba(151, 151, 151, 0.97) !important;
+    color: #8f9190 !important;
+    -webkit-text-fill-color: #8f9190 !important;
 }
 
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule span {
-    background: rgba(33, 33, 33, 0.92) !important;
+    background: rgba(33, 33, 33, 0.98) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
