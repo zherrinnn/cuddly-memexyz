@@ -18025,6 +18025,7 @@ dateDivider.className = 'wx-clean-time-capsule';
         const ribDiv = document.createElement('div');
         ribDiv.className = 'reply-inline-below';
         ribDiv.dataset.replyId = _pendingReplyBelow.id;
+        ribDiv.dataset.replySenderRole = msg.replyTo.sender === 'user' ? 'user' : 'partner';
         ribDiv.setAttribute('onclick', 'scrollToQuotedMessage(this)');
         const copyDiv = document.createElement('span');
         copyDiv.className = 'rib-copy';
@@ -41650,6 +41651,6 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<link rel="stylesheet" href="./wechat-mode.css?v=20261018-36">
-<script src="./wechat-mode.js?v=20261018-36"></script>
+<link rel="stylesheet" href="./wechat-mode.css?v=20261018-39">
+<script src="./wechat-mode.js?v=20261018-39"></script>
 </html>

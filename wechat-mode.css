@@ -90,6 +90,25 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-main {
     overflow: hidden !important;
 }
 
+/* When the on-screen keyboard is visible, pin the WeChat shell to the
+   visual viewport.  100dvh can become shorter than the actual keyboard
+   edge in iOS/WebView, which otherwise leaves a blank strip below composer. */
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-layout,
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-main,
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .main-chat-area {
+    height: var(--wechat-visual-height) !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .main-chat-area {
+    padding-bottom: 56px !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .input-area-wrapper {
+    height: 56px !important;
+    min-height: 56px !important;
+    padding-bottom: 8.333px !important;
+}
+
 html[data-wechat-mode="true"] body.wechat-mode #dc-main::before,
 html[data-wechat-mode="true"] body.wechat-mode #dc-main::after {
     content: none !important;
@@ -235,7 +254,7 @@ html[data-wechat-mode="true"] body.wechat-mode .partner-name-line #partner-name 
     border-radius: 0 !important;
     box-shadow: none !important;
     font-size: 17px !important;
-    font-weight: 600 !important;
+    font-weight: 400 !important;
     line-height: 58px !important;
     text-align: center !important;
     text-overflow: ellipsis !important;
@@ -542,7 +561,13 @@ html[data-wechat-mode="true"] body.wechat-mode .wx-clean-time-capsule span {
     padding: 2px 7px 3px !important;
     color: #7f7f7f !important;
     -webkit-text-fill-color: #7f7f7f !important;
-    background: rgba(255, 255, 255, 0.98) !important;
+    background: #f5f5f5 !important;
+    background-color: #f5f5f5 !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-blend-mode: normal !important;
     border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
     border-radius: 4px !important;
     box-shadow: none !important;
@@ -1570,7 +1595,13 @@ html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-cl
 }
 
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule span {
-    background: rgba(33, 33, 33, 0.98) !important;
+    background: #2c2c2c !important;
+    background-color: #2c2c2c !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-blend-mode: normal !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 

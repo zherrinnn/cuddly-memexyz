@@ -9,6 +9,8 @@
     var runtimeObserver = null;
     var typingObserver = null;
     var runtimeFrame = 0;
+    var keyboardFrame = 0;
+    var keyboardViewportBaseline = 0;
     var savedPresentationSettings = null;
 
     var RUNTIME_OVERRIDES = [
@@ -124,6 +126,7 @@
             properties: {
                 'align-self': 'center',
                 'font-family': '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
+                'font-weight': '400',
                 'position': 'relative',
                 'z-index': '12',
                 'transform': 'translateY(0.5px)'
@@ -370,6 +373,51 @@
         });
     }
 
+    function preferredMyName() {
+        try {
+            if (typeof settings !== 'undefined' && settings && settings.myName) {
+                return String(settings.myName).trim() || '我';
+            }
+        } catch (error) {}
+        var element = document.getElementById('my-name');
+        return element ? (String(element.textContent || '').trim() || '我') : '我';
+    }
+
+    function syncReplySenderLabels() {
+        var myName = preferredMyName();
+        document.querySelectorAll('#dc-main .reply-inline-below .rib-sender').forEach(function (element) {
+            var role = element.closest('.reply-inline-below') && element.closest('.reply-inline-below').getAttribute('data-reply-sender-role');
+            var text = String(element.textContent || '').trim();
+            if (role === 'user' || (!role && (text === '我：' || text === '我:'))) {
+                element.textContent = myName + '：';
+            }
+        });
+    }
+
+    function syncKeyboardViewport() {
+        if (keyboardFrame) window.cancelAnimationFrame(keyboardFrame);
+        keyboardFrame = window.requestAnimationFrame(function () {
+            keyboardFrame = 0;
+            if (!document.body) return;
+            var input = document.getElementById('message-input');
+            var focused = !!input && document.activeElement === input;
+            var viewport = window.visualViewport;
+            var layoutHeight = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+
+            if (!focused) keyboardViewportBaseline = layoutHeight;
+            if (!keyboardViewportBaseline) keyboardViewportBaseline = layoutHeight;
+
+            var visibleBottom = viewport ? Math.round(viewport.height + viewport.offsetTop) : layoutHeight;
+            var keyboardOpen = !!(enabled && focused && viewport && keyboardViewportBaseline - visibleBottom > 80);
+            document.body.classList.toggle('wechat-keyboard-open', keyboardOpen);
+            if (keyboardOpen) {
+                document.documentElement.style.setProperty('--wechat-visual-height', visibleBottom + 'px');
+            } else {
+                document.documentElement.style.removeProperty('--wechat-visual-height');
+            }
+        });
+    }
+
     function preferredPartnerName() {
         try {
             if (typeof settings !== 'undefined' && settings && settings.partnerName) {
@@ -442,7 +490,9 @@
             });
         });
         syncTimestampLabels();
+        syncReplySenderLabels();
         syncTypingHeader();
+        syncKeyboardViewport();
         updateSettingsCard();
     }
 
@@ -703,6 +753,23 @@
         createHeaderMoreButton();
         createWechatContinueButton();
         bindTypingHeader();
+        keyboardViewportBaseline = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+        document.addEventListener('focusin', function (event) {
+            if (event.target && event.target.id === 'message-input') {
+                window.setTimeout(syncKeyboardViewport, 0);
+                window.setTimeout(syncKeyboardViewport, 120);
+            }
+        });
+        document.addEventListener('focusout', function (event) {
+            if (event.target && event.target.id === 'message-input') {
+                window.setTimeout(syncKeyboardViewport, 120);
+            }
+        });
+        window.addEventListener('resize', syncKeyboardViewport, { passive: true });
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', syncKeyboardViewport, { passive: true });
+            window.visualViewport.addEventListener('scroll', syncKeyboardViewport, { passive: true });
+        }
         applyMode(readStoredMode(), { persist: false, announce: false });
 
         if (!runtimeObserver && document.body) {
