@@ -10,7 +10,6 @@
     var typingObserver = null;
     var runtimeFrame = 0;
     var savedPresentationSettings = null;
-    var visualViewportBound = false;
 
     var RUNTIME_OVERRIDES = [
         {
@@ -416,37 +415,6 @@
         }
     }
 
-    function syncVisualViewportOffset() {
-        var root = document.documentElement;
-        if (!root) return;
-        var offset = 0;
-        var viewport = window.visualViewport;
-        var input = document.querySelector('.message-input');
-        var inputFocused = !!input && document.activeElement === input;
-        if (enabled && viewport && inputFocused) {
-            offset = Math.max(0, Math.round((viewport.offsetTop || 0) * 100) / 100);
-        }
-        root.style.setProperty('--wc-keyboard-offset', offset + 'px');
-    }
-
-    function bindVisualViewport() {
-        if (visualViewportBound) return;
-        visualViewportBound = true;
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', syncVisualViewportOffset);
-            window.visualViewport.addEventListener('scroll', syncVisualViewportOffset);
-        }
-        window.addEventListener('resize', syncVisualViewportOffset);
-        document.addEventListener('focusin', function () {
-            window.setTimeout(syncVisualViewportOffset, 0);
-            window.setTimeout(syncVisualViewportOffset, 120);
-        });
-        document.addEventListener('focusout', function () {
-            window.setTimeout(syncVisualViewportOffset, 0);
-            window.setTimeout(syncVisualViewportOffset, 180);
-        });
-    }
-
     function applyRuntimeOverrides() {
         if (!document.body) return;
         if (enabled) syncWechatPresentationSettings(true);
@@ -620,7 +588,6 @@
         syncCustomCssIsolation(enabled);
         if (changed || options.forceRender) rerenderConversation();
         applyRuntimeOverrides();
-        syncVisualViewportOffset();
         syncThemeColor();
         updateSettingsCard();
         if (options.persist !== false) storeMode(enabled ? theme : 'off');
@@ -737,7 +704,6 @@
         createHeaderMoreButton();
         createWechatContinueButton();
         bindTypingHeader();
-        bindVisualViewport();
         applyMode(readStoredMode(), { persist: false, announce: false });
 
         if (!runtimeObserver && document.body) {

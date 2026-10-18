@@ -14,7 +14,6 @@ html[data-wechat-mode="true"] {
     --wc-muted: #8a8a8a;
     --wc-line: rgba(0, 0, 0, 0.09);
     --wc-radius: 4px;
-    --wc-keyboard-offset: 0px;
     /* 1320px-wide reference screenshot renders at a 440px CSS viewport:
        the widest WeChat bubble is 294px, including its padding. */
     --wc-bubble-max: min(294px, calc(100vw - 112px));
@@ -1244,7 +1243,6 @@ html[data-wechat-mode="true"] body.wechat-mode.compact-header-mode .main-chat-ar
 
 html[data-wechat-mode="true"] body.wechat-mode .input-area-wrapper,
 html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode .input-area-wrapper {
-    bottom: calc(0px - var(--wc-keyboard-offset, 0px)) !important;
     grid-template-columns: 36px minmax(0, 1fr) !important;
     column-gap: 4px !important;
     height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
