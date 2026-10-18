@@ -290,7 +290,7 @@
             },
             nightProperties: {
                 'background-image': 'url("./assets/night-send.svg")',
-                'background-position': '50% calc(50% + 0.2px)',
+                'background-position': '50% calc(50% + 2.2px)',
                 'filter': 'none'
             }
         },

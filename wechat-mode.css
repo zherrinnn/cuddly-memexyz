@@ -423,17 +423,9 @@ html[data-wechat-mode="true"] body.wechat-mode .translation-text,
 html[data-wechat-mode="true"] body.wechat-mode .transfer-card,
 html[data-wechat-mode="true"] body.wechat-mode .gift-card,
 html[data-wechat-mode="true"] body.wechat-mode .call-event-pill,
-html[data-wechat-mode="true"] body.wechat-mode .withdrawn-content,
-html[data-wechat-mode="true"] body.wechat-mode .image-bubble,
-html[data-wechat-mode="true"] body.wechat-mode .message-image {
+html[data-wechat-mode="true"] body.wechat-mode .withdrawn-content {
     box-sizing: border-box !important;
     max-width: var(--wc-bubble-max) !important;
-}
-
-html[data-wechat-mode="true"] body.wechat-mode .image-bubble img,
-html[data-wechat-mode="true"] body.wechat-mode .message-image img {
-    max-width: 100% !important;
-    height: auto !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .message-sent {
@@ -1379,6 +1371,12 @@ html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.sent .reply-inli
     align-self: flex-end !important;
 }
 
+/* The received bubble itself is shifted 2px to clear its tail. Keep the
+   quote bar on the same straight vertical edge as the bubble body. */
+html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.received .reply-inline-below {
+    margin-left: 2px !important;
+}
+
 html[data-wechat-mode="true"] body.wechat-mode .reply-inline-below .rib-copy {
     display: flex !important;
     align-items: baseline !important;
@@ -1500,9 +1498,9 @@ html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode #combo
 
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode #wechat-continue-btn {
     background-image: url("./assets/night-send.svg") !important;
-    /* The night SVG artwork sits 17.5 source pixels above the day artwork.
-       At 29px display size, +0.2px aligns their visible centers exactly. */
-    background-position: 50% calc(50% + 0.2px) !important;
+    /* Night artwork has different internal whitespace; lower it one more
+       CSS pixel so the visible plus aligns with the daylight control. */
+    background-position: 50% calc(50% + 2.2px) !important;
     filter: none !important;
 }
 
