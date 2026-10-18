@@ -2,7 +2,9 @@
     'use strict';
 
     var STORAGE_KEY = 'uwu-wechat-daylight-mode';
+    var THEME_KEY = 'uwu-wechat-theme';
     var enabled = false;
+    var theme = 'day';
     var originalThemeColor = null;
     var runtimeObserver = null;
     var typingObserver = null;
@@ -80,6 +82,11 @@
                 '-webkit-backdrop-filter': 'none',
                 'backdrop-filter': 'none',
                 'transform': 'none'
+            },
+            nightProperties: {
+                'background-image': 'url("./assets/night-back.svg")',
+                'background-size': '12px 24px',
+                'filter': 'none'
             }
         },
         {
@@ -141,6 +148,11 @@
                 'background-size': '21px 21px',
                 'background-position': 'calc(50% + 0.5px) calc(50% - 2.14px)',
                 'transform': 'none'
+            },
+            nightProperties: {
+                'background-image': 'url("./assets/night-more.svg")',
+                'background-size': '24px 24px',
+                'filter': 'none'
             }
         },
         {
@@ -179,6 +191,10 @@
                 'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
                 'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
                 'padding': '7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px'
+            },
+            nightProperties: {
+                'background': 'rgba(20, 20, 20, 0.96)',
+                'background-color': 'rgba(20, 20, 20, 0.96)'
             }
         },
         {
@@ -196,6 +212,7 @@
         {
             selector: '#dc-main .message-input',
             properties: {
+                'color': '#111111',
                 'background': '#ffffff',
                 'background-color': '#ffffff',
                 'box-shadow': 'none',
@@ -205,6 +222,11 @@
                 'min-height': '40px',
                 'max-height': '40px',
                 'margin': '0 7px 0 0'
+            },
+            nightProperties: {
+                'color': '#d5d5d5',
+                'background': '#292929',
+                'background-color': '#292929'
             }
         },
         {
@@ -234,6 +256,10 @@
                 'background-size': '29.5px 29.5px',
                 'background-position': '50% calc(50% - 0.13px)',
                 'transform': 'translateX(-1.5px)'
+            },
+            nightProperties: {
+                'background-image': 'url("./assets/night-plus.svg")',
+                'filter': 'none'
             }
         },
         {
@@ -246,6 +272,10 @@
                 'background-repeat': 'no-repeat',
                 'background-size': '72px 72px',
                 'background-position': '-37.845px -17.665px'
+            },
+            nightProperties: {
+                'background-image': 'url("./assets/night-sticker.svg")',
+                'filter': 'none'
             }
         },
         {
@@ -257,6 +287,11 @@
                 'background-repeat': 'no-repeat',
                 'background-size': '29px 29px',
                 'background-position': '50% calc(50% - 0.44px)'
+            },
+            nightProperties: {
+                'background-image': 'url("./assets/night-send.svg")',
+                'background-position': '50% calc(50% + 0.2px)',
+                'filter': 'none'
             }
         },
         {
@@ -388,8 +423,9 @@
                     if (!element.hasAttribute('data-wechat-original-style')) {
                         element.setAttribute('data-wechat-original-style', element.getAttribute('style') || '__none__');
                     }
-                    Object.keys(entry.properties).forEach(function (property) {
-                        var value = entry.properties[property];
+                    var properties = Object.assign({}, entry.properties, theme === 'night' ? (entry.nightProperties || {}) : {});
+                    Object.keys(properties).forEach(function (property) {
+                        var value = properties[property];
                         if (element.style.getPropertyValue(property) !== value || element.style.getPropertyPriority(property) !== 'important') {
                             element.style.setProperty(property, value, 'important');
                         }
@@ -417,15 +453,18 @@
 
     function readStoredMode() {
         try {
-            return localStorage.getItem(STORAGE_KEY) === 'true';
+            var storedTheme = localStorage.getItem(THEME_KEY);
+            if (storedTheme === 'day' || storedTheme === 'night') return storedTheme;
+            return localStorage.getItem(STORAGE_KEY) === 'true' ? 'day' : 'off';
         } catch (error) {
-            return false;
+            return 'off';
         }
     }
 
     function storeMode(value) {
         try {
-            localStorage.setItem(STORAGE_KEY, value ? 'true' : 'false');
+            localStorage.setItem(THEME_KEY, value);
+            localStorage.setItem(STORAGE_KEY, value === 'off' ? 'false' : 'true');
         } catch (error) {
             /* file:// privacy modes can reject storage; the active session still works. */
         }
@@ -435,10 +474,16 @@
         var card = document.getElementById('wechat-mode-settings-card');
         var status = document.getElementById('wechat-mode-card-status');
         if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
+        if (card) card.setAttribute('data-active-theme', enabled ? theme : 'off');
+        document.querySelectorAll('#wechat-mode-settings-card .wechat-theme-option').forEach(function (button) {
+            var active = button.getAttribute('data-theme-value') === (enabled ? theme : 'off');
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
         if (card && status) {
             status.textContent = enabled
-                ? '已开启 · 微信日间布局与配色'
-                : '已关闭 · 点击切换为微信日间样式';
+                ? (theme === 'night' ? '已开启 · 微信夜间布局与配色' : '已开启 · 微信日间布局与配色')
+                : '已关闭 · 选择日间或夜间开启';
         }
 
     }
@@ -449,7 +494,7 @@
         if (originalThemeColor === null) {
             originalThemeColor = meta.getAttribute('content') || '#000000';
         }
-        meta.setAttribute('content', enabled ? '#ededed' : originalThemeColor);
+        meta.setAttribute('content', enabled ? (theme === 'night' ? '#0f0f0f' : '#ededed') : originalThemeColor);
     }
 
     function syncCustomCssIsolation(value) {
@@ -516,27 +561,40 @@
         } catch (error) {}
     }
 
+    function normalizeMode(value) {
+        if (value === 'night') return 'night';
+        if (value === 'day' || value === true) return 'day';
+        return 'off';
+    }
+
     function applyMode(value, options) {
         options = options || {};
-        var changed = enabled !== Boolean(value);
-        enabled = Boolean(value);
+        var nextTheme = normalizeMode(value);
+        var nextEnabled = nextTheme !== 'off';
+        var changed = enabled !== nextEnabled || (nextEnabled && theme !== nextTheme);
+        enabled = nextEnabled;
+        if (nextEnabled) theme = nextTheme;
         document.documentElement.setAttribute('data-wechat-mode', enabled ? 'true' : 'false');
-        if (document.body) document.body.classList.toggle('wechat-mode', enabled);
+        document.documentElement.setAttribute('data-wechat-theme', enabled ? theme : 'off');
+        if (document.body) {
+            document.body.classList.toggle('wechat-mode', enabled);
+            document.body.classList.toggle('wechat-night-mode', enabled && theme === 'night');
+        }
         syncWechatPresentationSettings(enabled);
         syncCustomCssIsolation(enabled);
         if (changed || options.forceRender) rerenderConversation();
         applyRuntimeOverrides();
         syncThemeColor();
         updateSettingsCard();
-        if (options.persist !== false) storeMode(enabled);
+        if (options.persist !== false) storeMode(enabled ? theme : 'off');
 
         if (options.announce && typeof window.showNotification === 'function') {
-            window.showNotification(enabled ? '微信模式已开启' : '微信模式已关闭', 'success');
+            window.showNotification(enabled ? (theme === 'night' ? '微信夜间模式已开启' : '微信日间模式已开启') : '微信模式已关闭', 'success');
         }
     }
 
     function toggleMode() {
-        applyMode(!enabled, { persist: true, announce: true });
+        applyMode(!enabled ? 'day' : (theme === 'day' ? 'night' : 'off'), { persist: true, announce: true });
     }
 
     function createSettingsCard() {
@@ -548,21 +606,23 @@
         var card = document.createElement('div');
         card.id = 'wechat-mode-settings-card';
         card.className = 'settings-card';
-        card.setAttribute('role', 'switch');
-        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'group');
         card.setAttribute('aria-label', '微信模式');
         card.innerHTML =
             '<span class="wechat-mode-card-icon"><i class="fab fa-weixin" aria-hidden="true"></i></span>' +
             '<span class="wechat-mode-card-copy"><strong>微信模式</strong>' +
             '<small id="wechat-mode-card-status"></small></span>' +
-            '<span class="wechat-mode-switch" aria-hidden="true"></span>';
+            '<span class="wechat-theme-options" aria-label="微信模式外观">' +
+            '<button type="button" class="wechat-theme-option" data-theme-value="off">关闭</button>' +
+            '<button type="button" class="wechat-theme-option" data-theme-value="day">日间</button>' +
+            '<button type="button" class="wechat-theme-option" data-theme-value="night">夜间</button>' +
+            '</span>';
 
-        card.addEventListener('click', toggleMode);
-        card.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                toggleMode();
-            }
+        card.querySelectorAll('.wechat-theme-option').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.stopPropagation();
+                applyMode(button.getAttribute('data-theme-value'), { persist: true, announce: true });
+            });
         });
 
         grid.insertBefore(card, grid.firstChild);
@@ -581,8 +641,19 @@
         button.setAttribute('aria-label', '打开设置');
         button.addEventListener('click', function () {
             var modal = document.getElementById('settings-modal');
-            if (modal && typeof window.showModal === 'function') {
-                window.showModal(modal);
+            if (modal) {
+                if (typeof window.showModal === 'function') {
+                    window.showModal(modal);
+                } else {
+                    modal.style.display = 'flex';
+                    window.requestAnimationFrame(function () {
+                        var content = modal.querySelector('.modal-content');
+                        if (content) {
+                            content.style.opacity = '1';
+                            content.style.transform = 'translateY(0) scale(1)';
+                        }
+                    });
+                }
                 return;
             }
             var original = document.getElementById('settings-btn');
@@ -665,6 +736,9 @@
     }
 
     window.setWechatMode = function (value) {
+        applyMode(value, { persist: true, announce: false });
+    };
+    window.setWechatTheme = function (value) {
         applyMode(value, { persist: true, announce: false });
     };
     window.toggleWechatMode = toggleMode;
