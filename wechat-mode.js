@@ -163,8 +163,11 @@
                 'opacity': '1',
                 'width': '40px',
                 'min-width': '40px',
+                'max-width': '40px',
                 'height': '40px',
                 'min-height': '40px',
+                'max-height': '40px',
+                'flex': '0 0 40px',
                 'margin': '0',
                 'padding': '0'
             }
@@ -312,7 +315,8 @@
         {
             selector: '#dc-main .wx-clean-time-capsule, #dc-main .wx-clean-time-capsule span, #dc-main .meta-timestamp, #dc-main .discord-inline-timestamp, #dc-main .timestamp, #dc-main .msg-timestamp, #dc-main .inline-timestamp',
             properties: {
-                'color': '#7f7f7f',
+                'color': 'rgba(151, 151, 151, 0.97)',
+                '-webkit-text-fill-color': 'rgba(151, 151, 151, 0.97)',
                 'text-shadow': 'none'
             }
         },

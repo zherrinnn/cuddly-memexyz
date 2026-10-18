@@ -355,6 +355,7 @@ html[data-wechat-mode="true"] body.wechat-mode .empty-state p {
 html[data-wechat-mode="true"] body.wechat-mode .message-wrapper {
     max-width: calc(var(--wc-bubble-max) + 50px) !important;
     gap: 10px !important;
+    align-items: flex-start !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.discord-msg-first {
@@ -369,12 +370,24 @@ html[data-wechat-mode="true"] body.wechat-mode .message-avatar,
 html[data-wechat-mode="true"] body.wechat-mode .message-avatar img {
     width: 40px !important;
     min-width: 40px !important;
+    max-width: 40px !important;
     height: 40px !important;
     min-height: 40px !important;
+    max-height: 40px !important;
     border-radius: 4px !important;
     clip-path: none !important;
     box-shadow: none !important;
     overflow: hidden !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .message-avatar {
+    flex: 0 0 40px !important;
+    box-sizing: border-box !important;
+}
+
+html[data-wechat-mode="true"] body.wechat-mode .message-avatar img {
+    display: block !important;
+    object-fit: cover !important;
 }
 
 /* WeChat always renders an avatar for every message.  These rules deliberately
@@ -390,8 +403,11 @@ html[data-wechat-mode="true"] body.wechat-mode .message-wrapper.discord-msg-cont
     opacity: 1 !important;
     width: 40px !important;
     min-width: 40px !important;
+    max-width: 40px !important;
     height: 40px !important;
     min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
@@ -413,7 +429,7 @@ html[data-wechat-mode="true"] body.wechat-mode .message {
     box-shadow: none !important;
     font-size: var(--font-size, 16px) !important;
     font-weight: 400 !important;
-    line-height: 1.5 !important;
+    line-height: 20px !important;
     letter-spacing: 0 !important;
 }
 
@@ -511,8 +527,8 @@ html[data-wechat-mode="true"] body.wechat-mode .custom-independent-label {
 
 html[data-wechat-mode="true"] body.wechat-mode .wx-clean-time-capsule,
 html[data-wechat-mode="true"] body.wechat-mode .system-message {
-    color: #7f7f7f !important;
-    -webkit-text-fill-color: #7f7f7f !important;
+    color: rgba(151, 151, 151, 0.97) !important;
+    -webkit-text-fill-color: rgba(151, 151, 151, 0.97) !important;
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
@@ -524,8 +540,8 @@ html[data-wechat-mode="true"] body.wechat-mode .system-message {
 html[data-wechat-mode="true"] body.wechat-mode .wx-clean-time-capsule span {
     display: inline-block !important;
     padding: 2px 7px 3px !important;
-    color: #7f7f7f !important;
-    -webkit-text-fill-color: #7f7f7f !important;
+    color: rgba(151, 151, 151, 0.97) !important;
+    -webkit-text-fill-color: rgba(151, 151, 151, 0.97) !important;
     background: rgba(255, 255, 255, 0.82) !important;
     border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
     border-radius: 4px !important;
@@ -1549,8 +1565,8 @@ html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .trans
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule,
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .system-message,
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule span {
-    color: #8f9190 !important;
-    -webkit-text-fill-color: #8f9190 !important;
+    color: rgba(151, 151, 151, 0.97) !important;
+    -webkit-text-fill-color: rgba(151, 151, 151, 0.97) !important;
 }
 
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode .wx-clean-time-capsule span {
