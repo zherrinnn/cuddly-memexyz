@@ -465,9 +465,12 @@ html[data-wechat-mode="true"] body.wechat-mode .message-received:not(.message-im
     width: 17px !important;
     height: 17px !important;
     pointer-events: none !important;
+    background-color: transparent !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
     background-size: contain !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .message-sent:not(.message-image-bubble-none)::after {
