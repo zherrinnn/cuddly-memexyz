@@ -99,6 +99,11 @@ html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .main-chat-a
     height: var(--wechat-visual-height) !important;
 }
 
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-layout,
+html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-main {
+    overflow: visible !important;
+}
+
 html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .main-chat-area {
     padding-bottom: 56px !important;
 }
