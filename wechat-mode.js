@@ -9,8 +9,6 @@
     var runtimeObserver = null;
     var typingObserver = null;
     var runtimeFrame = 0;
-    var keyboardFrame = 0;
-    var keyboardViewportBaseline = 0;
     var savedPresentationSettings = null;
 
     var RUNTIME_OVERRIDES = [
@@ -179,7 +177,7 @@
             selector: '.main-chat-area',
             properties: {
                 'padding-top': 'calc(38px + env(safe-area-inset-top, 0px))',
-                'padding-bottom': 'calc(56px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px)))'
+                'padding-bottom': 'calc(56px + env(safe-area-inset-bottom, 0px))'
             }
         },
         {
@@ -194,9 +192,9 @@
                 'display': 'grid',
                 'grid-template-columns': '36px minmax(0, 1fr)',
                 'column-gap': '4px',
-                'height': 'calc(56px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px)))',
-                'min-height': 'calc(56px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px)))',
-                'padding': '7.667px 6px calc(8.333px + var(--wechat-composer-safe-bottom, env(safe-area-inset-bottom, 0px))) 8px'
+                'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
+                'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
+                'padding': '7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px'
             },
             nightProperties: {
                 'background': 'rgba(20, 20, 20, 0.96)',
@@ -394,89 +392,6 @@
         });
     }
 
-    function setImportantStyle(element, property, value) {
-        if (!element) return;
-        if (element.style.getPropertyValue(property) !== value || element.style.getPropertyPriority(property) !== 'important') {
-            element.style.setProperty(property, value, 'important');
-        }
-    }
-
-    function iosSafeAreaBottom() {
-        var probe = document.getElementById('wechat-safe-area-probe');
-        if (!probe) {
-            probe = document.createElement('div');
-            probe.id = 'wechat-safe-area-probe';
-            probe.setAttribute('aria-hidden', 'true');
-            probe.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:0;height:0;padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none;';
-            document.body.appendChild(probe);
-        }
-        return parseFloat(window.getComputedStyle(probe).paddingBottom) || 0;
-    }
-
-    function syncKeyboardViewport() {
-        if (keyboardFrame) window.cancelAnimationFrame(keyboardFrame);
-        keyboardFrame = window.requestAnimationFrame(function () {
-            keyboardFrame = 0;
-            if (!document.body) return;
-            var input = document.getElementById('message-input');
-            var focused = !!input && document.activeElement === input;
-            var viewport = window.visualViewport;
-            var layoutHeight = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
-
-            if (!focused) keyboardViewportBaseline = layoutHeight;
-            if (!keyboardViewportBaseline) keyboardViewportBaseline = layoutHeight;
-
-            var visibleBottom = viewport ? Math.round(viewport.height + viewport.offsetTop) : layoutHeight;
-            /* Some iOS WebViews report only a small viewport delta while the
-               keyboard is already open. Focus is the reliable signal here. */
-            var keyboardOpen = !!(enabled && focused);
-            document.body.classList.toggle('wechat-keyboard-open', keyboardOpen);
-            if (keyboardOpen) {
-                var visualHeightValue = visibleBottom + 'px';
-                if (document.documentElement.style.getPropertyValue('--wechat-visual-height') !== visualHeightValue) {
-                    document.documentElement.style.setProperty('--wechat-visual-height', visualHeightValue);
-                }
-                if (document.documentElement.style.getPropertyValue('--wechat-composer-safe-bottom') !== '0px') {
-                    document.documentElement.style.setProperty('--wechat-composer-safe-bottom', '0px');
-                }
-
-                /* Use an independent fixed layer while the iOS keyboard is
-                   visible. The added safe-area offset consumes WebKit's
-                   duplicated Home-indicator strip above the keyboard. */
-                var composer = document.querySelector('#dc-main .input-area-wrapper');
-                if (composer && viewport) {
-                    var composerHeight = composer.getBoundingClientRect().height || 56;
-                    var composerTop = Math.round((viewport.offsetTop + viewport.height - composerHeight + iosSafeAreaBottom()) * 100) / 100;
-                    setImportantStyle(composer, 'position', 'fixed');
-                    setImportantStyle(composer, 'top', composerTop + 'px');
-                    setImportantStyle(composer, 'bottom', 'auto');
-                    setImportantStyle(composer, 'left', Math.round(viewport.offsetLeft || 0) + 'px');
-                    setImportantStyle(composer, 'right', 'auto');
-                    setImportantStyle(composer, 'width', Math.round(viewport.width) + 'px');
-                    setImportantStyle(composer, 'z-index', '2147483000');
-                }
-
-            } else {
-                if (document.documentElement.style.getPropertyValue('--wechat-visual-height')) {
-                    document.documentElement.style.removeProperty('--wechat-visual-height');
-                }
-                if (document.documentElement.style.getPropertyValue('--wechat-composer-safe-bottom')) {
-                    document.documentElement.style.removeProperty('--wechat-composer-safe-bottom');
-                }
-                var composer = document.querySelector('#dc-main .input-area-wrapper');
-                if (composer) {
-                    setImportantStyle(composer, 'position', 'absolute');
-                    setImportantStyle(composer, 'top', 'auto');
-                    setImportantStyle(composer, 'bottom', '0px');
-                    setImportantStyle(composer, 'left', '0px');
-                    setImportantStyle(composer, 'right', '0px');
-                    setImportantStyle(composer, 'width', '100%');
-                    setImportantStyle(composer, 'z-index', '55');
-                }
-            }
-        });
-    }
-
     function preferredPartnerName() {
         try {
             if (typeof settings !== 'undefined' && settings && settings.partnerName) {
@@ -551,7 +466,6 @@
         syncTimestampLabels();
         syncReplySenderLabels();
         syncTypingHeader();
-        syncKeyboardViewport();
         updateSettingsCard();
     }
 
@@ -812,23 +726,6 @@
         createHeaderMoreButton();
         createWechatContinueButton();
         bindTypingHeader();
-        keyboardViewportBaseline = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
-        document.addEventListener('focusin', function (event) {
-            if (event.target && event.target.id === 'message-input') {
-                window.setTimeout(syncKeyboardViewport, 0);
-                window.setTimeout(syncKeyboardViewport, 120);
-            }
-        });
-        document.addEventListener('focusout', function (event) {
-            if (event.target && event.target.id === 'message-input') {
-                window.setTimeout(syncKeyboardViewport, 120);
-            }
-        });
-        window.addEventListener('resize', syncKeyboardViewport, { passive: true });
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', syncKeyboardViewport, { passive: true });
-            window.visualViewport.addEventListener('scroll', syncKeyboardViewport, { passive: true });
-        }
         applyMode(readStoredMode(), { persist: false, announce: false });
 
         if (!runtimeObserver && document.body) {

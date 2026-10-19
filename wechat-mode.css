@@ -90,30 +90,6 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-main {
     overflow: hidden !important;
 }
 
-/* When the on-screen keyboard is visible, pin the WeChat shell to the
-   visual viewport.  100dvh can become shorter than the actual keyboard
-   edge in iOS/WebView, which otherwise leaves a blank strip below composer. */
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-layout,
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-main,
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .main-chat-area {
-    height: var(--wechat-visual-height) !important;
-}
-
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-layout,
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open #dc-main {
-    overflow: visible !important;
-}
-
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .main-chat-area {
-    padding-bottom: 56px !important;
-}
-
-html[data-wechat-mode="true"] body.wechat-mode.wechat-keyboard-open .input-area-wrapper {
-    height: 56px !important;
-    min-height: 56px !important;
-    padding-bottom: 8.333px !important;
-}
-
 html[data-wechat-mode="true"] body.wechat-mode #dc-main::before,
 html[data-wechat-mode="true"] body.wechat-mode #dc-main::after {
     content: none !important;
