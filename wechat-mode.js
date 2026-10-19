@@ -190,7 +190,7 @@
                 'width': '100%',
                 'max-width': 'none',
                 'margin': '0',
-                'transform': 'translateY(var(--wechat-composer-shift, 0px))',
+                'transform': 'none',
                 'display': 'grid',
                 'grid-template-columns': '36px minmax(0, 1fr)',
                 'column-gap': '4px',
@@ -421,29 +421,12 @@
                     document.documentElement.style.setProperty('--wechat-composer-safe-bottom', '0px');
                 }
 
-                /* Align the measured composer bottom with the measured visual
-                   viewport bottom. This compensates for WebViews where dvh and
-                   safe-area values still leave a device-specific blank strip. */
-                var composer = document.querySelector('#dc-main .input-area-wrapper');
-                if (composer) {
-                    var previousShift = parseFloat(document.documentElement.style.getPropertyValue('--wechat-composer-shift')) || 0;
-                    var composerBottomWithoutShift = composer.getBoundingClientRect().bottom - previousShift;
-                    var nextShift = Math.round((visibleBottom - composerBottomWithoutShift) * 100) / 100;
-                    if (Math.abs(nextShift) < 0.5) nextShift = 0;
-                    var shiftValue = nextShift + 'px';
-                    if (document.documentElement.style.getPropertyValue('--wechat-composer-shift') !== shiftValue) {
-                        document.documentElement.style.setProperty('--wechat-composer-shift', shiftValue);
-                    }
-                }
             } else {
                 if (document.documentElement.style.getPropertyValue('--wechat-visual-height')) {
                     document.documentElement.style.removeProperty('--wechat-visual-height');
                 }
                 if (document.documentElement.style.getPropertyValue('--wechat-composer-safe-bottom')) {
                     document.documentElement.style.removeProperty('--wechat-composer-safe-bottom');
-                }
-                if (document.documentElement.style.getPropertyValue('--wechat-composer-shift')) {
-                    document.documentElement.style.removeProperty('--wechat-composer-shift');
                 }
             }
         });
