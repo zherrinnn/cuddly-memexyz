@@ -177,7 +177,9 @@
             selector: '.main-chat-area',
             properties: {
                 'padding-top': 'calc(38px + env(safe-area-inset-top, 0px))',
-                'padding-bottom': 'calc(56px + env(safe-area-inset-bottom, 0px))'
+                'padding-bottom': '0',
+                'height': '100%',
+                'flex': '1 1 auto'
             }
         },
         {
@@ -188,13 +190,16 @@
                 'width': '100%',
                 'max-width': 'none',
                 'margin': '0',
+                'position': 'relative',
+                'bottom': 'auto',
+                'flex-shrink': '0',
                 'transform': 'none',
                 'display': 'grid',
                 'grid-template-columns': '36px minmax(0, 1fr)',
                 'column-gap': '4px',
-                'height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
-                'min-height': 'calc(56px + env(safe-area-inset-bottom, 0px))',
-                'padding': '7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px'
+                'height': '56px',
+                'min-height': '56px',
+                'padding': '7.667px 6px 8.333px 8px'
             },
             nightProperties: {
                 'background': 'rgba(20, 20, 20, 0.96)',

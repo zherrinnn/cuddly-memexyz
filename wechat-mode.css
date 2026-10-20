@@ -75,7 +75,7 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-layout {
     display: block !important;
     width: 100% !important;
     max-width: 920px !important;
-    height: 100dvh !important;
+    height: 100% !important;
     margin: 0 auto !important;
     background: var(--wc-bg) !important;
     border-inline: 0.5px solid var(--wc-line) !important;
@@ -84,7 +84,7 @@ html[data-wechat-mode="true"] body.wechat-mode #dc-layout {
 html[data-wechat-mode="true"] body.wechat-mode #dc-main {
     position: relative !important;
     width: 100% !important;
-    height: 100dvh !important;
+    height: 100% !important;
     min-width: 0 !important;
     background: var(--wc-bg) !important;
     overflow: hidden !important;
@@ -303,9 +303,10 @@ html[data-wechat-mode="true"] body.wechat-mode .main-chat-area,
 html[data-wechat-mode="true"] body.wechat-mode:not(.compact-header-mode) .main-chat-area,
 html[data-wechat-mode="true"] body.wechat-mode.compact-header-mode .main-chat-area {
     box-sizing: border-box !important;
-    height: 100dvh !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
-    padding: calc(58px + env(safe-area-inset-top, 0px)) 0 calc(66px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: calc(58px + env(safe-area-inset-top, 0px)) 0 0 !important;
     background-color: var(--wc-bg) !important;
     background-image: var(--chat-bg-image, none) !important;
     background-size: cover !important;
@@ -620,11 +621,12 @@ html[data-wechat-mode="true"] body.wechat-mode #partner-name.wechat-partner-typi
 /* WeChat composer. */
 html[data-wechat-mode="true"] body.wechat-mode .input-area-wrapper,
 html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode .input-area-wrapper {
-    position: absolute !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
     z-index: 55 !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: 0 !important;
+    bottom: auto !important;
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
@@ -635,8 +637,8 @@ html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode .input-area-wr
     column-gap: 8px !important;
     align-items: end !important;
     box-sizing: border-box !important;
-    min-height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
-    padding: 7px 8px calc(7px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 58px !important;
+    padding: 7px 8px !important;
     background: rgba(246, 246, 246, 0.96) !important;
     border-top: 0.5px solid var(--wc-line) !important;
     box-shadow: none !important;
@@ -1247,16 +1249,16 @@ html[data-wechat-mode="true"] body.wechat-mode .main-chat-area,
 html[data-wechat-mode="true"] body.wechat-mode:not(.compact-header-mode) .main-chat-area,
 html[data-wechat-mode="true"] body.wechat-mode.compact-header-mode .main-chat-area {
     padding-top: calc(38px + env(safe-area-inset-top, 0px)) !important;
-    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: 0 !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .input-area-wrapper,
 html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode .input-area-wrapper {
     grid-template-columns: 36px minmax(0, 1fr) !important;
     column-gap: 4px !important;
-    height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
-    min-height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
-    padding: 7.667px 6px calc(8.333px + env(safe-area-inset-bottom, 0px)) 8px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 7.667px 6px 8.333px 8px !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .input-area,
