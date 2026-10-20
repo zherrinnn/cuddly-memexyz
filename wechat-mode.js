@@ -197,9 +197,9 @@
                 'display': 'grid',
                 'grid-template-columns': '36px minmax(0, 1fr)',
                 'column-gap': '4px',
-                'height': '56px',
-                'min-height': '56px',
-                'padding': '7.667px 6px 8.333px 8px'
+                'height': 'calc(56px + var(--wechat-composer-safe-bottom))',
+                'min-height': 'calc(56px + var(--wechat-composer-safe-bottom))',
+                'padding': '7.667px 6px calc(8.333px + var(--wechat-composer-safe-bottom)) 8px'
             },
             nightProperties: {
                 'background': 'rgba(20, 20, 20, 0.96)',

@@ -32,6 +32,13 @@ html[data-wechat-mode="true"][data-wechat-theme="night"] {
 
 html[data-wechat-mode="true"] body.wechat-mode {
     /* Keep the site's original theme outside the main conversation. */
+    --wechat-composer-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Keep the home-indicator inset while idle, but remove it as soon as the
+   native keyboard owns the bottom edge. */
+html[data-wechat-mode="true"] body.wechat-mode:has(#message-input:focus) {
+    --wechat-composer-safe-bottom: 0px;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #dc-main {
@@ -1256,9 +1263,9 @@ html[data-wechat-mode="true"] body.wechat-mode .input-area-wrapper,
 html[data-wechat-mode="true"] body.wechat-mode.composer-line-mode .input-area-wrapper {
     grid-template-columns: 36px minmax(0, 1fr) !important;
     column-gap: 4px !important;
-    height: 56px !important;
-    min-height: 56px !important;
-    padding: 7.667px 6px 8.333px 8px !important;
+    height: calc(56px + var(--wechat-composer-safe-bottom)) !important;
+    min-height: calc(56px + var(--wechat-composer-safe-bottom)) !important;
+    padding: 7.667px 6px calc(8.333px + var(--wechat-composer-safe-bottom)) 8px !important;
 }
 
 html[data-wechat-mode="true"] body.wechat-mode .input-area,
