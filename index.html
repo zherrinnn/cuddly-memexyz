@@ -2258,6 +2258,10 @@
             min-height: 120px; position: relative;
             border: 1px solid var(--border-color);
         }
+        .env-letter-item.reply .env-letter-preview,
+        #env-view-text.env-inbox-reply {
+            color: #000000 !important;
+        }
         .env-letter-paper::before {
             content: '';
             position: absolute; left: 40px; top: 0; bottom: 0;
@@ -20993,7 +20997,10 @@ window.viewEnvLetter = function(section, id) {
     }
 
     const textEl = document.getElementById('env-view-text');
-    if (textEl) textEl.textContent = letter.content;
+    if (textEl) {
+        textEl.textContent = letter.content;
+        textEl.classList.toggle('env-inbox-reply', section === 'inbox');
+    }
 
     const signDateEl = document.getElementById('env-view-sign-date');
     const signNameEl = document.getElementById('env-view-sign-name');
@@ -41651,6 +41658,6 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<link rel="stylesheet" href="./wechat-mode.css?v=20261019-50">
-<script src="./wechat-mode.js?v=20261019-50"></script>
+<link rel="stylesheet" href="./wechat-mode.css?v=20261020-51">
+<script src="./wechat-mode.js?v=20261020-51"></script>
 </html>

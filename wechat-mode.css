@@ -461,7 +461,7 @@ html[data-wechat-mode="true"] body.wechat-mode .message-received:not(.message-im
     content: "" !important;
     display: block !important;
     position: absolute !important;
-    top: 12px !important;
+    top: 11px !important;
     width: 17px !important;
     height: 17px !important;
     pointer-events: none !important;
