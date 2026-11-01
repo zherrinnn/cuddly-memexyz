@@ -11656,6 +11656,11 @@
         }
 
         /* ---- 头像弹窗 ---- */
+        /* 头像上传从“聊天设置”中打开时必须盖在设置弹窗之上，
+           不要求用户先关闭设置。 */
+        #avatar-modal {
+            z-index: 100020 !important;
+        }
         #dc-avatar-popup {
             position: fixed;
             z-index: 10000;
@@ -15730,7 +15735,8 @@ async function importAllData(file) {
                 label: '回复 / 拍一拍 / 氛围',
                 indexedDBNeedles: ['customReplies', 'customPokes', 'customStatuses', 'customMottos', 'customIntros', 'customEmojis', 'customReplyGroups', 'customPokeGroups', 'customStatusGroups'],
                 localStorageNeedles: ['disabledReplyItems', 'pokeSym_my', 'pokeSym_partner', 'pokeSym_my_custom', 'pokeSym_partner_custom',
-                                      'pokeSym_my_cust_left', 'pokeSym_my_cust_right', 'pokeSym_ptr_cust_left', 'pokeSym_ptr_cust_right']
+                                      'pokeSym_my_cust_left', 'pokeSym_my_cust_right', 'pokeSym_ptr_cust_left', 'pokeSym_ptr_cust_right',
+                                      'wechat-free-sentence-library-v1', 'wechat-free-sentence-disabled-groups-v1', 'wechat-free-sentence-deleted-groups-v1']
             },
             {
                 id: 'stickers',
@@ -16016,7 +16022,8 @@ async function importAllData(file) {
         if (!flags.inclSet) p.push('chatSettings', 'partnerPersonas', 'showPartnerNameInChat');
         if (!flags.inclCustom) p.push('customReplies', 'customPokes', 'customStatuses', 'customMottos', 'customIntros', 'customEmojis',
                                       'customReplyGroups', 'customPokeGroups', 'customStatusGroups',
-                                      'pokeSym_my_cust_left', 'pokeSym_my_cust_right', 'pokeSym_ptr_cust_left', 'pokeSym_ptr_cust_right');
+                                      'pokeSym_my_cust_left', 'pokeSym_my_cust_right', 'pokeSym_ptr_cust_left', 'pokeSym_ptr_cust_right',
+                                      'wechat-free-sentence-library-v1', 'wechat-free-sentence-disabled-groups-v1', 'wechat-free-sentence-deleted-groups-v1');
         if (!flags.inclAnn) p.push('anniversaries');
         if (!flags.inclThemes) p.push('customThemes', 'themeSchemes');
         if (!flags.inclDg) p.push('dg_custom_data', 'dg_status_pool', 'weekly_fortune', 'daily_fortune', 'customWeather_', 'dg_overlay_bg_tint');
@@ -18614,6 +18621,35 @@ if (partnerPersonas && partnerPersonas.length > 0 && Math.random() < 0.3) {
             const replyCountMin = Math.max(1, Math.min(5, Number(settings.replyCountMin) || 1));
             const replyCountMax = Math.max(replyCountMin, Math.min(5, Number(settings.replyCountMax) || 3));
             const replyCount = replyCountMin + Math.floor(Math.random() * (replyCountMax - replyCountMin + 1));
+            // 梦角自由造句：命中时从内置语料截词、换词或改写语气后回复。
+            const freeSentence = typeof window.pickFreeSentence === 'function'
+                ? window.pickFreeSentence()
+                : null;
+            if (freeSentence) {
+                showTypingIndicator();
+                const freeSentenceDelay = delayAlreadyWaited === true ? 0 :
+                    settings.replyDelayMin + Math.random() * (settings.replyDelayMax - settings.replyDelayMin);
+                setTimeout(() => {
+                    addMessage({
+                        id: Date.now(),
+                        sender: settings.partnerName || '对方',
+                        text: freeSentence,
+                        timestamp: new Date(),
+                        status: 'received',
+                        favorited: false,
+                        note: null,
+                        type: 'normal'
+                    });
+                    if (typeof window._sendPartnerNotification === 'function') {
+                        window._sendPartnerNotification(settings.partnerName || '对方', freeSentence);
+                    }
+                    playSound('message');
+                    finishReplyCycle();
+                    const freeSentenceTyping = document.getElementById('typing-indicator-wrapper');
+                    if (freeSentenceTyping) freeSentenceTyping.style.display = 'none';
+                }, freeSentenceDelay);
+                return;
+            }
             if (!customReplies || customReplies.length === 0) {
                 showNotification('回复库为空，请先到「自定义回复」中添加内容', 'info', 3500);
                 finishReplyCycle();
@@ -24950,9 +24986,9 @@ if (exportAllBtn) {
                             <span>每日公告 / 心情数据</span>
                         </label>
                         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border-color);border-radius:12px;background:var(--primary-bg);font-size:13px;color:var(--text-primary);">
-                            <input type="checkbox" id="_bk_stickers" style="accent-color:var(--accent-color);width:15px;height:15px;">
+                            <input type="checkbox" id="_bk_stickers" checked style="accent-color:var(--accent-color);width:15px;height:15px;">
                             <i class="fas fa-sticky-note" style="color:var(--accent-color);width:16px;text-align:center;"></i>
-                            <span>表情库 <span style="font-size:11px;color:var(--text-secondary);">(默认关，勾选后去重打包)</span></span>
+                            <span>表情库 <span style="font-size:11px;color:var(--text-secondary);">(全量备份默认包含)</span></span>
                         </label>
                     </div>
                     <div style="display:flex;gap:10px;">
@@ -35167,8 +35203,6 @@ window.addEventListener('load', function() {
 
 <style id="feature-trim-and-suggestion-style">
     /* Retired features are hidden before first paint; their legacy nodes are removed after startup. */
-    #group-chat-btn,
-    #group-chat-modal,
     #music-player-toggle,
     #player,
     #playlist-modal,
@@ -35387,7 +35421,6 @@ window.addEventListener('load', function() {
         /* Let the legacy startup finish, then permanently remove retired feature surfaces. */
         window.setTimeout(function () {
             [
-                'group-chat-btn', 'group-chat-modal',
                 'music-player-toggle', 'player', 'playlist-modal', 'add-song-modal',
                 'stats-function', 'stats-modal'
             ].forEach(function (id) {
@@ -35396,7 +35429,6 @@ window.addEventListener('load', function() {
             });
             if (typeof settings !== 'undefined') {
                 settings.musicPlayerEnabled = false;
-                settings.groupChatEnabled = false;
                 if (typeof throttledSaveData === 'function') throttledSaveData();
             }
         }, 0);
@@ -41658,6 +41690,8 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<link rel="stylesheet" href="./wechat-mode.css?v=20261020-53">
-<script src="./wechat-mode.js?v=20261020-53"></script>
+<link rel="stylesheet" href="./wechat-mode.css?v=20261101-60">
+<script src="./dictionary-spell-data.js?v=20261101-1"></script>
+<script src="./wechat-mode.js?v=20261029-56"></script>
+<script src="./dictionary-spell.js?v=20261101-6"></script>
 </html>

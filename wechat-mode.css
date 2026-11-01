@@ -621,7 +621,9 @@ html[data-wechat-mode="true"] body.wechat-mode .typing-dot {
 }
 
 html[data-wechat-mode="true"] body.wechat-mode #partner-name.wechat-partner-typing {
-    font-size: 16px !important;
+    /* Keep the title scale stable while the status switches to “typing”.
+       Matches the supplied WeChat reference: 17px / semibold. */
+    font-size: 17px !important;
     font-weight: 600 !important;
 }
 
@@ -1522,6 +1524,9 @@ html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode #wecha
 
 html[data-wechat-mode="true"][data-wechat-theme="night"] body.wechat-mode #chat-plus-btn {
     background-image: url("./assets/night-plus.svg") !important;
+    /* The night glyph has 2px less transparent padding on its inner edge.
+       Offset it outward so its visible gap to the emoji matches daylight. */
+    transform: translateX(-3.5px) !important;
     filter: none !important;
 }
 

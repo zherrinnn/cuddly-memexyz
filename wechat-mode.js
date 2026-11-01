@@ -660,8 +660,73 @@
         updateSettingsCard();
     }
 
+    function removeGroupChatFeature() {
+        ['group-chat-btn', 'group-chat-modal', 'group-mode-settings-card'].forEach(function (id) {
+            var element = document.getElementById(id);
+            if (element) element.remove();
+        });
+        try {
+            if (window.groupChatSettings) {
+                window.groupChatSettings.enabled = false;
+                window.groupChatSettings.members = [];
+            }
+            localStorage.removeItem('groupChatSettings');
+        } catch (error) {}
+    }
+
+    function openWechatSettings() {
+        var modal = document.getElementById('settings-modal');
+        if (modal) {
+            if (typeof window.showModal === 'function') {
+                window.showModal(modal);
+            } else {
+                modal.style.display = 'flex';
+                window.requestAnimationFrame(function () {
+                    var content = modal.querySelector('.modal-content');
+                    if (content) {
+                        content.style.opacity = '1';
+                        content.style.transform = 'translateY(0) scale(1)';
+                    }
+                });
+            }
+            return;
+        }
+        var original = document.getElementById('settings-btn');
+        if (original) original.click();
+    }
+
+    window.openWechatSettings = function (event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        openWechatSettings();
+        return false;
+    };
+
+    function bindHeaderMoreButton(button) {
+        if (!button) return;
+        button.setAttribute('onclick', "event.preventDefault();event.stopPropagation();var m=document.getElementById('settings-modal');if(m){m.style.setProperty('display','flex','important');var c=m.querySelector('.modal-content');if(c){c.style.opacity='1';c.style.transform='translateY(0) scale(1)';}}return false;");
+        button.onclick = function (event) {
+            return window.openWechatSettings(event);
+        };
+    }
+
+    function bindWechatHeaderEntries() {
+        bindHeaderMoreButton(document.getElementById('wechat-more-btn'));
+        if (window.__wechatHeaderEntryObserver || !document.body) return;
+        window.__wechatHeaderEntryObserver = new MutationObserver(function () {
+            bindHeaderMoreButton(document.getElementById('wechat-more-btn'));
+        });
+        window.__wechatHeaderEntryObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
     function createHeaderMoreButton() {
-        if (document.getElementById('wechat-more-btn')) return;
+        var existing = document.getElementById('wechat-more-btn');
+        if (existing) {
+            bindHeaderMoreButton(existing);
+            return;
+        }
         var actions = document.querySelector('.header-actions');
         if (!actions) return;
 
@@ -670,26 +735,8 @@
         button.type = 'button';
         button.title = '更多';
         button.setAttribute('aria-label', '打开设置');
-        button.addEventListener('click', function () {
-            var modal = document.getElementById('settings-modal');
-            if (modal) {
-                if (typeof window.showModal === 'function') {
-                    window.showModal(modal);
-                } else {
-                    modal.style.display = 'flex';
-                    window.requestAnimationFrame(function () {
-                        var content = modal.querySelector('.modal-content');
-                        if (content) {
-                            content.style.opacity = '1';
-                            content.style.transform = 'translateY(0) scale(1)';
-                        }
-                    });
-                }
-                return;
-            }
-            var original = document.getElementById('settings-btn');
-            if (original) original.click();
-        });
+        button.addEventListener('click', openWechatSettings);
+        bindHeaderMoreButton(button);
         actions.appendChild(button);
     }
 
@@ -727,8 +774,10 @@
     function initialize() {
         var meta = document.querySelector('meta[name="theme-color"]');
         originalThemeColor = meta ? (meta.getAttribute('content') || '#000000') : '#000000';
+        removeGroupChatFeature();
         createSettingsCard();
         createHeaderMoreButton();
+        bindWechatHeaderEntries();
         createWechatContinueButton();
         bindTypingHeader();
         applyMode(readStoredMode(), { persist: false, announce: false });
@@ -756,6 +805,7 @@
         [400, 1200, 2600].forEach(function (delay) {
             window.setTimeout(function () {
                 createSettingsCard();
+                removeGroupChatFeature();
                 createHeaderMoreButton();
                 createWechatContinueButton();
                 syncWechatPresentationSettings(enabled);
