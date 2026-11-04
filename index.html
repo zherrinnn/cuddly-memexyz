@@ -15736,7 +15736,7 @@ async function importAllData(file) {
                 indexedDBNeedles: ['customReplies', 'customPokes', 'customStatuses', 'customMottos', 'customIntros', 'customEmojis', 'customReplyGroups', 'customPokeGroups', 'customStatusGroups'],
                 localStorageNeedles: ['disabledReplyItems', 'pokeSym_my', 'pokeSym_partner', 'pokeSym_my_custom', 'pokeSym_partner_custom',
                                       'pokeSym_my_cust_left', 'pokeSym_my_cust_right', 'pokeSym_ptr_cust_left', 'pokeSym_ptr_cust_right',
-                                      'wechat-free-sentence-library-v1', 'wechat-free-sentence-disabled-groups-v1', 'wechat-free-sentence-deleted-groups-v1']
+                                      'wechat-free-sentence-library-v1', 'wechat-free-sentence-disabled-groups-v1', 'wechat-free-sentence-deleted-groups-v1', 'wechat-free-sentence-entry-overrides-v1']
             },
             {
                 id: 'stickers',
@@ -16023,7 +16023,7 @@ async function importAllData(file) {
         if (!flags.inclCustom) p.push('customReplies', 'customPokes', 'customStatuses', 'customMottos', 'customIntros', 'customEmojis',
                                       'customReplyGroups', 'customPokeGroups', 'customStatusGroups',
                                       'pokeSym_my_cust_left', 'pokeSym_my_cust_right', 'pokeSym_ptr_cust_left', 'pokeSym_ptr_cust_right',
-                                      'wechat-free-sentence-library-v1', 'wechat-free-sentence-disabled-groups-v1', 'wechat-free-sentence-deleted-groups-v1');
+                                      'wechat-free-sentence-library-v1', 'wechat-free-sentence-disabled-groups-v1', 'wechat-free-sentence-deleted-groups-v1', 'wechat-free-sentence-entry-overrides-v1');
         if (!flags.inclAnn) p.push('anniversaries');
         if (!flags.inclThemes) p.push('customThemes', 'themeSchemes');
         if (!flags.inclDg) p.push('dg_custom_data', 'dg_status_pool', 'weekly_fortune', 'daily_fortune', 'customWeather_', 'dg_overlay_bg_tint');
@@ -41693,5 +41693,5 @@ window.addEventListener('load', function() {
 <link rel="stylesheet" href="./wechat-mode.css?v=20261101-61">
 <script src="./dictionary-spell-data.js?v=20261101-4"></script>
 <script src="./wechat-mode.js?v=20261029-56"></script>
-<script src="./dictionary-spell.js?v=20261101-7"></script>
+<script src="./dictionary-spell.js?v=20261101-8"></script>
 </html>

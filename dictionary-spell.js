@@ -11,6 +11,7 @@
     var LIBRARY_KEY = 'wechat-free-sentence-library-v1';
     var GROUP_VISIBILITY_KEY = 'wechat-free-sentence-disabled-groups-v1';
     var DELETED_GROUPS_KEY = 'wechat-free-sentence-deleted-groups-v1';
+    var ENTRY_OVERRIDES_KEY = 'wechat-free-sentence-entry-overrides-v1';
     var lastSource = '';
     var segmentationDictionary;
     var maxWordLength = 4;
@@ -44,6 +45,34 @@
     function saveLibraryCustomCards(cards) {
         localStorage.setItem(LIBRARY_KEY, JSON.stringify(cards));
     }
+    function entryOverrides() {
+        try {
+            var value = JSON.parse(localStorage.getItem(ENTRY_OVERRIDES_KEY) || '{}');
+            return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        } catch (error) { return {}; }
+    }
+    function entryKey(group, index) { return groupKey(group) + '::' + index; }
+    function saveEntryOverride(group, index, text) {
+        var value = entryOverrides();
+        value[entryKey(group, index)] = text;
+        localStorage.setItem(ENTRY_OVERRIDES_KEY, JSON.stringify(value));
+        segmentationDictionary = null;
+    }
+    function removeCustomCard(index) {
+        var cards = libraryCustomCards();
+        if (index < 0 || index >= cards.length) return;
+        cards.splice(index, 1);
+        saveLibraryCustomCards(cards);
+        var prefix = '自建造句语料::', oldOverrides = entryOverrides(), nextOverrides = {};
+        Object.keys(oldOverrides).forEach(function (key) {
+            if (key.indexOf(prefix) !== 0) { nextOverrides[key] = oldOverrides[key]; return; }
+            var oldIndex = Number(key.slice(prefix.length));
+            if (oldIndex < index) nextOverrides[key] = oldOverrides[key];
+            else if (oldIndex > index) nextOverrides[prefix + (oldIndex - 1)] = oldOverrides[key];
+        });
+        localStorage.setItem(ENTRY_OVERRIDES_KEY, JSON.stringify(nextOverrides));
+        segmentationDictionary = null;
+    }
     function disabledGroups() {
         try {
             var value = JSON.parse(localStorage.getItem(GROUP_VISIBILITY_KEY) || '{}');
@@ -71,6 +100,11 @@
         var value = deletedGroups(), key = groupKey(group);
         if (key === '自建造句语料') {
             saveLibraryCustomCards([]);
+            var overrides = entryOverrides();
+            Object.keys(overrides).forEach(function (overrideKey) {
+                if (overrideKey.indexOf('自建造句语料::') === 0) delete overrides[overrideKey];
+            });
+            localStorage.setItem(ENTRY_OVERRIDES_KEY, JSON.stringify(overrides));
             segmentationDictionary = null;
             return;
         }
@@ -87,6 +121,13 @@
         var custom = libraryCustomCards();
         if (custom.length) groups.unshift(['自建造句语料', custom]);
         groups = current.length ? [['当前回复字卡', current]].concat(groups) : groups;
+        var overrides = entryOverrides();
+        groups = groups.map(function (group) {
+            return [group[0], (group[1] || []).map(function (card, index) {
+                var key = entryKey(group, index);
+                return Object.prototype.hasOwnProperty.call(overrides, key) ? overrides[key] : card;
+            })];
+        });
         var removed = deletedGroups();
         return groups.filter(function (group) {
             var key = groupKey(group);
@@ -207,12 +248,13 @@
         if (!host) return;
         var needle = String(query || '').trim(), html = [];
         bankGroups().forEach(function (group, index) {
-            var cards = (group[1] || []).filter(function (card) { return !needle || card.indexOf(needle) >= 0; });
+            var cards = (group[1] || []).map(function (card, cardIndex) { return { text: card, index: cardIndex }; }).filter(function (card) { return !needle || card.text.indexOf(needle) >= 0; });
             var editable = group[0] === '自建造句语料';
             var disabled = isGroupDisabled(group, index);
             if (!cards.length && needle) return;
             html.push('<section class="free-sentence-group' + (disabled ? ' is-disabled' : '') + '"><h4><span>' + escapeHTML(group[0]) + '<small>' + cards.length + ' 条</small></span><span class="free-sentence-group-actions"><button type="button" class="free-sentence-group-toggle" data-group-index="' + index + '">' + (disabled ? '已屏蔽' : '启用中') + '</button><button type="button" class="free-sentence-group-delete" data-group-index="' + index + '">删除本组</button></span></h4><div>' + cards.map(function (card) {
-                return '<span>' + escapeHTML(card) + (editable ? '<button type="button" class="free-sentence-delete" data-card="' + encodeURIComponent(card) + '" aria-label="删除语料">×</button>' : '') + '</span>';
+                var data = ' data-group-name="' + encodeURIComponent(group[0]) + '" data-card-index="' + card.index + '"';
+                return '<span>' + escapeHTML(card.text) + '<button type="button" class="free-sentence-edit"' + data + ' aria-label="编辑语料">编辑</button>' + (editable ? '<button type="button" class="free-sentence-delete"' + data + ' aria-label="删除语料">×</button>' : '') + '</span>';
             }).join('') + '</div></section>');
         });
         host.innerHTML = html.join('') || '<p class="free-sentence-empty">没有匹配的词条</p>';
@@ -222,7 +264,7 @@
         var style = document.createElement('style');
         style.id = 'free-sentence-style';
         style.textContent = '#free-sentence-modal .modal-content,#free-sentence-library .modal-content{max-width:520px}.free-sentence-panel{display:grid;gap:14px}.free-sentence-panel h3{margin:0;font-size:18px}.free-sentence-intro{margin:0;color:var(--text-secondary,#777);font-size:13px;line-height:1.65}.free-sentence-control{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--border-color,rgba(0,0,0,.08))}.free-sentence-control label:first-child{font-size:14px}.free-sentence-control input[type=range]{width:160px;accent-color:var(--accent-color,#07c160)}.free-sentence-number{min-width:38px;text-align:right;color:var(--text-secondary,#777);font-variant-numeric:tabular-nums}.free-sentence-segmented{display:flex;border:1px solid var(--border-color,rgba(0,0,0,.12));border-radius:8px;overflow:hidden}.free-sentence-segmented button{border:0;background:transparent;color:var(--text-secondary,#666);padding:7px 10px;cursor:pointer}.free-sentence-segmented button.active{background:var(--accent-color,#07c160);color:#fff}.free-sentence-library-btn{width:100%;border:1px solid var(--border-color,rgba(0,0,0,.12));background:var(--secondary-bg,#f5f5f5);color:var(--text-primary,#222);border-radius:9px;padding:10px;cursor:pointer}.free-sentence-library-btn small{color:var(--text-secondary,#777);margin-left:6px}.free-sentence-search{width:100%;padding:10px 12px;border:1px solid var(--border-color,rgba(0,0,0,.12));border-radius:8px;background:var(--input-bg,#fff);color:var(--text-primary,#222)}#free-sentence-list{max-height:52vh;overflow:auto;margin-top:12px;padding-right:4px}.free-sentence-group{padding:10px 0;border-bottom:1px solid var(--border-color,rgba(0,0,0,.08))}.free-sentence-group h4{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;font-size:13px}.free-sentence-group h4>span{display:flex;gap:6px;align-items:baseline}.free-sentence-group h4 small{font-weight:400;color:var(--text-secondary,#777)}.free-sentence-group-actions{flex:0 0 auto;align-items:center!important}.free-sentence-group-toggle,.free-sentence-group-delete{border:1px solid var(--border-color,rgba(0,0,0,.12));border-radius:999px;background:transparent;color:var(--text-secondary,#666);padding:3px 8px;font-size:11px;cursor:pointer}.free-sentence-group-delete{color:#d95151}.free-sentence-group:not(.is-disabled) .free-sentence-group-toggle{color:var(--accent-color,#07c160);border-color:var(--accent-color,#07c160)}.free-sentence-group.is-disabled>div{opacity:.38;filter:grayscale(1)}.free-sentence-group>div{display:flex;flex-wrap:wrap;gap:6px}.free-sentence-group span{padding:4px 7px;border-radius:6px;background:var(--secondary-bg,rgba(0,0,0,.05));font-size:12px;color:var(--text-primary,#333)}.free-sentence-empty{color:var(--text-secondary,#777);text-align:center;padding:26px 0}';
-        style.textContent += '.free-sentence-group h4>span{padding:0;background:transparent;border-radius:0;font-size:inherit;color:inherit}.free-sentence-group h4 .free-sentence-group-actions{display:flex;gap:6px;align-items:center}';
+        style.textContent += '.free-sentence-group h4>span{padding:0;background:transparent;border-radius:0;font-size:inherit;color:inherit}.free-sentence-group h4 .free-sentence-group-actions{display:flex;gap:6px;align-items:center}.free-sentence-group>div>span{display:inline-flex;align-items:center;gap:4px}.free-sentence-edit,.free-sentence-delete{border:0;background:transparent;color:var(--text-secondary,#777);font-size:11px;line-height:1;padding:1px 0;cursor:pointer}.free-sentence-edit{color:var(--accent-color,#07c160)}.free-sentence-delete{color:#d95151;font-size:15px;margin-left:1px}';
         document.head.appendChild(style);
     }
     function syncModal() {
@@ -283,11 +325,29 @@
                 syncModal();
                 return;
             }
+            var editButton = event.target.closest('.free-sentence-edit');
+            if (editButton) {
+                var editGroupName = decodeURIComponent(editButton.getAttribute('data-group-name') || '');
+                var editCardIndex = Number(editButton.getAttribute('data-card-index'));
+                var editGroup = bankGroups().filter(function (item) { return item[0] === editGroupName; })[0];
+                var previous = editGroup && editGroup[1] ? editGroup[1][editCardIndex] : '';
+                var next = window.prompt('编辑语料', previous || '');
+                if (next === null) return;
+                next = String(next).trim();
+                if (!next) { window.alert('语料不能为空'); return; }
+                if (editGroup) {
+                    saveEntryOverride(editGroup, editCardIndex, next);
+                    renderLibrary(library.querySelector('.free-sentence-search').value);
+                    syncModal();
+                }
+                return;
+            }
             var button = event.target.closest('.free-sentence-delete');
             if (!button) return;
-            var card = decodeURIComponent(button.getAttribute('data-card') || '');
-            saveLibraryCustomCards(libraryCustomCards().filter(function (item) { return item !== card; }));
+            var cardIndex = Number(button.getAttribute('data-card-index'));
+            removeCustomCard(cardIndex);
             renderLibrary(library.querySelector('.free-sentence-search').value);
+            syncModal();
         });
     }
     function openSettings() { mountModals(); syncModal(); document.getElementById('free-sentence-modal').style.display = 'flex'; }
