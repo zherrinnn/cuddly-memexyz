@@ -12,6 +12,7 @@
     var GROUP_VISIBILITY_KEY = 'wechat-free-sentence-disabled-groups-v1';
     var DELETED_GROUPS_KEY = 'wechat-free-sentence-deleted-groups-v1';
     var ENTRY_OVERRIDES_KEY = 'wechat-free-sentence-entry-overrides-v1';
+    var ENTRY_DELETIONS_KEY = 'wechat-free-sentence-entry-deletions-v1';
     var lastSource = '';
     var segmentationDictionary;
     var maxWordLength = 4;
@@ -56,6 +57,19 @@
         var value = entryOverrides();
         value[entryKey(group, index)] = text;
         localStorage.setItem(ENTRY_OVERRIDES_KEY, JSON.stringify(value));
+        segmentationDictionary = null;
+    }
+    function deletedEntries() {
+        try {
+            var value = JSON.parse(localStorage.getItem(ENTRY_DELETIONS_KEY) || '{}');
+            return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        } catch (error) { return {}; }
+    }
+    function isEntryDeleted(group, index) { return !!deletedEntries()[entryKey(group, index)]; }
+    function deleteEntry(group, index) {
+        var value = deletedEntries();
+        value[entryKey(group, index)] = true;
+        localStorage.setItem(ENTRY_DELETIONS_KEY, JSON.stringify(value));
         segmentationDictionary = null;
     }
     function removeCustomCard(index) {
@@ -137,7 +151,9 @@
     function allCards() {
         return bankGroups().reduce(function (all, group, index) {
             if (isGroupDisabled(group, index)) return all;
-            return all.concat(Array.isArray(group && group[1]) ? group[1] : []);
+            return all.concat((Array.isArray(group && group[1]) ? group[1] : []).filter(function (card, cardIndex) {
+                return !isEntryDeleted(group, cardIndex);
+            }));
         }, []).filter(function (item) {
             return typeof item === 'string' && item.length >= 4 && item.length <= 30 &&
                 (item.match(/[\u4e00-\u9fff]/g) || []).length >= 4 && !/[\uD800-\uDBFF]/.test(item);
@@ -149,7 +165,8 @@
         bankGroups().forEach(function (group, index) {
             if (isGroupDisabled(group, index)) return;
             if (!String(group && group[0]).startsWith('词库')) return;
-            (group[1] || []).forEach(function (word) {
+            (group[1] || []).forEach(function (word, wordIndex) {
+                if (isEntryDeleted(group, wordIndex)) return;
                 if (typeof word === 'string' && word.length >= 2) {
                     segmentationDictionary.add(word);
                     maxWordLength = Math.min(8, Math.max(maxWordLength, word.length));
@@ -248,13 +265,12 @@
         if (!host) return;
         var needle = String(query || '').trim(), html = [];
         bankGroups().forEach(function (group, index) {
-            var cards = (group[1] || []).map(function (card, cardIndex) { return { text: card, index: cardIndex }; }).filter(function (card) { return !needle || card.text.indexOf(needle) >= 0; });
-            var editable = group[0] === '自建造句语料';
+            var cards = (group[1] || []).map(function (card, cardIndex) { return { text: card, index: cardIndex }; }).filter(function (card) { return !isEntryDeleted(group, card.index) && (!needle || card.text.indexOf(needle) >= 0); });
             var disabled = isGroupDisabled(group, index);
             if (!cards.length && needle) return;
             html.push('<section class="free-sentence-group' + (disabled ? ' is-disabled' : '') + '"><h4><span>' + escapeHTML(group[0]) + '<small>' + cards.length + ' 条</small></span><span class="free-sentence-group-actions"><button type="button" class="free-sentence-group-toggle" data-group-index="' + index + '">' + (disabled ? '已屏蔽' : '启用中') + '</button><button type="button" class="free-sentence-group-delete" data-group-index="' + index + '">删除本组</button></span></h4><div>' + cards.map(function (card) {
                 var data = ' data-group-name="' + encodeURIComponent(group[0]) + '" data-card-index="' + card.index + '"';
-                return '<span>' + escapeHTML(card.text) + '<button type="button" class="free-sentence-edit"' + data + ' aria-label="编辑语料">编辑</button>' + (editable ? '<button type="button" class="free-sentence-delete"' + data + ' aria-label="删除语料">×</button>' : '') + '</span>';
+                return '<span>' + escapeHTML(card.text) + '<button type="button" class="free-sentence-edit"' + data + ' aria-label="编辑语料">编辑</button><button type="button" class="free-sentence-delete"' + data + ' aria-label="删除语料">×</button></span>';
             }).join('') + '</div></section>');
         });
         host.innerHTML = html.join('') || '<p class="free-sentence-empty">没有匹配的词条</p>';
@@ -344,8 +360,10 @@
             }
             var button = event.target.closest('.free-sentence-delete');
             if (!button) return;
+            var deleteGroupName = decodeURIComponent(button.getAttribute('data-group-name') || '');
             var cardIndex = Number(button.getAttribute('data-card-index'));
-            removeCustomCard(cardIndex);
+            var deleteEntryGroup = bankGroups().filter(function (item) { return item[0] === deleteGroupName; })[0];
+            if (deleteEntryGroup && window.confirm('确认删除这条语料吗？删除后将不再参与自由造句。')) deleteEntry(deleteEntryGroup, cardIndex);
             renderLibrary(library.querySelector('.free-sentence-search').value);
             syncModal();
         });
